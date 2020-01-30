@@ -17,7 +17,7 @@ const authenticator = require("../middleware/authenticator");
 router.post(
     "/registerUser",
     [
-        check("username", "Please Enter a Valid Username")
+        check("name", "Please Enter a Valid Name")
         .not()
         .isEmpty(),
         check("email", "Please enter a valid email").isEmail(),
@@ -34,7 +34,7 @@ router.post(
         }
 
         const {
-            username,
+            name,
             email,
             password
         } = req.body;
@@ -49,7 +49,7 @@ router.post(
             }
 
             user = new User({
-                username,
+                name,
                 email,
                 password
             });
@@ -155,7 +155,7 @@ router.post(
  * @method - GET
  * @description - Get LoggedIn User. authenticator is a middleware will be used to 
  * verify the token, retrieve user based on the token payload.
- * @param - /user/me
+ * @param - /auth/me
  */
 router.get("/me", authenticator, async (req, res) => {
     try {
@@ -166,6 +166,22 @@ router.get("/me", authenticator, async (req, res) => {
       res.send({ message: "Error in Fetching user" });
     }
   });
+
+    /**
+ * @method - GET
+ * @description - Get Users. authenticator is a middleware will be used to 
+ * verify the token, retrieve user based on the token payload.
+ * @param - /auth/getUsers
+ */
+router.get("/getUsers", authenticator, async (req, res) => {
+  try {
+    // request.user is getting fetched from Middleware after token authentication
+    const user = await User.find({});
+    res.json(user);
+  } catch (e) {
+    res.send({ message: "Error in Fetching users" });
+  }
+});
 
 
 

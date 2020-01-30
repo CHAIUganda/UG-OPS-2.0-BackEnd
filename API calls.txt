@@ -4,6 +4,7 @@ The Server "localhost" and Port "8080" may Vary.
 test username :paulsseb
 test pwd      :123456
 
-http://localhost:8080/auth/registerUser     post     username, email, password values sent as raw json obj   register
-http://localhost:8080/auth/login            post     username, password values sent as raw json obj
+http://localhost:8080/auth/registerUser     post     name "Send full name or names in 1 string", email, password values sent as raw json obj   register
+http://localhost:8080/auth/login            post     email, password values sent as raw json obj
 http://localhost:8080/auth/me               get      token  sent as header   verify the token, retrieve user based on the token payload.
+http://localhost:8080/auth/getUsers         get      token  sent as header   verify the token, retrieve user based on the token payload.
