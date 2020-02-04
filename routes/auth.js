@@ -1,12 +1,10 @@
-// Filename : user.js
+// Filename : auth.js
 
 const express = require("express");
-const { check, validationResult} = require("express-validator/check");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+const { check} = require("express-validator/check");
+// Import auth controller
+var authController = require('../controller/authController');
 const router = express.Router();
-
-const User = require("../model/User");
 const authenticator = require("../middleware/authenticator");
 
 /**
@@ -17,78 +15,28 @@ const authenticator = require("../middleware/authenticator");
 router.post(
     "/registerUser",
     [
-        check("name", "Please Enter a Valid Name")
-        .not()
-        .isEmpty(),
+
+         //input validations
+        check("fName", "Please Enter a Valid First Name").not().isEmpty(),
+        check("lName", "Please Enter a Valid Last Name").not().isEmpty(),
+        check("contractStartDate", "Please Enter a Valid Contract Start Date").not().isEmpty(),
+        check("contractEndDate", "Please Enter a Valid Contract End Date").not().isEmpty(),
+        check("contractType", "Please Enter a Valid Contract Type").not().isEmpty(),
+        check("internationalStaff", "Please Specify the type of Staff you are").not().isEmpty(),
+        check("annualLeaveBF", "Please Enter Annual leave Brought forward").not().isEmpty(),
+        check("programmeManagerEmail", "Please supply User's valid Program Manager Email").isEmail(),
+        check("unPaidLeaveTaken", "Please Enter a Valid Name").not().isEmpty(),
         check("email", "Please enter a valid email").isEmail(),
         check("password", "Please enter a valid password").isLength({
             min: 6
         })
-    ],
-    async (req, res) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({
-                errors: errors.array()
-            });
-        }
-
-        const {
-            name,
-            email,
-            password
-        } = req.body;
-        try {
-            let user = await User.findOne({
-                email
-            });
-            if (user) {
-                return res.status(400).json({
-                    msg: "User Already Exists"
-                });
-            }
-
-            user = new User({
-                name,
-                email,
-                password
-            });
-
-            const salt = await bcrypt.genSalt(10);
-            user.password = await bcrypt.hash(password, salt);
-
-            await user.save();
-
-            const payload = {
-                user: {
-                    id: user.id
-                }
-            };
-
-            jwt.sign(
-                payload,
-                "randomString", {
-                    expiresIn: 10000
-                },
-                (err, token) => {
-                    if (err) throw err;
-                    res.status(200).json({
-                        token
-                    });
-                }
-            );
-        } catch (err) {
-            console.log(err.message);
-            res.status(500).send("Error in Saving");
-        }
-    }
-);
+    ], authController.registerUser);
 
 
 /**
  * @method - POST
  * @param - /login
- * @description - User authentication into the system
+ * @description - User authentication into the system. calls controller after checking inputs
  */
 router.post(
     "/login",
@@ -97,92 +45,23 @@ router.post(
       check("password", "Please enter a valid password").isLength({
         min: 6
       })
-    ],
-    async (req, res) => {
-      const errors = validationResult(req);
-  
-      if (!errors.isEmpty()) {
-        return res.status(400).json({
-          errors: errors.array()
-        });
-      }
-  
-      const { email, password } = req.body;
-      try {
-        let user = await User.findOne({
-          email
-        });
-        if (!user)
-          return res.status(400).json({
-            message: "User Does Not Exist"
-          });
-  
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch)
-          return res.status(400).json({
-            message: "Incorrect Password !"
-          });
-  
-        const payload = {
-          user: {
-            id: user.id
-          }
-        };
-  
-        jwt.sign(
-          payload,
-          "secret",
-          {
-            expiresIn: 3600  //ms
-          },
-          (err, token) => {
-            if (err) throw err;
-            res.status(200).json({
-              token
-            });
-          }
-        );
-      } catch (e) {
-        console.error(e);
-        res.status(500).json({
-          message: "Server Error"
-        });
-      }
-    }
-  );
+    ], authController.login);
 
   /**
  * @method - GET
  * @description - Get LoggedIn User. authenticator is a middleware will be used to 
- * verify the token, retrieve user based on the token payload.
+ * verify the token, retrieve user based on the token payload. calls controller after checking inputs
  * @param - /auth/me
  */
-router.get("/me", authenticator, async (req, res) => {
-    try {
-      // request.user is getting fetched from Middleware after token authentication
-      const user = await User.findById(req.user.id);
-      res.json(user);
-    } catch (e) {
-      res.send({ message: "Error in Fetching user" });
-    }
-  });
+router.get("/me", authenticator, authController.generatetoken);
 
     /**
  * @method - GET
  * @description - Get Users. authenticator is a middleware will be used to 
- * verify the token, retrieve user based on the token payload.
+ * verify the token, retrieve user based on the token payload. calls controller after checking inputs
  * @param - /auth/getUsers
  */
-router.get("/getUsers", authenticator, async (req, res) => {
-  try {
-    // request.user is getting fetched from Middleware after token authentication
-    const user = await User.find({});
-    res.json(user);
-  } catch (e) {
-    res.send({ message: "Error in Fetching users" });
-  }
-});
-
+router.get("/getUsers", authenticator, authController.getUsers);
 
 
 module.exports = router;

@@ -6,6 +6,7 @@ const InitiateMongoServer = require("./config/db");
 
 // Import routes
 const auth = require("./routes/auth"); 
+const leaveApi = require("./routes/leaveApi"); 
 
 // Initialise the app
 let app = express();
@@ -25,6 +26,7 @@ app.get('/', (req, res) => res.send('Welcome to UG-OPS 2 API'));
 
 // Use Api routes in the App
 app.use("/auth", auth);
+app.use("/leaveApi", leaveApi);
 
 
 // Launch app to listen to specified port
