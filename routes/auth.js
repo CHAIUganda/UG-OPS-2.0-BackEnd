@@ -36,16 +36,10 @@ router.post(
     check('internationalStaff', 'Please Specify the type of Staff you are')
       .not()
       .isEmpty(),
-    check('annualLeaveBF', 'Please Enter Annual leave Brought forward')
-      .not()
-      .isEmpty(),
     check(
       'programmeManagerEmail',
       'Please supply Users valid Program Manager Email'
     ).isEmail(),
-    check('unPaidLeaveTaken', 'Please Enter a Valid Name')
-      .not()
-      .isEmpty(),
     check('email', 'Please enter a valid email').isEmail(),
     check('password', 'Please enter a valid password').isLength({
       min: 6
@@ -73,7 +67,8 @@ router.post(
 /**
  * @method - GET
  * @description - Get LoggedIn User. authenticator is a middleware will be used to
- * verify the token, retrieve user based on the token payload. calls controller after checking inputs
+ * verify the token, retrieve user based on the token payload.
+ * calls controller after checking inputs
  * @param - /auth/me
  */
 router.get('/me', authenticator, authController.getLoggedInUser);
@@ -81,7 +76,8 @@ router.get('/me', authenticator, authController.getLoggedInUser);
 /**
  * @method - GET
  * @description - Get Users. authenticator is a middleware will be used to
- * verify the token, retrieve user based on the token payload. calls controller after checking inputs
+ * verify the token, retrieve user based on the token payload.
+ * calls controller after checking inputs
  * @param - /auth/getUsers
  */
 router.get('/getUsers', authenticator, authController.getUsers);

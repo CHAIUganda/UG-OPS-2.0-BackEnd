@@ -39,9 +39,9 @@ const login = async (req, res) => {
 
     jwt.sign(
       payload,
-      'secret',
+      'randomString',
       {
-        expiresIn: 3600 // ms
+        expiresIn: 3600 //  values are in seconds, strings need timeunits i.e. "2 days", "10h", "7d"
       },
       (err, token) => {
         if (err) throw err;

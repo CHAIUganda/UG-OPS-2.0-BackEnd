@@ -12,7 +12,7 @@ const InitiateMongoServer = async () => {
     });
     debug('Connected to DB !!');
   } catch (e) {
-    debug(e);
+    debug(`Mongodb server not running.. ${e}`);
     throw e;
   }
 };

@@ -69,7 +69,7 @@ const registerUser = async (req, res) => {
       payload,
       'randomString',
       {
-        expiresIn: 10000
+        expiresIn: 10000 //  values are in seconds, strings need timeunits i.e. "2 days", "10h","7d"
       },
       (err, token) => {
         if (err) throw err;
