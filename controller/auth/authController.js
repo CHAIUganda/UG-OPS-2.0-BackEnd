@@ -3,7 +3,7 @@
 const { validationResult } = require('express-validator/check');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const debug = require('debug')('authController');
+const debug = require('debug')('server');
 
 const User = require('../../model/User');
 
