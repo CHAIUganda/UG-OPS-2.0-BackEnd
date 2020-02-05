@@ -11,7 +11,16 @@ const createLeave = async (req, res) => {
     });
   }
 
-  const { startDate, endDate, type, staffEmail, status, progress } = req.body;
+  // prettier-ignore
+  const {
+    startDate,
+    endDate,
+    type,
+    staffEmail,
+    status,
+    progress
+  } = req.body;
+
   try {
     // let user = await User.findOne({
     //     email
