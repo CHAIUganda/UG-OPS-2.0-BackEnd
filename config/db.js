@@ -1,6 +1,6 @@
 // Import Mongoose
 const mongoose = require('mongoose');
-const debug = require('debug')('mongoos');
+const debug = require('debug')('server');
 
 // Replace this with your MONGOURI.
 const MONGOURI = 'mongodb://localhost/ugopps2';

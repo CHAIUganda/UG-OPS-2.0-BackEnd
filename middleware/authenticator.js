@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const debug = require('debug')('authMiddleWare');
+const debug = require('debug')('server');
 
 module.exports = (req, res, next) => {
   const token = req.header('token');
