@@ -2,7 +2,7 @@
 
 const registerUser = require('./registerUser');
 const login = require('./login');
-const generateToken = require('./generateToken');
+const getLoggedInUser = require('./getLoggedInUser');
 const getUsers = require('./getUsers');
 
 // Handle new staff
@@ -12,7 +12,7 @@ exports.registerUser = registerUser;
 exports.login = login;
 
 // Handle me "generate token"
-exports.generateToken = generateToken;
+exports.getLoggedInUser = getLoggedInUser;
 
 // Handle get all users
 exports.getUsers = getUsers;

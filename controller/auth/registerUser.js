@@ -20,14 +20,16 @@ const registerUser = async (req, res) => {
     contractEndDate,
     contractType,
     internationalStaff,
-    annualLeaveBF,
     programmeManagerEmail,
-    unPaidLeaveTaken,
     oNames,
     email,
     password
   } = req.body;
   try {
+    // Annual leave brought forward and unpaid leave taken are 0 when staff  is created.
+    const annualLeaveBF = 0;
+    const unPaidLeaveTaken = 0;
+
     let user = await User.findOne({
       email
     });
