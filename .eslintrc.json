@@ -23,6 +23,7 @@
     "no-useless-return": 1,
     "camelcase": "error",
     "no-debugger": "warn",
-    "import/no-extraneous-dependencies": "off"
+    "import/no-extraneous-dependencies": "off",
+    "consistent-return": 0
   }
 }

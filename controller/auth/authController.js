@@ -1,10 +1,11 @@
 // authController.js
-// Import Leave model
 
-const { validationResult } = require("express-validator/check");
-const User = require("../../model/User");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+const { validationResult } = require('express-validator/check');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const debug = require('debug')('authController');
+
+const User = require('../../model/User');
 
 // Handle new staff
 exports.registerUser = async (req, res) => {
@@ -35,7 +36,7 @@ exports.registerUser = async (req, res) => {
     });
     if (user) {
       return res.status(400).json({
-        message: "User Already Exists"
+        message: 'User Already Exists'
       });
     }
 
@@ -68,20 +69,20 @@ exports.registerUser = async (req, res) => {
 
     jwt.sign(
       payload,
-      "randomString",
+      'randomString',
       {
         expiresIn: 10000
       },
       (err, token) => {
         if (err) throw err;
         res.status(200).json({
-          token: token
+          token
         });
       }
     );
   } catch (err) {
-    console.log(err.message);
-    res.status(500).json({ message: "Error in Saving" });
+    debug(err.message);
+    res.status(500).json({ message: 'Error in Saving' });
   }
 };
 
@@ -97,19 +98,21 @@ exports.login = async (req, res) => {
 
   const { email, password } = req.body;
   try {
-    let user = await User.findOne({
+    const user = await User.findOne({
       email
     });
-    if (!user)
+    if (!user) {
       return res.status(400).json({
-        message: "User Does Not Exist"
+        message: 'User Does Not Exist'
       });
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
+    if (!isMatch) {
       return res.status(400).json({
-        message: "Incorrect Password !"
+        message: 'Incorrect Password !'
       });
+    }
 
     const payload = {
       user: {
@@ -119,9 +122,9 @@ exports.login = async (req, res) => {
 
     jwt.sign(
       payload,
-      "secret",
+      'secret',
       {
-        expiresIn: 3600 //ms
+        expiresIn: 3600 // ms
       },
       (err, token) => {
         if (err) throw err;
@@ -131,9 +134,9 @@ exports.login = async (req, res) => {
       }
     );
   } catch (e) {
-    console.error(e);
+    debug(e);
     res.status(500).json({
-      message: "Server Error"
+      message: 'Server Error'
     });
   }
 };
@@ -145,7 +148,7 @@ exports.generatetoken = async (req, res) => {
     const user = await User.findById(req.user.id);
     res.json(user);
   } catch (e) {
-    res.status(500).json({ message: "Error in Fetching user" });
+    res.status(500).json({ message: 'Error in Fetching user' });
   }
 };
 
@@ -156,6 +159,6 @@ exports.getUsers = async (req, res) => {
     const user = await User.find({});
     res.json(user);
   } catch (e) {
-    res.status(500).json({ message: "Error in Fetching users" });
+    res.status(500).json({ message: 'Error in Fetching users' });
   }
 };

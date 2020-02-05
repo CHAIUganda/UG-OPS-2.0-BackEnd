@@ -1,8 +1,10 @@
 // leaveController.js
 // Import Leave model
 
-const { validationResult } = require("express-validator/check");
-const Leave = require("../../model/Leave");
+const { validationResult } = require('express-validator/check');
+const debug = require('debug')('leave-controller');
+
+const Leave = require('../../model/Leave');
 
 // Handle new Leave
 exports.createLeave = async (req, res) => {
@@ -24,7 +26,7 @@ exports.createLeave = async (req, res) => {
     //     });
     // }
 
-    let leave = new Leave({
+    const leave = new Leave({
       startDate,
       endDate,
       type,
@@ -35,12 +37,12 @@ exports.createLeave = async (req, res) => {
 
     await leave.save();
     res.status(200).json({
-      message: "Leave Created successfully"
+      message: 'Leave Created successfully'
     });
   } catch (err) {
-    console.log(err.message);
+    debug(err.message);
     res.status(500).json({
-      message: "Error Creating Leave"
+      message: 'Error Creating Leave'
     });
   }
 };

@@ -1,10 +1,11 @@
-//Filename : leave.js
-const express = require("express");
-const { check } = require("express-validator/check");
+// Filename : leave.js
+const express = require('express');
+const { check } = require('express-validator/check');
+
 const router = express.Router();
 // Import leave controller
-var leaveController = require("../controller/leave/leaveController");
-const authenticator = require("../middleware/auth/authenticator");
+const leaveController = require('../controller/leave/leaveController');
+const authenticator = require('../middleware/authenticator');
 
 /**
  * @method - POST
@@ -13,26 +14,26 @@ const authenticator = require("../middleware/auth/authenticator");
  * @param - /leaveApi/leave
  */
 router.post(
-  "/leave",
+  '/leave',
   [
     // valid date 2018-05-12
-    //check("startDate", "Please Enter a Valid Date").matches(),
+    // check("startDate", "Please Enter a Valid Date").matches(),
 
-    //input validations date validation pending
-    check("startDate", "Please Enter a Valid StartDate")
+    // input validations date validation pending
+    check('startDate', 'Please Enter a Valid StartDate')
       .not()
       .isEmpty(),
-    check("endDate", "Please Enter a Valid EndDate")
+    check('endDate', 'Please Enter a Valid EndDate')
       .not()
       .isEmpty(),
-    check("type", "Please Enter a Valid Leave Type")
+    check('type', 'Please Enter a Valid Leave Type')
       .not()
       .isEmpty(),
-    check("staffEmail", "Please Enter a Valid Email").isEmail(),
-    check("status", "Please enter a valid status")
+    check('staffEmail', 'Please Enter a Valid Email').isEmail(),
+    check('status', 'Please enter a valid status')
       .not()
       .isEmpty(),
-    check("progress", "Please enter a valid progress")
+    check('progress', 'Please enter a valid progress')
       .not()
       .isEmpty()
   ],

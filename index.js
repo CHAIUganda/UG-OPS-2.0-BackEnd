@@ -1,6 +1,6 @@
 // Import express
 const express = require('express');
-const debug = require('debug')('server');
+const debug = require('debug');
 
 const InitiateMongoServer = require('./config/db');
 
@@ -30,5 +30,5 @@ app.use('/leaveApi', leaveApi);
 
 // Launch app to listen to specified port
 app.listen(port, () => {
-  debug(`Running UG-OPS 2 on port ${port}`);
+  console.log(`Running UG-OPS 2 on port ${port}`);
 });
