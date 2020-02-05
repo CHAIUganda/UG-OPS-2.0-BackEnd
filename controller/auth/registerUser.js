@@ -71,6 +71,7 @@ const registerUser = async (req, res) => {
       },
       (err, token) => {
         if (err) throw err;
+        // debug('User has been Registered');
         res.status(200).json({
           token
         });

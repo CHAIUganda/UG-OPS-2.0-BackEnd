@@ -76,7 +76,7 @@ router.post(
  * verify the token, retrieve user based on the token payload. calls controller after checking inputs
  * @param - /auth/me
  */
-router.get('/me', authenticator, authController.generatetoken);
+router.get('/me', authenticator, authController.generateToken);
 
 /**
  * @method - GET
