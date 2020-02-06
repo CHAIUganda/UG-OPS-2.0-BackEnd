@@ -18,16 +18,16 @@ const login = async (req, res) => {
     const user = await User.findOne({
       email
     });
-    if (!user) {
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!user || !isMatch) {
       return res.status(400).json({
-        message: 'User Does Not Exist'
+        message: 'Invalid email or password'
       });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
+    if (!user.isVerified) {
       return res.status(400).json({
-        message: 'Incorrect Password !'
+        message: 'Your account has not been verified.'
       });
     }
 

@@ -82,4 +82,11 @@ router.get('/me', authenticator, authController.getLoggedInUser);
  */
 router.get('/getUsers', authenticator, authController.getUsers);
 
+/**
+ * @method - GET
+ * @description - Token Confirmation
+ * @param - /auth/confirmation
+ */
+router.get('/confirmation/:token', authController.verification);
+
 module.exports = router;

@@ -3,7 +3,9 @@ const debug = require('debug')('server');
 
 module.exports = (req, res, next) => {
   const token = req.header('token');
-  if (!token) return res.status(401).json({ message: 'Auth Error' });
+  if (!token) {
+    return res.status(401).json({ message: 'Auth Error' });
+  }
 
   try {
     const decoded = jwt.verify(token, 'randomString');
@@ -11,6 +13,6 @@ module.exports = (req, res, next) => {
     next();
   } catch (e) {
     debug(e);
-    res.status(500).send({ message: 'Invalid Token' });
+    res.status(500).json({ message: 'Invalid Token' });
   }
 };

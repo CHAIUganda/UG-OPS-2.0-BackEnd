@@ -4,6 +4,7 @@ const registerUser = require('./registerUser');
 const login = require('./login');
 const getLoggedInUser = require('./getLoggedInUser');
 const getUsers = require('./getUsers');
+const verification = require('./verification');
 
 // Handle new staff
 exports.registerUser = registerUser;
@@ -16,3 +17,6 @@ exports.getLoggedInUser = getLoggedInUser;
 
 // Handle get all users
 exports.getUsers = getUsers;
+
+// Handle user email verification
+exports.verification = verification;

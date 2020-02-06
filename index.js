@@ -1,4 +1,5 @@
 // Import express
+require('dotenv').config();
 const express = require('express');
 const debug = require('debug')('server');
 

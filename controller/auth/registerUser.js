@@ -2,8 +2,10 @@ const { validationResult } = require('express-validator/check');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const debug = require('debug')('server');
+const Mailer = require('../../helpers/Mailer');
 
 const User = require('../../model/User');
+const Token = require('../../model/Token');
 
 const registerUser = async (req, res) => {
   const errors = validationResult(req);
@@ -71,12 +73,32 @@ const registerUser = async (req, res) => {
       {
         expiresIn: 10000 //  values are in seconds, strings need timeunits i.e. "2 days", "10h","7d"
       },
-      (err, token) => {
-        if (err) throw err;
-        // debug('User has been Registered');
-        res.status(200).json({
-          token
+      (error, token) => {
+        if (error) throw error;
+        // create user verication token in token schema
+        const usertokenDoc = new Token({ _userId: user._id, token });
+        // Save the verification token
+        usertokenDoc.save((err) => {
+          if (err) {
+            return res.status(500).send({ msg: err.message });
+          }
+          // Send the email
+          const from = 'no-reply@clintonhealthaccess.org';
+          const to = user.email;
+          const subject = 'Account Verification Token';
+
+          // prettier-ignore
+          const text = `${'Hello,\n\n'
+            + 'Please verify your account by clicking the link: \nhttp://'}${
+            req.headers.host
+          }/auth/confirmation/${token}\n`;
+
+          Mailer(from, to, subject, text, res);
         });
+
+        // res.status(200).json({
+        //   token
+        // });
       }
     );
   } catch (err) {
