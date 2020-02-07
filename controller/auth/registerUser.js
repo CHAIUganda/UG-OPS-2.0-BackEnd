@@ -91,7 +91,7 @@ const registerUser = async (req, res) => {
           // Send the email
           const from = 'no-reply@clintonhealthaccess.org';
           const to = user.email;
-          const subject = 'Account Verification Token';
+          const subject = 'UG-OPPS 2.0 Account Verification Token';
 
           // prettier-ignore
           const text = `${'Hello,\n\n'
