@@ -5,6 +5,8 @@ const getLoggedInUser = async (req, res) => {
   try {
     // request.user is getting fetched from Middleware after token authentication
     const user = await User.findById(req.user.id);
+    user.password = undefined;
+
     res.json(user);
   } catch (e) {
     debug(e.message);

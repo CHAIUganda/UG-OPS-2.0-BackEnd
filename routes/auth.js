@@ -71,7 +71,7 @@ router.post(
  * calls controller after checking inputs
  * @param - /auth/me
  */
-router.get('/me', authenticator, authController.getLoggedInUser);
+router.get('/getLoggedInUser', authenticator, authController.getLoggedInUser);
 
 /**
  * @method - GET
