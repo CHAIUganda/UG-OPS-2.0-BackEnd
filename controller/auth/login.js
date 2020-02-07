@@ -39,7 +39,7 @@ const login = async (req, res) => {
 
     jwt.sign(
       payload,
-      'randomString',
+      process.env.JWT_SECRET,
       {
         expiresIn: 3600 //  values are in seconds, strings need timeunits i.e. "2 days", "10h", "7d"
       },

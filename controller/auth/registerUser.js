@@ -21,6 +21,9 @@ const registerUser = async (req, res) => {
     contractStartDate,
     contractEndDate,
     contractType,
+    gender,
+    position,
+    department,
     internationalStaff,
     programmeManagerEmail,
     oNames,
@@ -48,6 +51,9 @@ const registerUser = async (req, res) => {
       contractType,
       internationalStaff,
       programmeManagerEmail,
+      gender,
+      position,
+      department,
       oNames,
       email,
       password,
@@ -69,7 +75,7 @@ const registerUser = async (req, res) => {
 
     jwt.sign(
       payload,
-      'randomString',
+      process.env.JWT_SECRET,
       {
         expiresIn: 10000 //  values are in seconds, strings need timeunits i.e. "2 days", "10h","7d"
       },

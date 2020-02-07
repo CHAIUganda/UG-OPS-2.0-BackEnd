@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: false }));
 InitiateMongoServer();
 
 // Setup server port
-const port = process.env.PORT || 8080;
+const port = process.env.SERVER_PORT || 8080;
 
 // Send message for default URL
 app.get('/', (req, res) => res.send('Welcome to UG-OPS 2 API'));

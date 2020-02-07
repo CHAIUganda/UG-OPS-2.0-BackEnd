@@ -20,11 +20,24 @@ const UserSchema = mongoose.Schema({
     type: String,
     required: false
   },
+  gender: {
+    type: String,
+    required: true
+  },
   email: {
     type: String,
     required: true
   },
   password: {
+    type: String,
+    required: true
+  },
+  position: {
+    type: String,
+    required: true
+  },
+  department: {
+    // HR Finance Vaccines etc
     type: String,
     required: true
   },

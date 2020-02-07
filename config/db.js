@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const debug = require('debug')('server');
 
 // Replace this with your MONGOURI.
-const MONGOURI = 'mongodb://localhost/ugopps2';
+const MONGOURI = process.env.MONGODB_URI;
 
 const InitiateMongoServer = async () => {
   try {
