@@ -2,6 +2,7 @@
 require('dotenv').config();
 const express = require('express');
 const debug = require('debug')('server');
+const cors = require('cors');
 
 const InitiateMongoServer = require('./config/db');
 
@@ -15,6 +16,7 @@ const app = express();
 // Configure express to handle post requests
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cors());
 
 // Initiate Mongo Server
 InitiateMongoServer();
