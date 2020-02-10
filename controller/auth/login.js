@@ -8,8 +8,14 @@ const login = async (req, res) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
+    let msg = '';
+
+    errors.array.forEach((error) => {
+      msg = `${msg} ${error.msg} ::`;
+    });
+
     return res.status(400).json({
-      message: errors.array()
+      message: msg
     });
   }
 
@@ -32,7 +38,7 @@ const login = async (req, res) => {
 
     if (!user.isVerified) {
       return res.status(400).json({
-        message: 'Your account has not been verified.'
+        message: 'Please reset your password to access you'
       });
     }
 
