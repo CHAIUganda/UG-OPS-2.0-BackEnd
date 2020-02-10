@@ -11,7 +11,7 @@ const UserSchema = mongoose.Schema({
     type: String,
     required: true
   },
-  isVerified: {
+  isPwdReset: {
     // To track verification
     type: Boolean,
     default: false

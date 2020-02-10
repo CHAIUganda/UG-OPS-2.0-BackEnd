@@ -36,9 +36,9 @@ const login = async (req, res) => {
       });
     }
 
-    if (!user.isVerified) {
+    if (!user.isPwdReset) {
       return res.status(400).json({
-        message: 'Please reset your password to access you'
+        message: 'Please first set a new password'
       });
     }
 

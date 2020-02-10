@@ -38,6 +38,7 @@ const registerUser = async (req, res) => {
     let user = await User.findOne({
       email
     });
+
     if (user) {
       return res.status(400).json({
         message: 'User Already Exists'
@@ -91,13 +92,13 @@ const registerUser = async (req, res) => {
           // Send the email
           const from = 'no-reply@clintonhealthaccess.org';
           const to = user.email;
-          const subject = 'UG-OPPS 2.0 Account Verification Token';
+          const subject = 'UG-OPPS 2.0 Account Password ReSetting';
 
           // prettier-ignore
           const text = `${'Hello,\n\n'
-            + 'Please verify your account by clicking the link: \nhttp://'}${
+            + 'Please reset your account password by clicking the link: \nhttp://'}${
             req.headers.host
-          }/auth/confirmation/${token}\n`;
+          }/auth/reset/${token}\n`;
 
           Mailer(from, to, subject, text, res);
         });

@@ -57,7 +57,7 @@ router.post(
   '/login',
   [
     check('email', 'Please enter a valid email').isEmail(),
-    check('password', 'Please enter a valid password').isLength({
+    check('password', 'Minimum password length is 6').isLength({
       min: 6
     })
   ],
@@ -88,5 +88,21 @@ router.get('/getUsers', authenticator, authController.getUsers);
  * @param - /auth/confirmation
  */
 router.get('/confirmation/:token', authController.verification);
+
+/**
+ * @method - POST
+ * @param - http://localhost:8080/auth/reset/
+ * @description - User password set on first login
+ */
+router.post(
+  '/reset',
+  [
+    check('email', 'Please enter a valid email').isEmail(),
+    check('password', 'Minimum password length is 6').isLength({
+      min: 6
+    })
+  ],
+  authController.reset
+);
 
 module.exports = router;
