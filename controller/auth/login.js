@@ -10,7 +10,7 @@ const login = async (req, res) => {
   if (!errors.isEmpty()) {
     let msg = '';
 
-    errors.array.forEach((error) => {
+    errors.array().forEach((error) => {
       msg = `${msg} ${error.msg} ::`;
     });
 
