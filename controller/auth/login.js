@@ -46,7 +46,7 @@ const login = async (req, res) => {
       payload,
       process.env.JWT_SECRET,
       {
-        expiresIn: 3600 //  values are in seconds, strings need timeunits i.e. "2 days", "10h", "7d"
+        expiresIn: '1 day' //  values are in seconds, strings need timeunits i.e. "2 days", "10h", "7d"
       },
       (err, token) => {
         if (err) throw err;
