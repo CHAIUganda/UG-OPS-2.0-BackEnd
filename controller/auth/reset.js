@@ -1,4 +1,5 @@
 const debug = require('debug')('server');
+const { validationResult } = require('express-validator/check');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../../model/User');
@@ -8,10 +9,17 @@ const Mailer = require('../../helpers/Mailer');
 // Get LoggedIn User
 const reset = async (req, res) => {
   try {
+    // check input error
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        message: errors.array()
+      });
+    }
     // Find a matching token
     const tokensent = await Token.findOne({ token: req.header('token') });
     if (!tokensent) {
-      // if not a token we are sending another and deleting already existing ones for that user
+      // if token expired we are sending another
       const user = await User.findOne({
         email: req.body.email
       });
@@ -57,14 +65,10 @@ const reset = async (req, res) => {
           });
         }
       );
-      // const tokenToRemove = await User.findOne({
-      //   _id: user._userId
-      // });
-      // tokenToRemove.remove();
 
       return res.status(400).json({
         message:
-          'Password reset token is invalid or has expired. we have sent another to your email'
+          'Password reset token is invalid or has expired. We have sent another to your email'
       });
     }
 
@@ -89,9 +93,28 @@ const reset = async (req, res) => {
       }
       // delete token after usage
       tokensent.remove();
-      res.status(200).json({
-        message: 'The account password has been set. Please log in.'
-      });
+      // create a token for the user
+      const payload = {
+        user: {
+          id: user.id
+        }
+      };
+
+      jwt.sign(
+        payload,
+        process.env.JWT_SECRET,
+        {
+          expiresIn: '1 day' //  values are in seconds, strings need timeunits i.e. "2 days", "10h", "7d"
+        },
+        (err, token) => {
+          if (err) throw err;
+          res.status(200).json({
+            message: 'password set. user logged in "use token" .',
+            token,
+            userClone
+          });
+        }
+      );
     });
   } catch (e) {
     debug(e.message);

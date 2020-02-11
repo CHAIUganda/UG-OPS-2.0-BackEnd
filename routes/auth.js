@@ -83,13 +83,6 @@ router.get('/getLoggedInUser', authenticator, authController.getLoggedInUser);
 router.get('/getUsers', authenticator, authController.getUsers);
 
 /**
- * @method - GET
- * @description - Token Confirmation
- * @param - /auth/confirmation
- */
-router.get('/confirmation/:token', authController.verification);
-
-/**
  * @method - POST
  * @param - http://localhost:8080/auth/reset/
  * @description - User password set on first login
