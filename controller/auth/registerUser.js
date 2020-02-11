@@ -1,9 +1,8 @@
 const { validationResult } = require('express-validator/check');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const debug = require('debug')('server');
+const jwt = require('jsonwebtoken');
 const Mailer = require('../../helpers/Mailer');
-
 const User = require('../../model/User');
 const Token = require('../../model/Token');
 
@@ -65,7 +64,6 @@ const registerUser = async (req, res) => {
     });
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(password, salt);
-
     await user.save();
 
     const payload = {
@@ -82,30 +80,26 @@ const registerUser = async (req, res) => {
       },
       (error, token) => {
         if (error) throw error;
-        // create user verication token in token schema
         const usertokenDoc = new Token({ _userId: user._id, token });
         // Save the verification token
         usertokenDoc.save((err) => {
           if (err) {
-            return res.status(500).send({ msg: err.message });
+            return res.status(500).send({ mesg: err.message });
           }
           // Send the email
           const from = 'no-reply@clintonhealthaccess.org';
           const to = user.email;
           const subject = 'UG-OPPS 2.0 Account Password ReSetting';
-
+          // to be put in .env file
+          const uiHost = 'localhost:3000/#/';
           // prettier-ignore
           const text = `${'Hello,\n\n'
-            + 'Please reset your account password by clicking the link: \nhttp://'}${
-            req.headers.host
-          }/auth/reset/${token}\n`;
+       + 'Please reset your account password by clicking the link: \nhttp://'}${
+            uiHost
+          }/auth/ResetPassword/${user.email}/${token}\n`;
 
           Mailer(from, to, subject, text, res);
         });
-
-        // res.status(200).json({
-        //   token
-        // });
       }
     );
   } catch (err) {

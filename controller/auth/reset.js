@@ -1,22 +1,76 @@
 const debug = require('debug')('server');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../../model/User');
 const Token = require('../../model/Token');
+const Mailer = require('../../helpers/Mailer');
 
 // Get LoggedIn User
 const reset = async (req, res) => {
   try {
     // Find a matching token
-    const token = await Token.findOne({ token: req.header('token') });
-    if (!token) {
-      return res
-        .status(400)
-        .json({ message: 'Password reset token is invalid or has expired.' });
+    const tokensent = await Token.findOne({ token: req.header('token') });
+    if (!tokensent) {
+      // if not a token we are sending another and deleting already existing ones for that user
+      const user = await User.findOne({
+        email: req.body.email
+      });
+
+      if (!user) {
+        return res.status(400).json({
+          message: 'User Does not exist'
+        });
+      }
+      const payload = {
+        user: {
+          id: user.id
+        }
+      };
+
+      // resend token to user email token generation is needed here
+      jwt.sign(
+        payload,
+        process.env.JWT_SECRET,
+        {
+          expiresIn: 10000 // values are in seconds, strings need timeunits i.e "2 days", "10h","7d"
+        },
+        (error, token) => {
+          if (error) throw error;
+          const usertokenDoc = new Token({ _userId: user._id, token });
+          // Save the verification token
+          usertokenDoc.save((err) => {
+            if (err) {
+              return res.status(500).send({ mesg: err.message });
+            }
+            // Send the email
+            const from = 'no-reply@clintonhealthaccess.org';
+            const to = user.email;
+            const subject = 'UG-OPPS 2.0 Account Password ReSetting';
+            // to be put in .env file
+            const uiHost = 'localhost:3000/#/';
+            // prettier-ignore
+            const text = `${'Hello,\n\n'
+       + 'Please reset your account password by clicking the link: \nhttp://'}${
+              uiHost
+            }/auth/ResetPassword/${user.email}/${token}\n`;
+            Mailer(from, to, subject, text, res);
+          });
+        }
+      );
+      // const tokenToRemove = await User.findOne({
+      //   _id: user._userId
+      // });
+      // tokenToRemove.remove();
+
+      return res.status(400).json({
+        message:
+          'Password reset token is invalid or has expired. we have sent another to your email'
+      });
     }
 
     // If we found a token, find a matching user using token userid and supplied email
     const user = await User.findOne({
-      _id: token._userId,
+      _id: tokensent._userId,
       email: req.body.email
     });
 
@@ -34,7 +88,7 @@ const reset = async (req, res) => {
         return res.status(500).send({ message: error.message });
       }
       // delete token after usage
-      token.remove();
+      tokensent.remove();
       res.status(200).json({
         message: 'The account password has been set. Please log in.'
       });
