@@ -12,6 +12,10 @@ const reset = async (req, res) => {
     // check input error
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      let msg = '';
+      errors.array().forEach((err) => {
+        msg = `${msg} ${err.msg} :::`;
+      });
       return res.status(400).json({
         message: errors.array()
       });

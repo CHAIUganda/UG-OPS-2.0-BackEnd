@@ -12,7 +12,7 @@ const UserSchema = mongoose.Schema({
     required: true
   },
   isPwdReset: {
-    // To track verification
+    // To track Pwd reset immediately sfter user registration
     type: Boolean,
     default: false
   },
