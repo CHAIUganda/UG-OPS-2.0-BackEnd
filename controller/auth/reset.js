@@ -93,28 +93,9 @@ const reset = async (req, res) => {
       }
       // delete token after usage
       tokensent.remove();
-      // create a token for the user
-      const payload = {
-        user: {
-          id: user.id
-        }
-      };
-
-      jwt.sign(
-        payload,
-        process.env.JWT_SECRET,
-        {
-          expiresIn: '1 day' //  values are in seconds, strings need timeunits i.e. "2 days", "10h", "7d"
-        },
-        (err, token) => {
-          if (err) throw err;
-          res.status(200).json({
-            message: 'password set. user logged in "use token" .',
-            token,
-            userClone
-          });
-        }
-      );
+      res.status(200).json({
+        message: 'password reset.'
+      });
     });
   } catch (e) {
     debug(e.message);
