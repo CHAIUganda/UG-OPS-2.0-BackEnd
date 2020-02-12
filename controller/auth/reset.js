@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../../model/User');
 const Token = require('../../model/Token');
 const Mailer = require('../../helpers/Mailer');
+const errorToString = require('../../helpers/errorToString');
 
 // Get LoggedIn User
 const reset = async (req, res) => {
@@ -12,12 +13,8 @@ const reset = async (req, res) => {
     // check input error
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      let msg = '';
-      errors.array().forEach((err) => {
-        msg = `${msg} ${err.msg} :::`;
-      });
       return res.status(400).json({
-        message: errors.array()
+        message: errorToString(errors.array())
       });
     }
     // Find a matching token
@@ -61,10 +58,9 @@ const reset = async (req, res) => {
             // to be put in .env file
             const uiHost = 'localhost:3000/#/';
             // prettier-ignore
-            const text = `${'Hello,\n\n'
-       + 'Please reset your account password by clicking the link: \nhttp://'}${
-              uiHost
-            }/auth/ResetPassword/${user.email}/${token}\n`;
+            const text = `Hello, 
+                Please reset your account password by clicking the link: http://${uiHost}auth/ResetPassword/${user.email}/${token}
+                `;
             Mailer(from, to, subject, text, res);
           });
         }
