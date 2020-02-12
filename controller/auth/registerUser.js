@@ -91,7 +91,7 @@ const registerUser = async (req, res) => {
           const to = user.email;
           const subject = 'UG-OPPS 2.0 Account Password ReSetting';
           // to be put in .env file
-          const uiHost = 'localhost:3000/#/';
+          const uiHost = 'localhost:3000/#';
           // prettier-ignore
           const text = `${'Hello,\n\n'
        + 'Please reset your account password by clicking the link: \nhttp://'}${
