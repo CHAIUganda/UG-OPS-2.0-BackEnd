@@ -6,7 +6,7 @@ const getUsers = async (req, res) => {
     // request.user is getting fetched from Middleware after token authentication
     const user = await User.find({});
     user.password = undefined;
-    res.json(user);
+    res.status(200).json(user);
   } catch (e) {
     debug(e.message);
     res.status(500).json({ message: 'Error in Fetching users' });

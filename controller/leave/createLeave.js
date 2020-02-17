@@ -1,13 +1,13 @@
 const { validationResult } = require('express-validator/check');
 const debug = require('debug')('leave-controller');
-
+const errorToString = require('../../helpers/errorToString');
 const Leave = require('../../model/Leave');
 
 const createLeave = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
-      message: errors.array()
+      message: errorToString(errors.array())
     });
   }
 

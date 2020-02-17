@@ -1,16 +1,14 @@
 const { validationResult } = require('express-validator/check');
 const bcrypt = require('bcryptjs');
 const debug = require('debug')('server');
-const jwt = require('jsonwebtoken');
-const Mailer = require('../../helpers/Mailer');
 const User = require('../../model/User');
-const Token = require('../../model/Token');
+const errorToString = require('../../helpers/errorToString');
 
 const registerUser = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
-      message: errors.array()
+      message: errorToString(errors.array())
     });
   }
 
@@ -65,41 +63,7 @@ const registerUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(password, salt);
     await user.save();
-
-    const payload = {
-      user: {
-        id: user.id
-      }
-    };
-
-    jwt.sign(
-      payload,
-      process.env.JWT_SECRET,
-      {
-        expiresIn: 10000 //  values are in seconds, strings need timeunits i.e. "2 days", "10h","7d"
-      },
-      (error, token) => {
-        if (error) throw error;
-        const usertokenDoc = new Token({ _userId: user._id, token });
-        // Save the verification token
-        usertokenDoc.save((err) => {
-          if (err) {
-            return res.status(500).send({ mesg: err.message });
-          }
-          // Send the email
-          const from = 'no-reply@clintonhealthaccess.org';
-          const to = user.email;
-          const subject = 'UG-OPPS 2.0 Account Password ReSetting';
-          // to be put in .env file
-          const uiHost = 'localhost:3000/#/';
-          // prettier-ignore
-          const text = `Hello, 
-              Please reset your account password by clicking the link: http://${uiHost}auth/ResetPassword/${user.email}/${token}
-              `;
-          Mailer(from, to, subject, text, res);
-        });
-      }
-    );
+    res.status(201).json({ message: 'User Created successfully' });
   } catch (err) {
     debug(err.message);
     res.status(500).json({ message: 'Error in Saving' });
