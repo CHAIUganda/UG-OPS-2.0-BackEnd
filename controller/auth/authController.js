@@ -4,7 +4,7 @@ const registerUser = require('./registerUser');
 const login = require('./login');
 const getLoggedInUser = require('./getLoggedInUser');
 const getUsers = require('./getUsers');
-const reset = require('./reset');
+const resetOnFirstLogin = require('./resetOnFirstLogin');
 
 // Handle new staff
 exports.registerUser = registerUser;
@@ -18,5 +18,5 @@ exports.getLoggedInUser = getLoggedInUser;
 // Handle get all users
 exports.getUsers = getUsers;
 
-// Handle user email reset
-exports.reset = reset;
+// Handle user email pwd reset on first login
+exports.reset = resetOnFirstLogin;

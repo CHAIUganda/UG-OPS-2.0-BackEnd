@@ -88,14 +88,14 @@ router.get('/getUsers', authenticator, authController.getUsers);
  * @description - User password set on first login
  */
 router.post(
-  '/reset',
+  '/resetOnFirstLogin',
   [
     check('email', 'Please enter a valid email').isEmail(),
     check('password', 'Minimum password length is 6').isLength({
       min: 6
     })
   ],
-  authController.reset
+  authController.resetOnFirstLogin
 );
 
 module.exports = router;
