@@ -5,7 +5,6 @@ const { check } = require('express-validator/check');
 const router = express.Router();
 // Import leave controller
 const leaveController = require('../controller/leave/leaveController');
-const authenticator = require('../middleware/authenticator');
 
 /**
  * @method - POST
@@ -37,7 +36,6 @@ router.post(
       .not()
       .isEmpty()
   ],
-  authenticator,
   leaveController.createLeave
 );
 

@@ -7,7 +7,6 @@ const { check } = require('express-validator/check');
 const authController = require('../controller/auth/authController');
 
 const router = express.Router();
-const authenticator = require('../middleware/authenticator');
 
 /**
  * @method - POST
@@ -49,53 +48,12 @@ router.post(
 );
 
 /**
- * @method - POST
- * @param - /login
- * @description - User authentication into the system. calls controller after checking inputs
- */
-router.post(
-  '/login',
-  [
-    check('email', 'Please enter a valid email').isEmail(),
-    check('password', 'Minimum password length is 6').isLength({
-      min: 6
-    })
-  ],
-  authController.login
-);
-
-/**
- * @method - GET
- * @description - Get LoggedIn User. authenticator is a middleware will be used to
- * verify the token, retrieve user based on the token payload.
- * calls controller after checking inputs
- * @param - /auth/me
- */
-router.get('/getLoggedInUser', authenticator, authController.getLoggedInUser);
-
-/**
  * @method - GET
  * @description - Get Users. authenticator is a middleware will be used to
  * verify the token, retrieve user based on the token payload.
  * calls controller after checking inputs
  * @param - /auth/getUsers
  */
-router.get('/getUsers', authenticator, authController.getUsers);
-
-/**
- * @method - POST
- * @param - http://localhost:8080/auth/reset/
- * @description - User password set on first login
- */
-router.post(
-  '/resetOnFirstLogin',
-  [
-    check('email', 'Please enter a valid email').isEmail(),
-    check('password', 'Minimum password length is 6').isLength({
-      min: 6
-    })
-  ],
-  authController.resetOnFirstLogin
-);
+router.get('/getUsers', authController.getUsers);
 
 module.exports = router;
