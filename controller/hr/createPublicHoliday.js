@@ -33,8 +33,8 @@ const createPublicHoliday = async (req, res) => {
     });
 
     await holidaytoSave.save();
-    res.status(200).json({
-      message: 'Public Holiday Created successfully'
+    res.status(201).json({
+      holidaytoSave
     });
   } catch (err) {
     debug(err.message);
