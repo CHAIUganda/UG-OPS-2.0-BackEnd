@@ -5,11 +5,12 @@ const debug = require('debug')('server');
 const cors = require('cors');
 
 const InitiateMongoServer = require('./config/db');
-const authenticationRequired = require('./middleware/oktaAuthenticator');
+// const authenticationRequired = require('./middleware/oktaAuthenticator');
 
 // Import routes
 const auth = require('./routes/auth');
 const leaveApi = require('./routes/leaveApi');
+const hrApi = require('./routes/hrApi');
 
 // Initialise the app
 const app = express();
@@ -29,8 +30,10 @@ const port = process.env.SERVER_PORT || 8080;
 app.get('/', (req, res) => res.send('Welcome to UG-OPS 2 API'));
 
 // Use Api routes in the App
-app.use('/auth', authenticationRequired, auth);
-app.use('/leaveApi', authenticationRequired, leaveApi);
+// app.use('/auth', authenticationRequired, auth);
+app.use('/auth', auth);
+app.use('/leaveApi', leaveApi);
+app.use('/hrApi', hrApi);
 
 // Launch app to listen to specified port
 app.listen(port, () => {
