@@ -30,7 +30,7 @@ const createLeave = async (req, res) => {
     //         msg: "User Already Exists"
     //     });
     // }
-
+    // leave can already exist so that check is not needed.
     const leave = new Leave({
       startDate,
       endDate,
