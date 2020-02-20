@@ -45,18 +45,6 @@ const UserSchema = mongoose.Schema({
     type: String,
     required: true
   },
-  contractStartDate: {
-    type: Date,
-    required: true
-  },
-  contractEndDate: {
-    type: Date,
-    required: true
-  },
-  contractType: {
-    type: String,
-    required: true
-  },
   internationalStaff: {
     type: String,
     required: true
@@ -66,7 +54,31 @@ const UserSchema = mongoose.Schema({
       type: Number,
       required: true
     },
+    homeLeaveTaken: {
+      type: Number,
+      required: true
+    },
     unPaidLeaveTaken: {
+      type: Number,
+      required: true
+    },
+    annualLeaveTaken: {
+      type: Number,
+      required: true
+    },
+    maternityLeaveTaken: {
+      type: Number,
+      required: true
+    },
+    paternityLeaveTaken: {
+      type: Number,
+      required: true
+    },
+    sickLeaveTaken: {
+      type: Number,
+      required: true
+    },
+    studyLeaveTaken: {
       type: Number,
       required: true
     }
