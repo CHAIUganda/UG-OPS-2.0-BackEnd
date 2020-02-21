@@ -2,6 +2,7 @@ const { validationResult } = require('express-validator/check');
 const debug = require('debug')('leave-controller');
 const errorToString = require('../../helpers/errorToString');
 const Leave = require('../../model/Leave');
+const User = require('../../model/User');
 
 const createLeave = async (req, res) => {
   const errors = validationResult(req);
@@ -17,29 +18,37 @@ const createLeave = async (req, res) => {
     endDate,
     type,
     staffEmail,
+    daysTaken,
+    publicHolidays, // array of days i.e ['25/12/2020','26/12/2020','01/01/2021']
+    comment,
     status,
     progress
   } = req.body;
 
   try {
-    // let user = await User.findOne({
-    //     email
-    // });
-    // if (user) {
-    //     return res.status(400).json({
-    //         msg: "User Already Exists"
-    //     });
-    // }
-    // leave can already exist so that check is not needed.
+    const user = await User.findOne({
+      email: staffEmail
+    });
+    if (!user) {
+      return res.status(400).json({
+        message: 'User does not Exists'
+      });
+    }
+
     const leave = new Leave({
       startDate,
       endDate,
       type,
       staffEmail,
+      daysTaken,
+      publicHolidays, // array of days i.e ['25/12/2020','26/12/2020','01/01/2021']
+      comment,
       status,
       progress
     });
-
+    // leave saved on staff collecttion after it has been approved and taken
+    user.leaves.push(leave._id);
+    await user.save();
     await leave.save();
     res.status(200).json({
       message: 'Leave Created successfully'

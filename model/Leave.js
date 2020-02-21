@@ -14,6 +14,12 @@ const LeaveSchema = mongoose.Schema({
     type: Date,
     required: true
   },
+  daysTaken: {
+    // data type is number
+    type: Number,
+    required: true
+  },
+  publicHolidays: [],
   type: {
     // STUDY, ANNUAL ..... HOME
     type: String,
@@ -27,6 +33,11 @@ const LeaveSchema = mongoose.Schema({
     // can be CANCELLED PENDING REJECTED APPROVED TAKEN NOT-TAKEN
     type: String,
     required: true
+  },
+  comment: {
+    // Comments/Description   optional
+    type: String,
+    required: false
   },
   progress: {
     // PM CD
