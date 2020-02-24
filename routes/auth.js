@@ -26,18 +26,35 @@ router.post(
     check('contractStartDate', 'Please Enter a Valid Contract Start Date')
       .not()
       .isEmpty(),
+    check('gender', 'Please Enter a Valid Gender')
+      .not()
+      .isEmpty(),
+    check('title', 'Please Enter a Valid Staff Title')
+      .not()
+      .isEmpty(),
     check('contractEndDate', 'Please Enter a Valid Contract End Date')
       .not()
       .isEmpty(),
     check('contractType', 'Please Enter a Valid Contract Type')
       .not()
       .isEmpty(),
-    check('internationalStaff', 'Please Specify the type of Staff you are')
+    check('type', 'Please Specify the type of Staff')
+      .not()
+      .isEmpty(),
+    check('level', 'Please Specify the Staff Level')
+      .not()
+      .isEmpty(),
+
+    check('team', 'Please Specify the  Staff team')
+      .not()
+      .isEmpty(),
+
+    check('program', 'Please Specify the staff Program')
       .not()
       .isEmpty(),
     check(
-      'programmeManagerEmail',
-      'Please supply Users valid Program Manager Email'
+      'supervisorEmail',
+      'Please supply a valid Supervisor Email'
     ).isEmail(),
     check('email', 'Please enter a valid email').isEmail(),
     check('password', 'Please enter a valid password').isLength({

@@ -46,7 +46,7 @@ const createLeave = async (req, res) => {
       status,
       progress
     });
-    // leave saved on staff collecttion after it has been approved and taken
+    // leave saved on staff collection after it has been planned, it the status that is updated
     user.leaves.push(leave._id);
     await user.save();
     await leave.save();

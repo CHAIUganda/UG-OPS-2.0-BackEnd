@@ -30,7 +30,7 @@ const LeaveSchema = mongoose.Schema({
     required: true
   },
   status: {
-    // can be CANCELLED PENDING REJECTED APPROVED TAKEN NOT-TAKEN
+    // can be planned, pending, cancelled, rejected approved taken nottaken
     type: String,
     required: true
   },
@@ -40,7 +40,7 @@ const LeaveSchema = mongoose.Schema({
     required: false
   },
   progress: {
-    // PM CD
+    // supervisor countyDirector
     type: String,
     required: true
   }

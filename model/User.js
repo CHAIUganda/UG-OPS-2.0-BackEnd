@@ -32,20 +32,31 @@ const UserSchema = mongoose.Schema({
     type: String,
     required: true
   },
-  position: {
+  title: {
     type: String,
     required: true
   },
-  department: {
-    // HR Finance Vaccines etc
+  program: {
+    // operations  Vaccines etc
     type: String,
     required: true
   },
-  programmeManagerEmail: {
+  supervisorEmail: {
     type: String,
     required: true
   },
-  internationalStaff: {
+  type: {
+    // local TCN expat
+    type: String,
+    required: true
+  },
+  level: {
+    // 1-6
+    type: String,
+    required: true
+  },
+  team: {
+    // countryOffice global
     type: String,
     required: true
   },
