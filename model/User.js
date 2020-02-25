@@ -94,7 +94,7 @@ const UserSchema = mongoose.Schema({
       required: true
     }
   },
-  leaves: [],
+  leaves: [mongoose.Schema.Types.ObjectId],
   createdAt: {
     type: Date,
     default: Date.now()

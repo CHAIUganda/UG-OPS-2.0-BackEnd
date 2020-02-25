@@ -41,20 +41,28 @@ const createLeave = async (req, res) => {
       type,
       staffEmail,
       daysTaken,
-      publicHolidays, // array of days i.e ['25/12/2020','26/12/2020','01/01/2021']
+      publicHolidays,
+      // $push: { publicHolidays: { $each: publicHolidays } },
+      // array of days i.e ['25/12/2020','26/12/2020','01/01/2021']
       comment,
       status,
       progress
     });
+    console.log(publicHolidays);
     // leave saved on staff collection after it has been planned, it the status that is updated
-    user.leaves.push(leave._id);
-    await user.save();
+    await User.updateOne(
+      {
+        email: staffEmail
+      },
+      { $push: { leaves: leave._id } }
+    );
     await leave.save();
-    res.status(200).json({
+    res.status(201).json({
       message: 'Leave Created successfully'
     });
   } catch (err) {
     debug(err.message);
+    console.log(err.message);
     res.status(500).json({
       message: 'Error Creating Leave'
     });

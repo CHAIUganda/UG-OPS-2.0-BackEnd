@@ -42,7 +42,7 @@ const registerUser = async (req, res) => {
     const sickLeaveTaken = 0;
     const studyLeaveTaken = 0;
 
-    const contactStatus = 'ACTIVE';
+    const contractStatus = 'ACTIVE';
     let user = await User.findOne({
       email
     });
@@ -86,7 +86,7 @@ const registerUser = async (req, res) => {
       contractStartDate,
       contractEndDate,
       contractType,
-      contactStatus
+      contractStatus
     });
     await contract.save();
     await user.save();
