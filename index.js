@@ -6,6 +6,7 @@ const cors = require('cors');
 
 const InitiateMongoServer = require('./config/db');
 // const authenticationRequired = require('./middleware/oktaAuthenticator');
+const authenticator = require('./middleware/authenticator'); // to be rplaced with Okta auth
 
 // Import routes
 const auth = require('./routes/auth');
@@ -32,8 +33,8 @@ app.get('/', (req, res) => res.send('Welcome to UG-OPS 2 API'));
 // Use Api routes in the App
 // app.use('/auth', authenticationRequired, auth);
 app.use('/auth', auth);
-app.use('/leaveApi', leaveApi);
-app.use('/hrApi', hrApi);
+app.use('/leaveApi', authenticator, leaveApi);
+app.use('/hrApi', authenticator, hrApi);
 
 // Launch app to listen to specified port
 app.listen(port, () => {

@@ -19,7 +19,7 @@ const LeaveSchema = mongoose.Schema({
     type: Number,
     required: true
   },
-  publicHolidays: [],
+  publicHolidays: [Date],
   type: {
     // STUDY, ANNUAL ..... HOME
     type: String,

@@ -11,8 +11,8 @@ const UserSchema = mongoose.Schema({
     type: String,
     required: true
   },
-  isPwdReset: {
-    // To track Pwd reset immediately sfter user registration
+  admin: {
+    // To track is user is admin
     type: Boolean,
     default: false
   },
