@@ -42,13 +42,11 @@ const createLeave = async (req, res) => {
       staffEmail,
       daysTaken,
       publicHolidays,
-      // $push: { publicHolidays: { $each: publicHolidays } },
-      // array of days i.e ['25/12/2020','26/12/2020','01/01/2021']
+      // array of days i.e ["2020-02-25","2020-02-29"]
       comment,
       status,
       progress
     });
-    console.log(publicHolidays);
     // leave saved on staff collection after it has been planned, it the status that is updated
     await User.updateOne(
       {
