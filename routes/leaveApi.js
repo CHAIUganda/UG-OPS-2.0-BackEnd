@@ -5,6 +5,7 @@ const { check } = require('express-validator/check');
 const router = express.Router();
 // Import leave controller
 const leaveController = require('../controller/leave/leaveController');
+const authenticator = require('../middleware/authenticator');
 
 /**
  * @method - POST
@@ -29,6 +30,7 @@ router.post(
       .not()
       .isEmpty(),
     check('staffEmail', 'Please Enter a Valid Email').isEmail(),
+    check('supervisorEmail', 'Please Enter a Valid Email').isEmail(),
     check('status', 'Please enter a valid status')
       .not()
       .isEmpty(),
@@ -45,7 +47,31 @@ router.post(
       .not()
       .isEmpty()
   ],
+  authenticator,
   leaveController.createLeave
 );
 
+/**
+ * @method - GET
+ * @description - Get staff Leaves. authenticator is a middleware will be used to
+ * verify the token
+ * @param - /auth/getLeaves
+ */
+router.get(
+  '/getStaffLeaves/:email/:status',
+  authenticator,
+  leaveController.getStaffLeaves
+);
+
+/**
+ * @method - GET
+ * @description - Get supervisor Leaves. authenticator is a middleware will be used to
+ * verify the token
+ * @param - /auth/getLeaves
+ */
+router.get(
+  '/getSupervisorLeaves/:email/:status',
+  authenticator,
+  leaveController.getSupervisorLeaves
+);
 module.exports = router;

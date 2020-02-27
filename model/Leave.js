@@ -29,6 +29,10 @@ const LeaveSchema = mongoose.Schema({
     type: String,
     required: true
   },
+  supervisorEmail: {
+    type: String,
+    required: true
+  },
   status: {
     // can be planned, pending, cancelled, rejected approved taken nottaken
     type: String,

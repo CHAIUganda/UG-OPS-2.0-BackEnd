@@ -18,6 +18,7 @@ const createLeave = async (req, res) => {
     endDate,
     type,
     staffEmail,
+    supervisorEmail,
     daysTaken,
     publicHolidays, // array of days i.e ['25/12/2020','26/12/2020','01/01/2021']
     comment,
@@ -34,12 +35,13 @@ const createLeave = async (req, res) => {
         message: 'User does not Exists'
       });
     }
-
+    // checks if user has enough leaves days happen here basing on what has been computed
     const leave = new Leave({
       startDate,
       endDate,
       type,
       staffEmail,
+      supervisorEmail,
       daysTaken,
       publicHolidays,
       // array of days i.e ["2020-02-25","2020-02-29"]
@@ -47,7 +49,7 @@ const createLeave = async (req, res) => {
       status,
       progress
     });
-    // leave saved on staff collection after it has been planned, it the status that is updated
+    // leave id saved on staff collection after it has been planned, it the status that is updated
     await User.updateOne(
       {
         email: staffEmail
@@ -55,6 +57,7 @@ const createLeave = async (req, res) => {
       { $push: { leaves: leave._id } }
     );
     await leave.save();
+    // send email notification to supervisor if leave is is pending
     res.status(201).json({
       message: 'Leave Created successfully'
     });
