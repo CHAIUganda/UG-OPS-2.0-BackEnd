@@ -1,4 +1,5 @@
 const { validationResult } = require('express-validator/check');
+const moment = require('moment-timezone');
 const debug = require('debug')('leave-controller');
 const errorToString = require('../../helpers/errorToString');
 const Leave = require('../../model/Leave');
@@ -35,7 +36,120 @@ const createLeave = async (req, res) => {
         message: 'User does not Exists'
       });
     }
+    // set timezone to kampala
+    const CurrentDate = moment()
+      .tz('Africa/Kampala')
+      .format();
+    const today = new Date(CurrentDate);
+    const currentMonth = today.getMonth();
+
+    // Computing Annual Leave
+    let accruedAnnualLeave;
+    if (currentMonth === 0) {
+      accruedAnnualLeave = 0;
+    } else {
+      accruedAnnualLeave = currentMonth * 1.75;
+    }
+
+    const {
+      annualLeaveBF,
+      unPaidLeaveTaken,
+      homeLeaveTaken,
+      annualLeaveTaken,
+      maternityLeaveTaken,
+      paternityLeaveTaken,
+      sickLeaveTaken,
+      studyLeaveTaken
+    } = user.leaveDetails;
+    // prettier-ignore
+    const totalAcruedAnualLeavePlusAnualLeaveBF = accruedAnnualLeave + annualLeaveBF;
+    const maternity = 60;
+    const paternity = 7;
+    const sick = 42;
+    const study = 4;
+    const unpaid = 60;
+
+    if (type === 'Paternity') {
+      if (user.gender === 'Female') {
+        return res.status(400).json({
+          message: 'Paternity leave only given to Gentlemen'
+        });
+      }
+      const totalPaternity = paternityLeaveTaken + daysTaken;
+      if (paternity === totalPaternity || paternity < totalPaternity) {
+        return res.status(400).json({
+          message: 'You Dont have enough Paternity Leave days'
+        });
+      }
+    }
+    if (type === 'Home') {
+      if (user.type !== 'Expat') {
+        return res.status(400).json({
+          message: 'Home leave only given to Expatriates '
+        });
+      }
+      const totalHome = homeLeaveTaken + annualLeaveTaken + daysTaken;
+      const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF === totalHome;
+      const chk2 = totalAcruedAnualLeavePlusAnualLeaveBF < totalHome;
+      if (chk1 || chk2) {
+        return res.status(400).json({
+          message: 'You Dont have enough Annual Leave days'
+        });
+      }
+    }
+    if (type === 'Maternity') {
+      if (user.gender === 'Male') {
+        return res.status(400).json({
+          message: 'Maternity leave only given to Ladies'
+        });
+      }
+      const totalMaternity = maternityLeaveTaken + daysTaken;
+      if (maternity === totalMaternity || maternity < totalMaternity) {
+        return res.status(400).json({
+          message: 'You Dont have enough Maternity Leave days'
+        });
+      }
+    }
+    if (type === 'Sick') {
+      const totalSick = sickLeaveTaken + daysTaken;
+      if (sick === totalSick || sick < totalSick) {
+        return res.status(400).json({
+          message: 'You Dont have enough Sick Leave days'
+        });
+      }
+    }
+    if (type === 'Unpaid') {
+      const totalUnpaid = unPaidLeaveTaken + daysTaken;
+      if (unpaid === totalUnpaid || unpaid < totalUnpaid) {
+        return res.status(400).json({
+          message: 'You Dont have enough Unpaid Leave days'
+        });
+      }
+    }
+    if (type === 'Study') {
+      const totalStudy = studyLeaveTaken + daysTaken;
+      if (study === totalStudy || study < totalStudy) {
+        return res.status(400).json({
+          message: 'You Dont have enough Study Leave days'
+        });
+      }
+    }
+    if (type === 'Annual') {
+      const totalAnnual = annualLeaveTaken + daysTaken;
+      const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF === totalAnnual;
+      const chk2 = totalAcruedAnualLeavePlusAnualLeaveBF < totalAnnual;
+      if (chk1 || chk2) {
+        return res.status(400).json({
+          message: 'You Dont have enough Annual Leave days',
+          annualLeaveTaken,
+          daysTaken,
+          totalAcruedAnualLeavePlusAnualLeaveBF
+        });
+      }
+    }
+
     // checks if user has enough leaves days happen here basing on what has been computed
+
     const leave = new Leave({
       startDate,
       endDate,
