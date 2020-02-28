@@ -15,7 +15,7 @@ const getLoggedInUser = async (req, res) => {
     }
     const supervisorDetails = {
       fName: supervisor.fName,
-      lNast: supervisor.lName,
+      lName: supervisor.lName,
       email: supervisor.email
     };
 
