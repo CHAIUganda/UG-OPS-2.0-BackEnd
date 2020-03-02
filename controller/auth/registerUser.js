@@ -20,7 +20,6 @@ const registerUser = async (req, res) => {
     contractEndDate,
     contractType,
     gender,
-    admin,
     title,
     program,
     type,
@@ -31,6 +30,18 @@ const registerUser = async (req, res) => {
     email,
     password
   } = req.body;
+
+  let { hr, supervisor, admin } = req.body;
+
+  if (!admin === true) {
+    admin = false;
+  }
+  if (!hr === true) {
+    hr = false;
+  }
+  if (!supervisor === true) {
+    supervisor = false;
+  }
   try {
     // Annual leave brought forward and others leaves taken are 0 when staff  is created.
     // to be updated when staff leave is approved
@@ -59,7 +70,11 @@ const registerUser = async (req, res) => {
       lName,
       supervisorEmail,
       gender,
-      admin,
+      roles: {
+        admin,
+        hr,
+        supervisor
+      },
       title,
       program,
       oNames,

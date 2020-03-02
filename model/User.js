@@ -11,11 +11,6 @@ const UserSchema = mongoose.Schema({
     type: String,
     required: true
   },
-  admin: {
-    // To track is user is admin
-    type: Boolean,
-    default: false
-  },
   oNames: {
     type: String,
     required: false
@@ -98,6 +93,25 @@ const UserSchema = mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now()
+  },
+  roles: {
+    admin: {
+      // To track is user is admin
+      type: Boolean,
+      default: false
+    },
+    ordinary: {
+      type: Boolean,
+      default: true
+    },
+    hr: {
+      type: Boolean,
+      default: false
+    },
+    supervisor: {
+      type: Boolean,
+      default: false
+    }
   }
 });
 
