@@ -48,7 +48,51 @@ router.post(
 /**
  * @method - GET
  * @description - Get public holidays.
- * @param - /auth/getUsers
+ * @param - /getPublicHolidays
  */
 router.get('/getPublicHolidays', hrController.getPublicHolidays);
+
+/**
+ * @method - POST
+ * @description - Create a Program
+ * @param - /createProgram
+ */
+router.post(
+  '/createProgram',
+  [
+    // input validations date validation pending
+    check('name', 'Please Enter a Valid name for the Program')
+      .not()
+      .isEmpty(),
+    check(
+      'programManagerEmail',
+      'Please Enter a Valid Program manager Email'
+    ).isEmail()
+  ],
+  hrController.createProgram
+);
+
+/**
+ * @method - POST
+ * @description - Remove a program.
+ * @param - /removeProgram
+ */
+router.post(
+  '/removeProgram',
+  [
+    // input validations
+    check('name', 'Please Enter a name for the program')
+      .not()
+      .isEmpty()
+  ],
+  hrController.removeProgram
+);
+
+/**
+ * @method - GET
+ * @description - Get Programs.
+ * @param - /agetPrograms
+ */
+router.get('/getPrograms', hrController.getPrograms);
+
 module.exports = router;

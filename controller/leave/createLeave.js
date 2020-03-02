@@ -61,6 +61,7 @@ const createLeave = async (req, res) => {
       sickLeaveTaken,
       studyLeaveTaken
     } = user.leaveDetails;
+
     // prettier-ignore
     const totalAcruedAnualLeavePlusAnualLeaveBF = accruedAnnualLeave + annualLeaveBF;
     const maternity = 60;
