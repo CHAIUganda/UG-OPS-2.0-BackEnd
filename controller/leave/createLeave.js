@@ -4,6 +4,7 @@ const debug = require('debug')('leave-controller');
 const errorToString = require('../../helpers/errorToString');
 const Leave = require('../../model/Leave');
 const User = require('../../model/User');
+const getLeavesTaken = require('./getLeavesTaken');
 
 const createLeave = async (req, res) => {
   const errors = validationResult(req);
@@ -50,9 +51,10 @@ const createLeave = async (req, res) => {
     } else {
       accruedAnnualLeave = currentMonth * 1.75;
     }
+    const { annualLeaveBF } = user;
+    const leaveDetails = await getLeavesTaken(user);
 
     const {
-      annualLeaveBF,
       unPaidLeaveTaken,
       homeLeaveTaken,
       annualLeaveTaken,
@@ -60,7 +62,7 @@ const createLeave = async (req, res) => {
       paternityLeaveTaken,
       sickLeaveTaken,
       studyLeaveTaken
-    } = user.leaveDetails;
+    } = leaveDetails;
 
     // prettier-ignore
     const totalAcruedAnualLeavePlusAnualLeaveBF = accruedAnnualLeave + annualLeaveBF;
@@ -82,8 +84,7 @@ const createLeave = async (req, res) => {
           message: 'You Dont have enough Paternity Leave days'
         });
       }
-    }
-    if (type === 'Home') {
+    } else if (type === 'Home') {
       if (user.type !== 'Expat') {
         return res.status(400).json({
           message: 'Home leave only given to Expatriates '
@@ -97,8 +98,7 @@ const createLeave = async (req, res) => {
           message: 'You Dont have enough Annual Leave days'
         });
       }
-    }
-    if (type === 'Maternity') {
+    } else if (type === 'Maternity') {
       if (user.gender === 'Male') {
         return res.status(400).json({
           message: 'Maternity leave only given to Ladies'
@@ -110,32 +110,28 @@ const createLeave = async (req, res) => {
           message: 'You Dont have enough Maternity Leave days'
         });
       }
-    }
-    if (type === 'Sick') {
+    } else if (type === 'Sick') {
       const totalSick = sickLeaveTaken + daysTaken;
       if (sick === totalSick || sick < totalSick) {
         return res.status(400).json({
           message: 'You Dont have enough Sick Leave days'
         });
       }
-    }
-    if (type === 'Unpaid') {
+    } else if (type === 'Unpaid') {
       const totalUnpaid = unPaidLeaveTaken + daysTaken;
       if (unpaid === totalUnpaid || unpaid < totalUnpaid) {
         return res.status(400).json({
           message: 'You Dont have enough Unpaid Leave days'
         });
       }
-    }
-    if (type === 'Study') {
+    } else if (type === 'Study') {
       const totalStudy = studyLeaveTaken + daysTaken;
       if (study === totalStudy || study < totalStudy) {
         return res.status(400).json({
           message: 'You Dont have enough Study Leave days'
         });
       }
-    }
-    if (type === 'Annual') {
+    } else if (type === 'Annual') {
       const totalAnnual = annualLeaveTaken + daysTaken;
       const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF === totalAnnual;
       const chk2 = totalAcruedAnualLeavePlusAnualLeaveBF < totalAnnual;
@@ -147,6 +143,10 @@ const createLeave = async (req, res) => {
           totalAcruedAnualLeavePlusAnualLeaveBF
         });
       }
+    } else {
+      return res.status(400).json({
+        message: 'Invalid Leave type selected'
+      });
     }
 
     // checks if user has enough leaves days happen here basing on what has been computed

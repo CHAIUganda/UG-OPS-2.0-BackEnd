@@ -48,46 +48,16 @@ const UserSchema = mongoose.Schema({
   level: {
     // 1-6
     type: String,
-    required: true
+    required: false
   },
   team: {
     // countryOffice global
     type: String,
     required: true
   },
-  leaveDetails: {
-    annualLeaveBF: {
-      type: Number,
-      required: true
-    },
-    homeLeaveTaken: {
-      type: Number,
-      required: true
-    },
-    unPaidLeaveTaken: {
-      type: Number,
-      required: true
-    },
-    annualLeaveTaken: {
-      type: Number,
-      required: true
-    },
-    maternityLeaveTaken: {
-      type: Number,
-      required: true
-    },
-    paternityLeaveTaken: {
-      type: Number,
-      required: true
-    },
-    sickLeaveTaken: {
-      type: Number,
-      required: true
-    },
-    studyLeaveTaken: {
-      type: Number,
-      required: true
-    }
+  annualLeaveBF: {
+    type: Number,
+    required: true
   },
   leaves: [mongoose.Schema.Types.ObjectId],
   createdAt: {

@@ -42,9 +42,9 @@ router.post(
     check('type', 'Please Specify the type of Staff')
       .not()
       .isEmpty(),
-    check('level', 'Please Specify the Staff Level')
-      .not()
-      .isEmpty(),
+    // check('level', 'Please Specify the Staff Level')
+    //   .not()
+    //   .isEmpty(),
 
     check('team', 'Please Specify the  Staff team')
       .not()

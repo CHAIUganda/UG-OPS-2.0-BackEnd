@@ -47,6 +47,12 @@ const LeaveSchema = mongoose.Schema({
     // supervisor countyDirector
     type: String,
     required: true
+  },
+
+  rejectionReason: {
+    // optional reason why supervisor o countyDirector rejeccted
+    type: String,
+    required: false
   }
 });
 

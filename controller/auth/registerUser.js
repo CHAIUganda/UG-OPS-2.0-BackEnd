@@ -43,16 +43,9 @@ const registerUser = async (req, res) => {
     supervisor = false;
   }
   try {
-    // Annual leave brought forward and others leaves taken are 0 when staff  is created.
+    // Annual leave brought forward is 0 when staff  is created.
     // to be updated when staff leave is approved
     const annualLeaveBF = 0;
-    const unPaidLeaveTaken = 0;
-    const homeLeaveTaken = 0;
-    const annualLeaveTaken = 0;
-    const maternityLeaveTaken = 0;
-    const paternityLeaveTaken = 0;
-    const sickLeaveTaken = 0;
-    const studyLeaveTaken = 0;
 
     const contractStatus = 'ACTIVE';
     let user = await User.findOne({
@@ -83,16 +76,7 @@ const registerUser = async (req, res) => {
       level,
       team,
       password,
-      leaveDetails: {
-        annualLeaveBF,
-        unPaidLeaveTaken,
-        homeLeaveTaken,
-        annualLeaveTaken,
-        maternityLeaveTaken,
-        paternityLeaveTaken,
-        sickLeaveTaken,
-        studyLeaveTaken
-      }
+      annualLeaveBF
     });
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(password, salt);
