@@ -74,4 +74,26 @@ router.get(
   authenticator,
   leaveController.getSupervisorLeaves
 );
+
+/**
+ * @method - POST
+ * @description - Handle a leave. Involves aprroving or rejecting
+ * a leave by supervisor or CD authenticator is a middleware will be used to
+ * verify the token.
+ * @param - /leaveApi/handleLeave
+ */
+router.post(
+  '/handleLeave',
+  [
+    check('leaveId', 'Please Enter a Valid Leave Id')
+      .not()
+      .isEmpty(),
+    check('status', 'Please Enter a Valid Status')
+      .not()
+      .isEmpty(),
+    check('staffEmail', 'Please Enter a Valid Staff Email').isEmail()
+  ],
+  authenticator,
+  leaveController.handleLeave
+);
 module.exports = router;
