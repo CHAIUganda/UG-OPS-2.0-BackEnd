@@ -1,6 +1,7 @@
 const errorToString = (errorArray) => {
   let msg = '';
-  errorArray.array().forEach((err) => {
+  console.log(errorArray);
+  errorArray.forEach((err) => {
     msg = `${msg} ${err.msg} :::`;
   });
   return msg;

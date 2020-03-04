@@ -31,7 +31,10 @@ const registerUser = async (req, res) => {
     password
   } = req.body;
 
-  let { hr, supervisor, admin } = req.body;
+  // prettier-ignore
+  let {
+    hr, supervisor, admin, countryDirector
+  } = req.body;
 
   if (!admin === true) {
     admin = false;
@@ -41,6 +44,9 @@ const registerUser = async (req, res) => {
   }
   if (!supervisor === true) {
     supervisor = false;
+  }
+  if (!countryDirector === true) {
+    countryDirector = false;
   }
   try {
     // Annual leave brought forward is 0 when staff  is created.
@@ -66,7 +72,8 @@ const registerUser = async (req, res) => {
       roles: {
         admin,
         hr,
-        supervisor
+        supervisor,
+        countryDirector
       },
       title,
       program,

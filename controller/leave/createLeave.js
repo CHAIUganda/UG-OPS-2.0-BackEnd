@@ -85,9 +85,9 @@ const createLeave = async (req, res) => {
         });
       }
     } else if (type === 'Home') {
-      if (user.type !== 'Expat') {
+      if (user.type !== 'Expat' || user.type !== 'tcn') {
         return res.status(400).json({
-          message: 'Home leave only given to Expatriates '
+          message: 'Home leave only given to Expatriates and TCNs'
         });
       }
       const totalHome = homeLeaveTaken + annualLeaveTaken + daysTaken;

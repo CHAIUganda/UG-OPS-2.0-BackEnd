@@ -40,16 +40,23 @@ const handleLeave = async (req, res) => {
     }
     // handle leave here
     if (status === 'approved') {
-      if (user.type === 'expat' || user.type === 'tcn') {
+      // prettier-ignore
+      if (
+        (user.type === 'expat' || user.type === 'tcn') && leave.type === 'Home'
+      ) {
+        if (leave.progress === 'supervisor') {
+          // change progress to cd and notify
+          
+  
+        } else {
+          // change status to approved and notify
+  
+        }
+
         // do logic here
-        return res.status(400).json({
-          message: 'Home leave only given to Expatriates '
-        });
-      } else {
-        // do logic here
-        return res.status(400).json({
-          message: 'Home leave only given to Expatriates '
-        });
+      } else { // Leave not home
+      // change status to approved and notify
+
       }
     } else if (status === 'rejected') {
       if (user.type !== 'Expat') {

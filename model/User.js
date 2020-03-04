@@ -81,6 +81,11 @@ const UserSchema = mongoose.Schema({
     supervisor: {
       type: Boolean,
       default: false
+    },
+    countryDirector: {
+      // To track is user is CD
+      type: Boolean,
+      default: false
     }
   }
 });
