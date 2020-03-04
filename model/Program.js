@@ -12,6 +12,16 @@ const ProgramSchema = mongoose.Schema({
   programManagerEmail: {
     type: String,
     required: true
+  },
+  programManagerDetails: {
+    fName: {
+      type: String,
+      required: true
+    },
+    lName: {
+      type: String,
+      required: true
+    }
   }
 });
 

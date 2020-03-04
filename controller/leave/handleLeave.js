@@ -46,22 +46,97 @@ const handleLeave = async (req, res) => {
       ) {
         if (leave.progress === 'supervisor') {
           // change progress to cd and notify
-          
-  
+          await Leave.updateOne(
+            {
+              _id: leaveId
+            },
+            { $set: { progress: 'countryDirector' } }
+          );
+          // sends mail to staff and notification about progress
+          res.status(200).json({
+            message: 'Leave has been Approved, Pending CD approval'
+          });
+        } else if (leave.progress === 'countryDirector') {
+          // approve & notify that CD approved their leave request
+          await Leave.updateOne(
+            {
+              _id: leaveId
+            },
+            { $set: { status: 'approved' } }
+          );
+          // sends mail to staff and notification about leave approval
+          res.status(200).json({
+            message: 'Leave has been Approved'
+          });
         } else {
-          // change status to approved and notify
-  
+          // respond with invalid progress
+          return res.status(400).json({
+            message: 'invalid progress'
+          });
         }
-
-        // do logic here
-      } else { // Leave not home
+      } else {
+      // Leave not home
       // change status to approved and notify
-
+      // approve & notify that supervisor approved their leave request
+        await Leave.updateOne(
+          {
+            _id: leaveId
+          },
+          { $set: { status: 'approved' } }
+        );
+        // sends mail to staff and notification about leave approval
+        res.status(200).json({
+          message: 'Leave has been Approved'
+        });
       }
     } else if (status === 'rejected') {
-      if (user.type !== 'Expat') {
-        return res.status(400).json({
-          message: 'Home leave only given to Expatriates '
+      // prettier-ignore
+      if (
+        (user.type === 'expat' || user.type === 'tcn') && leave.type === 'Home'
+      ) {
+        if (leave.progress === 'supervisor') {
+          // change status to rejected and notify
+          // notify that supervisor rejected their leave request
+          await Leave.updateOne(
+            {
+              _id: leaveId
+            },
+            { $set: { status: 'rejected', rejectionReason: reason } }
+          );
+          // sends mail to staff and notification about supervisor leave rejection
+          res.status(200).json({
+            message: 'Leave has been Rejected by supervisor'
+          });
+        } else if (leave.progress === 'countryDirector') {
+          // change status to rejected and notify
+          // notify that CD rejected their leave request
+          await Leave.updateOne(
+            {
+              _id: leaveId
+            },
+            { $set: { status: 'rejected', rejectionReason: reason } }
+          );
+          // sends mail to staff and notification about supervisor leave rejection
+          res.status(200).json({
+            message: 'Leave has been Rejected by CD'
+          });
+        } else {
+          return res.status(400).json({
+            message: 'invalid progress'
+          });
+        }
+      } else { // Leave not home
+        // change status to rejected
+        // notify that supervisor rejected their leave request
+        await Leave.updateOne(
+          {
+            _id: leaveId
+          },
+          { $set: { status: 'rejected', rejectionReason: reason } }
+        );
+        // sends mail to staff and notification about supervisor leave rejection
+        res.status(200).json({
+          message: 'Leave has been Rejected by supervisor'
         });
       }
     } else {

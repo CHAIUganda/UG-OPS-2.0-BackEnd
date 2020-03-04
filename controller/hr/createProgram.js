@@ -2,6 +2,7 @@ const { validationResult } = require('express-validator/check');
 const debug = require('debug')('leave-controller');
 const errorToString = require('../../helpers/errorToString');
 const Program = require('../../model/Program');
+const User = require('../../model/User');
 
 const createProgram = async (req, res) => {
   const errors = validationResult(req);
@@ -18,6 +19,14 @@ const createProgram = async (req, res) => {
   } = req.body;
 
   try {
+    const user = await User.findOne({
+      email: programManagerEmail
+    });
+    if (!user) {
+      return res.status(400).json({
+        message: 'Program Manager does not Exist'
+      });
+    }
     const program = await Program.findOne({
       name
     });
@@ -27,9 +36,15 @@ const createProgram = async (req, res) => {
       });
     }
 
+    const programManagerDetails = {
+      fName: user.fName,
+      lName: user.lName
+    };
+
     const programtoSave = new Program({
       name,
-      programManagerEmail
+      programManagerEmail,
+      programManagerDetails
     });
 
     await programtoSave.save();

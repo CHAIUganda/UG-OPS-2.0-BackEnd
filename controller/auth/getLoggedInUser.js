@@ -10,7 +10,7 @@ const getLoggedInUser = async (req, res) => {
     const supervisor = await User.findOne({ email: user.supervisorEmail });
     if (!supervisor) {
       return res.status(400).json({
-        message: 'Supervisor does not Exists'
+        message: 'Supervisor does not Exist'
       });
     }
     const supervisorDetails = {
