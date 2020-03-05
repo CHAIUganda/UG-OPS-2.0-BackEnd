@@ -17,11 +17,14 @@ const handleLeave = async (req, res) => {
   const {
     leaveId,
     staffEmail,
-    status,
-    reason
+    status
   } = req.body;
+  let { reason } = req.body;
 
   try {
+    if (reason === null) {
+      reason = '';
+    }
     const user = await User.findOne({
       email: staffEmail
     });
@@ -39,9 +42,18 @@ const handleLeave = async (req, res) => {
         message: 'The leave doesnot exist'
       });
     }
-
-    const from = 'no-replyugopps@clintonhealthaccess.org';
+    const subject = 'Uganda Operations Leaves';
+    const from = 'spaul@clintonhealthaccess.org';
     const to = user.email;
+    const footer = `
+
+Regards,
+
+Uganda Operations
+Clinton Health Access Initiative
+
+Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
+
     // handle leave here
     if (status === 'approved') {
       // prettier-ignore
@@ -58,11 +70,11 @@ const handleLeave = async (req, res) => {
           );
           // sends mail to staff and notification about progress
           // Send the email
-          const subject = 'UG-OPPS Leave ';
           // prettier-ignore
           const text = `Dear ${user.fName}, 
-                 Your Leave has been approved by your supervisor. It is pending Country director approval.
-                 `;
+
+Your Leave has been approved by your supervisor. It is pending Country director approvalr${footer}.
+                         `;
           Mailer(from, to, subject, text, res);
 
           res.status(200).json({
@@ -78,11 +90,12 @@ const handleLeave = async (req, res) => {
           );
           // sends mail to staff and notification about leave approval
           // Send the email
-          const subject = 'UG-OPPS Leave ';
           // prettier-ignore
           const text = `Dear ${user.fName}, 
-                  Your Leave has been approved by the Country director.
-                  `;
+
+Your Leave has been approved by the Country director${footer}.
+                                   `;
+
           Mailer(from, to, subject, text, res);
           res.status(200).json({
             message: 'Leave has been Approved'
@@ -105,10 +118,10 @@ const handleLeave = async (req, res) => {
         );
         // sends mail to staff and notification about leave approval
         // Send the email
-        const subject = 'UG-OPPS Leave ';
         // prettier-ignore
         const text = `Dear ${user.fName}, 
-                 Your Leave has been approved by your Supervisor.
+
+Your Leave has been approved by your Supervisor${footer}.
                  `;
         Mailer(from, to, subject, text, res);
         res.status(200).json({
@@ -131,11 +144,11 @@ const handleLeave = async (req, res) => {
           );
           // sends mail to staff and notification about supervisor leave rejection
           // Send the email
-          const subject = 'UG-OPPS Leave ';
           // prettier-ignore
           const text = `Dear ${user.fName}, 
-                 Your Leave has been rejected by your Supervisor.
-                 `;
+
+Your Leave has been rejected by your Supervisor${footer}.
+                                   `;
           Mailer(from, to, subject, text, res);
           res.status(200).json({
             message: 'Leave has been Rejected by supervisor'
@@ -151,11 +164,11 @@ const handleLeave = async (req, res) => {
           );
           // sends mail to staff and notification about CD leave rejection
           // Send the email
-          const subject = 'UG-OPPS Leave ';
           // prettier-ignore
           const text = `Dear ${user.fName}, 
-                 Your Leave has been rejected by the Country director.
-                 `;
+
+Your Leave has been rejected by the Country director.${footer}.
+                                   `;
           Mailer(from, to, subject, text, res);
           res.status(200).json({
             message: 'Leave has been Rejected by CD'
@@ -176,11 +189,11 @@ const handleLeave = async (req, res) => {
         );
         // sends mail to staff and notification about supervisor leave rejection
         // Send the email
-        const subject = 'UG-OPPS Leave ';
         // prettier-ignore
         const text = `Dear ${user.fName}, 
-                Your Leave has been rejected by the Country director.
-                `;
+
+Your Leave has been rejected by your Supervisor.${footer}.
+                                   `;
         Mailer(from, to, subject, text, res);
         res.status(200).json({
           message: 'Leave has been Rejected by supervisor'

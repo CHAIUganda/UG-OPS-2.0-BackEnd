@@ -37,6 +37,7 @@ const createLeave = async (req, res) => {
         message: 'User does not Exists'
       });
     }
+    const { program } = user;
     // set timezone to kampala
     const CurrentDate = moment()
       .tz('Africa/Kampala')
@@ -162,7 +163,8 @@ const createLeave = async (req, res) => {
       // array of days i.e ["2020-02-25","2020-02-29"]
       comment,
       status,
-      progress
+      progress,
+      program
     });
     // leave id saved on staff collection after it has been planned, it the status that is updated
     await User.updateOne(

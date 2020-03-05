@@ -48,6 +48,11 @@ const LeaveSchema = mongoose.Schema({
     type: String,
     required: true
   },
+  program: {
+    // program
+    type: String,
+    required: true
+  },
 
   rejectionReason: {
     // optional reason why supervisor o countyDirector rejeccted
