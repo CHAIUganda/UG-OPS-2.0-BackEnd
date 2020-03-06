@@ -5,7 +5,7 @@ const Leave = require('../../model/Leave');
 const User = require('../../model/User');
 const Mailer = require('../../helpers/Mailer');
 
-const handleLeave = async (req, res) => {
+const staffHandleLeave = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
@@ -53,6 +53,8 @@ Uganda Operations
 Clinton Health Access Initiative
 
 Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
+
+    // if leave is taken by staff notify the HR and Supervisor.
 
     // handle leave here
     if (status === 'approved') {
@@ -212,4 +214,4 @@ Your Leave has been rejected by your Supervisor.${footer}.
   }
 };
 
-module.exports = handleLeave;
+module.exports = staffHandleLeave;

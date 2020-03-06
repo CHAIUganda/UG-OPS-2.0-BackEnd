@@ -55,7 +55,7 @@ router.post(
  * @method - GET
  * @description - Get staff Leaves. authenticator is a middleware will be used to
  * verify the token
- * @param - /auth/getLeaves
+ * @param - /getLeaves
  */
 router.get(
   '/getStaffLeaves/:email/:status',
@@ -67,7 +67,7 @@ router.get(
  * @method - GET
  * @description - Get supervisor Leaves. authenticator is a middleware will be used to
  * verify the token
- * @param - /auth/getLeaves
+ * @param - /getLeaves
  */
 router.get(
   '/getSupervisorLeaves/:email/:status',
@@ -83,7 +83,7 @@ router.get(
  * @param - /leaveApi/handleLeave
  */
 router.post(
-  '/handleLeave',
+  '/supervisorHandleLeave',
   [
     check('leaveId', 'Please Enter a Valid Leave Id')
       .not()
@@ -94,6 +94,19 @@ router.post(
     check('staffEmail', 'Please Enter a Valid Staff Email').isEmail()
   ],
   authenticator,
-  leaveController.handleLeave
+  leaveController.supervisorHandleLeave
 );
+
+/**
+ * @method - GET
+ * @description - Get All staff Leaves. authenticator is a middleware will be used to
+ * verify the token
+ * @param - /getAllStaffLeaves
+ */
+router.get(
+  '/getAllStaffLeaves/:program/:status',
+  authenticator,
+  leaveController.getAllStaffLeaves
+);
+
 module.exports = router;
