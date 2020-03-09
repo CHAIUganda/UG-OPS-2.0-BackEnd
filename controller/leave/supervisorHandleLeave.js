@@ -73,7 +73,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
           // prettier-ignore
           const text = `Dear ${user.fName}, 
 
-Your Leave has been approved by your supervisor. It is pending Country director approvalr${footer}.
+Your Leave has been approved by your supervisor. It is pending Country director approval${footer}.
                          `;
           Mailer(from, to, subject, text, res);
 

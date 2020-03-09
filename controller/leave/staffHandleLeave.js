@@ -19,12 +19,7 @@ const staffHandleLeave = async (req, res) => {
     staffEmail,
     status
   } = req.body;
-  let { reason } = req.body;
-
   try {
-    if (reason === null) {
-      reason = '';
-    }
     const user = await User.findOne({
       email: staffEmail
     });
@@ -44,7 +39,6 @@ const staffHandleLeave = async (req, res) => {
     }
     const subject = 'Uganda Operations Leaves';
     const from = 'spaul@clintonhealthaccess.org';
-    const to = user.email;
     const footer = `
 
 Regards,
@@ -57,33 +51,35 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
     // if leave is taken by staff notify the HR and Supervisor.
 
     // handle leave here
-    if (status === 'approved') {
-      // prettier-ignore
-      if (
-        (user.type === 'expat' || user.type === 'tcn') && leave.type === 'Home'
-      ) {
-        if (leave.progress === 'supervisor') {
-          // change progress to cd and notify
+    if (leave.status === 'approved') {
+      if (status === 'taken') {
+        // prettier-ignore
+        if (
+          (user.type === 'expat' || user.type === 'tcn') && leave.type === 'Home'
+        ) {
+          // change status to taken
           await Leave.updateOne(
             {
               _id: leaveId
             },
-            { $set: { progress: 'countryDirector' } }
+            { $set: { status: 'taken' } }
           );
-          // sends mail to staff and notification about progress
+          // sends mail to cd supervisor HR and notification about status
           // Send the email
           // prettier-ignore
-          const text = `Dear ${user.fName}, 
+          const text = `Hello, 
 
-Your Leave has been approved by your supervisor. It is pending Country director approvalr${footer}.
+${user.fName}  ${user.lName} will be off from ${leave.startDate} to ${leave.endDate}${footer}.
                          `;
           Mailer(from, to, subject, text, res);
 
           res.status(200).json({
-            message: 'Leave has been Approved by your supervisor, Pending CD approval'
+            message: 'Leave has been taken. Enjoy your leave.'
           });
-        } else if (leave.progress === 'countryDirector') {
-          // approve & notify that CD approved their leave request
+        } else {
+          // Leave not home
+          // change status to approved and notify
+          // approve & notify that supervisor approved their leave request
           await Leave.updateOne(
             {
               _id: leaveId
@@ -95,115 +91,22 @@ Your Leave has been approved by your supervisor. It is pending Country director 
           // prettier-ignore
           const text = `Dear ${user.fName}, 
 
-Your Leave has been approved by the Country director${footer}.
-                                   `;
-
+Your Leave has been approved by your Supervisor${footer}.
+                 `;
           Mailer(from, to, subject, text, res);
           res.status(200).json({
             message: 'Leave has been Approved'
           });
-        } else {
-          // respond with invalid progress
-          return res.status(400).json({
-            message: 'invalid progress'
-          });
         }
+      } else if (status === 'nottaken') {
       } else {
-      // Leave not home
-      // change status to approved and notify
-      // approve & notify that supervisor approved their leave request
-        await Leave.updateOne(
-          {
-            _id: leaveId
-          },
-          { $set: { status: 'approved' } }
-        );
-        // sends mail to staff and notification about leave approval
-        // Send the email
-        // prettier-ignore
-        const text = `Dear ${user.fName}, 
-
-Your Leave has been approved by your Supervisor${footer}.
-                 `;
-        Mailer(from, to, subject, text, res);
-        res.status(200).json({
-          message: 'Leave has been Approved'
-        });
-      }
-    } else if (status === 'rejected') {
-      // prettier-ignore
-      if (
-        (user.type === 'expat' || user.type === 'tcn') && leave.type === 'Home'
-      ) {
-        if (leave.progress === 'supervisor') {
-          // change status to rejected and notify
-          // notify that supervisor rejected their leave request
-          await Leave.updateOne(
-            {
-              _id: leaveId
-            },
-            { $set: { status: 'rejected', rejectionReason: reason } }
-          );
-          // sends mail to staff and notification about supervisor leave rejection
-          // Send the email
-          // prettier-ignore
-          const text = `Dear ${user.fName}, 
-
-Your Leave has been rejected by your Supervisor${footer}.
-                                   `;
-          Mailer(from, to, subject, text, res);
-          res.status(200).json({
-            message: 'Leave has been Rejected by supervisor'
-          });
-        } else if (leave.progress === 'countryDirector') {
-          // change status to rejected and notify
-          // notify that CD rejected their leave request
-          await Leave.updateOne(
-            {
-              _id: leaveId
-            },
-            { $set: { status: 'rejected', rejectionReason: reason } }
-          );
-          // sends mail to staff and notification about CD leave rejection
-          // Send the email
-          // prettier-ignore
-          const text = `Dear ${user.fName}, 
-
-Your Leave has been rejected by the Country director.${footer}.
-                                   `;
-          Mailer(from, to, subject, text, res);
-          res.status(200).json({
-            message: 'Leave has been Rejected by CD'
-          });
-        } else {
-          return res.status(400).json({
-            message: 'invalid progress'
-          });
-        }
-      } else { // Leave not home
-        // change status to rejected
-        // notify that supervisor rejected their leave request
-        await Leave.updateOne(
-          {
-            _id: leaveId
-          },
-          { $set: { status: 'rejected', rejectionReason: reason } }
-        );
-        // sends mail to staff and notification about supervisor leave rejection
-        // Send the email
-        // prettier-ignore
-        const text = `Dear ${user.fName}, 
-
-Your Leave has been rejected by your Supervisor.${footer}.
-                                   `;
-        Mailer(from, to, subject, text, res);
-        res.status(200).json({
-          message: 'Leave has been Rejected by supervisor'
+        return res.status(400).json({
+          message: 'Invalid status for staff leave handling'
         });
       }
     } else {
       return res.status(400).json({
-        message: 'Invalid Leave status'
+        message: 'This leave cannot be taken'
       });
     }
   } catch (err) {

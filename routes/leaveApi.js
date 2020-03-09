@@ -30,17 +30,10 @@ router.post(
       .not()
       .isEmpty(),
     check('staffEmail', 'Please Enter a Valid Email').isEmail(),
-    check('supervisorEmail', 'Please Enter a Valid Email').isEmail(),
     check('status', 'Please enter a valid status')
       .not()
       .isEmpty(),
     check('daysTaken', 'Please enter the total number of days')
-      .not()
-      .isEmpty(),
-    check('publicHolidays', 'Please enter the public holidays if any or "none"')
-      .not()
-      .isEmpty(),
-    check('comment', 'Please enter comments if any or "none"')
       .not()
       .isEmpty()
   ],

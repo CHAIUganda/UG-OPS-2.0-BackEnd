@@ -20,12 +20,15 @@ const createLeave = async (req, res) => {
     endDate,
     type,
     staffEmail,
-    supervisorEmail,
     daysTaken,
     publicHolidays, // array of days i.e ['25/12/2020','26/12/2020','01/01/2021']
-    comment,
     status
   } = req.body;
+
+  let { comment } = req.body;
+  if (comment === null) {
+    comment = '';
+  }
 
   try {
     const user = await User.findOne({
@@ -151,7 +154,7 @@ const createLeave = async (req, res) => {
     }
 
     // checks if user has enough leaves days happen here basing on what has been computed
-
+    const { supervisorEmail } = user;
     const leave = new Leave({
       startDate,
       endDate,
