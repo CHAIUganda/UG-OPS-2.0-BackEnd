@@ -42,9 +42,6 @@ router.post(
       .isEmpty(),
     check('comment', 'Please enter comments if any or "none"')
       .not()
-      .isEmpty(),
-    check('progress', 'Please enter a valid progress')
-      .not()
       .isEmpty()
   ],
   authenticator,

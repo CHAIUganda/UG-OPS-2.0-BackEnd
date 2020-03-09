@@ -24,8 +24,7 @@ const createLeave = async (req, res) => {
     daysTaken,
     publicHolidays, // array of days i.e ['25/12/2020','26/12/2020','01/01/2021']
     comment,
-    status,
-    progress
+    status
   } = req.body;
 
   try {
@@ -38,6 +37,7 @@ const createLeave = async (req, res) => {
       });
     }
     const { program } = user;
+    const progress = 'supervisor';
     // set timezone to kampala
     const CurrentDate = moment()
       .tz('Africa/Kampala')
