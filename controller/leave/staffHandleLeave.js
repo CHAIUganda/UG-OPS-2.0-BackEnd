@@ -20,12 +20,28 @@ const staffHandleLeave = async (req, res) => {
     status
   } = req.body;
   try {
+    // check if user exists
     const user = await User.findOne({
       email: staffEmail
     });
     if (!user) {
       return res.status(400).json({
         message: 'User does not Exists'
+      });
+    }
+    // check if HR exists in System
+    const hr = await User.findOne({ 'roles.hr': true });
+    if (!hr) {
+      return res.status(400).json({
+        message: 'HR is not Registered in system'
+      });
+    }
+
+    // check if Supervisor exists in System
+    const supervisor = await User.findOne({ email: user.supervisorEmail });
+    if (!supervisor) {
+      return res.status(400).json({
+        message: 'Supervisor is not Registered in system'
       });
     }
 
@@ -57,6 +73,14 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
         if (
           (user.type === 'expat' || user.type === 'tcn') && leave.type === 'Home'
         ) {
+          // check if CD exists in System
+          const cd = await User.findOne({ 'roles.countryDirector': true });
+          if (!cd) {
+            return res.status(400).json({
+              message: 'Country Director is not Registered in the system'
+            });
+          }
+
           // change status to taken
           await Leave.updateOne(
             {
@@ -65,40 +89,137 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
             { $set: { status: 'taken' } }
           );
           // sends mail to cd supervisor HR and notification about status
-          // Send the email
           // prettier-ignore
-          const text = `Hello, 
+          // email to HR
+          const text = `Hello  ${hr.fName}, 
 
 ${user.fName}  ${user.lName} will be off from ${leave.startDate} to ${leave.endDate}${footer}.
                          `;
-          Mailer(from, to, subject, text, res);
+          Mailer(from, hr.email, subject, text, res);
+
+          // email to CD
+          const textCd = `Hello  ${cd.fName}, 
+
+${user.fName}  ${user.lName} will be off from ${leave.startDate} to ${leave.endDate}${footer}.
+                         `;
+          Mailer(from, cd.email, subject, textCd, res);
+
+          // email to Supervisor
+          const textSupervisor = `Hello  ${supervisor.fName}, 
+
+${user.fName}  ${user.lName} will be off from ${leave.startDate} to ${leave.endDate}${footer}.
+                         `;
+          Mailer(from, supervisor.email, subject, textSupervisor, res);
 
           res.status(200).json({
             message: 'Leave has been taken. Enjoy your leave.'
           });
         } else {
           // Leave not home
-          // change status to approved and notify
-          // approve & notify that supervisor approved their leave request
+          // change status to taken
+
+          // change status to taken
           await Leave.updateOne(
             {
               _id: leaveId
             },
-            { $set: { status: 'approved' } }
+            { $set: { status: 'taken' } }
           );
-          // sends mail to staff and notification about leave approval
-          // Send the email
+          // sends mail to cd supervisor HR and notification about status
           // prettier-ignore
-          const text = `Dear ${user.fName}, 
+          // email to HR
+          const text = `Hello  ${hr.fName}, 
 
-Your Leave has been approved by your Supervisor${footer}.
-                 `;
-          Mailer(from, to, subject, text, res);
+${user.fName}  ${user.lName} will be off from ${leave.startDate} to ${leave.endDate}${footer}.
+                         `;
+          Mailer(from, hr.email, subject, text, res);
+
+          // email to Supervisor
+          const textSupervisor = `Hello  ${supervisor.fName}, 
+
+${user.fName}  ${user.lName} will be off from ${leave.startDate} to ${leave.endDate}${footer}.
+                         `;
+          Mailer(from, supervisor.email, subject, textSupervisor, res);
+
           res.status(200).json({
-            message: 'Leave has been Approved'
+            message: 'Leave has been taken. Enjoy your leave.'
           });
         }
       } else if (status === 'nottaken') {
+        // prettier-ignore
+        if (
+          (user.type === 'expat' || user.type === 'tcn') && leave.type === 'Home'
+        ) {
+          // check if CD exists in System
+          const cd = await User.findOne({ 'roles.countryDirector': true });
+          if (!cd) {
+            return res.status(400).json({
+              message: 'Country Director is not Registered in the system'
+            });
+          }
+
+          // change status to nottaken
+          await Leave.updateOne(
+            {
+              _id: leaveId
+            },
+            { $set: { status: 'nottaken' } }
+          );
+          // sends mail to cd supervisor HR and notification about status
+          // prettier-ignore
+          // email to HR
+          const text = `Hello  ${hr.fName}, 
+
+${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate} to ${leave.endDate}${footer}.
+                         `;
+          Mailer(from, hr.email, subject, text, res);
+
+          // email to CD
+          const textCd = `Hello  ${cd.fName}, 
+
+${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate} to ${leave.endDate}${footer}.
+                         `;
+          Mailer(from, cd.email, subject, textCd, res);
+
+          // email to Supervisor
+          const textSupervisor = `Hello  ${supervisor.fName}, 
+
+${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate} to ${leave.endDate}${footer}.
+                         `;
+          Mailer(from, supervisor.email, subject, textSupervisor, res);
+
+          res.status(200).json({
+            message: 'Leave has been Cancelled'
+          });
+        } else {
+          // Leave not home
+
+          // change status to nottaken
+          await Leave.updateOne(
+            {
+              _id: leaveId
+            },
+            { $set: { status: 'nottaken' } }
+          );
+          // sends mail to cd supervisor HR and notification about status
+          // prettier-ignore
+          // email to HR
+          const text = `Hello  ${hr.fName}, 
+
+${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate} to ${leave.endDate}${footer}.
+                         `;
+          Mailer(from, hr.email, subject, text, res);
+          // email to Supervisor
+          const textSupervisor = `Hello  ${supervisor.fName}, 
+
+${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate} to ${leave.endDate}${footer}.
+                         `;
+          Mailer(from, supervisor.email, subject, textSupervisor, res);
+
+          res.status(200).json({
+            message: 'Leave has been Cancelled'
+          });
+        }
       } else {
         return res.status(400).json({
           message: 'Invalid status for staff leave handling'

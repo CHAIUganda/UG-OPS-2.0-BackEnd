@@ -15,16 +15,24 @@ const getSupervisorLeaves = async (req, res) => {
       });
     }
     let query; // more queries to be added for leaves
-    if (status) {
-      if (status === 'all') {
-        query = { supervisorEmail: staffEmail };
-      } else {
-        query = { supervisorEmail: staffEmail, status };
-      }
-    }
 
+    if (status === 'all') {
+      query = { supervisorEmail: staffEmail };
+    } else {
+      query = { supervisorEmail: staffEmail, status };
+    }
     const leaves = await Leave.find(query);
-    res.status(200).json(leaves);
+
+    let combinedArray = [];
+    if (user.roles.countryDirector) {
+      const progress = 'countryDirector';
+      const queryCd = { status, progress };
+      const leavesCd = await Leave.find(queryCd);
+      combinedArray = [...leaves, ...leavesCd];
+      res.status(200).json(combinedArray);
+    } else {
+      res.status(200).json(leaves);
+    }
   } catch (e) {
     console.log(e.message);
     debug(e.message);

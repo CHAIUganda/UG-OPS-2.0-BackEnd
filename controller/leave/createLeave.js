@@ -179,7 +179,8 @@ const createLeave = async (req, res) => {
     await leave.save();
     // send email notification to supervisor if leave is is pending
     res.status(201).json({
-      message: 'Leave Created successfully'
+      message: 'Leave Created successfully',
+      leave
     });
   } catch (err) {
     debug(err.message);
