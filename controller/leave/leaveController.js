@@ -5,6 +5,7 @@ const getStaffLeaves = require('./getStaffLeaves');
 const getSupervisorLeaves = require('./getSupervisorLeaves');
 const supervisorHandleLeave = require('./supervisorHandleLeave');
 const getAllStaffLeaves = require('./getAllStaffLeaves');
+const getStaffLeavesTaken = require('./getStaffLeavesTaken');
 
 // Handle new Leave
 exports.createLeave = createLeave;
@@ -20,3 +21,6 @@ exports.supervisorHandleLeave = supervisorHandleLeave;
 
 // Handle get all staff Leaves
 exports.getAllStaffLeaves = getAllStaffLeaves;
+
+// Handle get staff Leaves Taken
+exports.getStaffLeavesTaken = getStaffLeavesTaken;

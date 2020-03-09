@@ -106,4 +106,16 @@ router.get(
   leaveController.getAllStaffLeaves
 );
 
+/**
+ * @method - GET
+ * @description - Get Staff Leaves Taken. authenticator is a middleware will be used to
+ * verify the token
+ * @param - /getStaffLeavesTaken
+ */
+router.get(
+  '/getStaffLeavesTaken/:email',
+  authenticator,
+  leaveController.getStaffLeavesTaken
+);
+
 module.exports = router;
