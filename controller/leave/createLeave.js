@@ -1,5 +1,5 @@
 const { validationResult } = require('express-validator/check');
-const moment = require('moment-timezone');
+// const moment = require('moment-timezone');
 const debug = require('debug')('leave-controller');
 const errorToString = require('../../helpers/errorToString');
 const Leave = require('../../model/Leave');
@@ -17,7 +17,6 @@ const createLeave = async (req, res) => {
   // prettier-ignore
   const {
     startDate,
-    endDate,
     type,
     staffEmail,
     daysTaken,
@@ -26,6 +25,7 @@ const createLeave = async (req, res) => {
   } = req.body;
 
   let { comment } = req.body;
+  let { endDate } = req.body;
   if (comment === null) {
     comment = '';
   }
@@ -42,18 +42,17 @@ const createLeave = async (req, res) => {
     const { program } = user;
     const progress = 'supervisor';
     // set timezone to kampala
-    const CurrentDate = moment()
-      .tz('Africa/Kampala')
-      .format();
-    const today = new Date(CurrentDate);
-    const currentMonth = today.getMonth();
+    // const CurrentDate = moment().tz('Africa/Kampala').format();
+    endDate = new Date(endDate);
+    const endDateMonth = endDate.getMonth();
 
     // Computing Annual Leave
     let accruedAnnualLeave;
-    if (currentMonth === 0) {
+    if (endDateMonth === 0) {
       accruedAnnualLeave = 0;
     } else {
-      accruedAnnualLeave = currentMonth * 1.75;
+      // accruedAnnualLeave = currentMonth * 1.75;
+      accruedAnnualLeave = Math.trunc(endDateMonth * 1.75);
     }
     const { annualLeaveBF } = user;
     const leaveDetails = await getLeavesTaken(user);
@@ -89,7 +88,7 @@ const createLeave = async (req, res) => {
         });
       }
     } else if (type === 'Home') {
-      if (user.type !== 'Expat' || user.type !== 'tcn') {
+      if (user.type === 'local') {
         return res.status(400).json({
           message: 'Home leave only given to Expatriates and TCNs'
         });
@@ -99,7 +98,10 @@ const createLeave = async (req, res) => {
       const chk2 = totalAcruedAnualLeavePlusAnualLeaveBF < totalHome;
       if (chk1 || chk2) {
         return res.status(400).json({
-          message: 'You Dont have enough Annual Leave days'
+          message: 'You Dont have enough Annual Leave days',
+          annualLeaveTaken,
+          daysTaken,
+          totalAcruedAnualLeavePlusAnualLeaveBF
         });
       }
     } else if (type === 'Maternity') {

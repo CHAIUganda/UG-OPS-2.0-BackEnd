@@ -67,10 +67,10 @@ router.get(
 
 /**
  * @method - POST
- * @description - Handle a leave. Involves aprroving or rejecting
+ * @description - Supervisor Handle a leave. Involves aprroving or rejecting
  * a leave by supervisor or CD authenticator is a middleware will be used to
  * verify the token.
- * @param - /leaveApi/handleLeave
+ * @param - /leaveApi/supervisorHandleLeave
  */
 router.post(
   '/supervisorHandleLeave',
@@ -109,6 +109,28 @@ router.get(
   '/getStaffLeavesTaken/:email',
   authenticator,
   leaveController.getStaffLeavesTaken
+);
+
+/**
+ * @method - POST
+ * @description - Staff Handle a leave. Involves taking or not taking
+ * a leave by staff authenticator is a middleware will be used to
+ * verify the token.
+ * @param - /leaveApi/staffHandleLeave
+ */
+router.post(
+  '/staffHandleLeave',
+  [
+    check('leaveId', 'Please Enter a Valid Leave Id')
+      .not()
+      .isEmpty(),
+    check('status', 'Please Enter a Valid Status')
+      .not()
+      .isEmpty(),
+    check('staffEmail', 'Please Enter a Valid Staff Email').isEmail()
+  ],
+  authenticator,
+  leaveController.staffHandleLeave
 );
 
 module.exports = router;
