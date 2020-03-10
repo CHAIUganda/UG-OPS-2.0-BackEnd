@@ -30,7 +30,7 @@ const supervisorHandleLeave = async (req, res) => {
     });
     if (!user) {
       return res.status(400).json({
-        message: 'User does not Exists'
+        message: 'User does not Exist'
       });
     }
 

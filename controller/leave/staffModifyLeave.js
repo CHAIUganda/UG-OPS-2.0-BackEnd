@@ -1,11 +1,12 @@
 const { validationResult } = require('express-validator/check');
 const debug = require('debug')('leave-controller');
+const moment = require('moment-timezone');
 const errorToString = require('../../helpers/errorToString');
 const Leave = require('../../model/Leave');
 const User = require('../../model/User');
 const Mailer = require('../../helpers/Mailer');
 
-const staffHandleLeave = async (req, res) => {
+const staffModifyLeave = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
@@ -17,9 +18,17 @@ const staffHandleLeave = async (req, res) => {
   const {
     leaveId,
     staffEmail,
-    status
+    action
   } = req.body;
+  // action can be changeStartDate changeEndDate cancelLeave
+  let { startDate, endDate } = req.body;
   try {
+    // set timezone to kampala
+    const CurrentDate = moment()
+      .tz('Africa/Kampala')
+      .format();
+    endDate = new Date(endDate);
+    startDate = new Date(startDate);
     // check if user exists
     const user = await User.findOne({
       email: staffEmail
@@ -67,8 +76,13 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
     // if leave is taken by staff notify the HR and Supervisor.
 
     // handle leave here
-    if (leave.status === 'approved') {
-      if (status === 'taken') {
+    if (leave.status === 'taken') {
+      if (action === 'changeStartDate') {
+        if (action === 'changeStartDate') {
+          return res.status(400).json({
+            message: 'Country Director is not Registered in the system'
+          });
+        }
         // prettier-ignore
         if (
           (user.type === 'expat' || user.type === 'tcn') && leave.type === 'Home'
@@ -227,7 +241,7 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
       }
     } else {
       return res.status(400).json({
-        message: 'This leave has not yet been approved'
+        message: `This leave with a status: ${leave.status} cannot be not modified`
       });
     }
   } catch (err) {
@@ -238,4 +252,4 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
   }
 };
 
-module.exports = staffHandleLeave;
+module.exports = staffModifyLeave;

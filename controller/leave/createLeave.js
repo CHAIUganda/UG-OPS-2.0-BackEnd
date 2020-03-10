@@ -36,152 +36,172 @@ const createLeave = async (req, res) => {
     });
     if (!user) {
       return res.status(400).json({
-        message: 'User does not Exists'
+        message: 'User does not Exist'
       });
     }
-    const { program } = user;
-    const progress = 'supervisor';
-    // set timezone to kampala
-    // const CurrentDate = moment().tz('Africa/Kampala').format();
-    endDate = new Date(endDate);
-    const endDateMonth = endDate.getMonth();
-
-    // Computing Annual Leave
-    let accruedAnnualLeave;
-    if (endDateMonth === 0) {
-      accruedAnnualLeave = 0;
-    } else {
-      // accruedAnnualLeave = currentMonth * 1.75;
-      accruedAnnualLeave = Math.trunc(endDateMonth * 1.75);
+    if (status === 'pending') {
+      const chkleaves = await Leave.find({
+        _id: { $in: user.leaves },
+        status,
+        type
+      });
+      if (chkleaves.length > 0) {
+        return res.status(400).json({
+          message: `A pending Leave of type ${type} Already exists `,
+          chkleaves
+        });
+      }
     }
-    const { annualLeaveBF } = user;
-    const leaveDetails = await getLeavesTaken(user);
 
-    const {
-      unPaidLeaveTaken,
-      homeLeaveTaken,
-      annualLeaveTaken,
-      maternityLeaveTaken,
-      paternityLeaveTaken,
-      sickLeaveTaken,
-      studyLeaveTaken
-    } = leaveDetails;
+    if (status === 'pending' || status === 'planned') {
+      const { program } = user;
+      const progress = 'supervisor';
+      // set timezone to kampala
+      // const CurrentDate = moment().tz('Africa/Kampala').format();
+      endDate = new Date(endDate);
+      const endDateMonth = endDate.getMonth();
 
-    // prettier-ignore
-    const totalAcruedAnualLeavePlusAnualLeaveBF = accruedAnnualLeave + annualLeaveBF;
-    const maternity = 60;
-    const paternity = 7;
-    const sick = 42;
-    const study = 4;
-    const unpaid = 60;
+      // Computing Annual Leave
+      let accruedAnnualLeave;
+      if (endDateMonth === 0) {
+        accruedAnnualLeave = 0;
+      } else {
+        // accruedAnnualLeave = currentMonth * 1.75;
+        accruedAnnualLeave = Math.trunc(endDateMonth * 1.75);
+      }
+      const { annualLeaveBF } = user;
+      const leaveDetails = await getLeavesTaken(user);
 
-    if (type === 'Paternity') {
-      if (user.gender === 'Female') {
+      const {
+        unPaidLeaveTaken,
+        homeLeaveTaken,
+        annualLeaveTaken,
+        maternityLeaveTaken,
+        paternityLeaveTaken,
+        sickLeaveTaken,
+        studyLeaveTaken
+      } = leaveDetails;
+
+      // prettier-ignore
+      const totalAcruedAnualLeavePlusAnualLeaveBF = accruedAnnualLeave + annualLeaveBF;
+      const maternity = 60;
+      const paternity = 7;
+      const sick = 42;
+      const study = 4;
+      const unpaid = 60;
+
+      if (type === 'Paternity') {
+        if (user.gender === 'Female') {
+          return res.status(400).json({
+            message: 'Paternity leave only given to Gentlemen'
+          });
+        }
+        const totalPaternity = paternityLeaveTaken + daysTaken;
+        if (paternity < totalPaternity) {
+          return res.status(400).json({
+            message: 'You Dont have enough Paternity Leave days'
+          });
+        }
+      } else if (type === 'Home') {
+        if (user.type === 'local') {
+          return res.status(400).json({
+            message: 'Home leave only given to Expatriates and TCNs'
+          });
+        }
+        const totalHome = homeLeaveTaken + annualLeaveTaken + daysTaken;
+        const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalHome;
+        if (chk1) {
+          return res.status(400).json({
+            message: 'You Dont have enough Annual Leave days',
+            annualLeaveTaken,
+            daysTaken,
+            totalAcruedAnualLeavePlusAnualLeaveBF
+          });
+        }
+      } else if (type === 'Maternity') {
+        if (user.gender === 'Male') {
+          return res.status(400).json({
+            message: 'Maternity leave only given to Ladies'
+          });
+        }
+        const totalMaternity = maternityLeaveTaken + daysTaken;
+        if (maternity < totalMaternity) {
+          return res.status(400).json({
+            message: 'You Dont have enough Maternity Leave days'
+          });
+        }
+      } else if (type === 'Sick') {
+        const totalSick = sickLeaveTaken + daysTaken;
+        if (sick < totalSick) {
+          return res.status(400).json({
+            message: 'You Dont have enough Sick Leave days'
+          });
+        }
+      } else if (type === 'Unpaid') {
+        const totalUnpaid = unPaidLeaveTaken + daysTaken;
+        if (unpaid < totalUnpaid) {
+          return res.status(400).json({
+            message: 'You Dont have enough Unpaid Leave days'
+          });
+        }
+      } else if (type === 'Study') {
+        const totalStudy = studyLeaveTaken + daysTaken;
+        if (study < totalStudy) {
+          return res.status(400).json({
+            message: 'You Dont have enough Study Leave days'
+          });
+        }
+      } else if (type === 'Annual') {
+        const totalAnnual = annualLeaveTaken + daysTaken;
+        const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalAnnual;
+        if (chk1) {
+          return res.status(400).json({
+            message: 'You Dont have enough Annual Leave days',
+            annualLeaveTaken,
+            daysTaken,
+            totalAcruedAnualLeavePlusAnualLeaveBF
+          });
+        }
+      } else {
         return res.status(400).json({
-          message: 'Paternity leave only given to Gentlemen'
+          message: 'Invalid Leave type selected'
         });
       }
-      const totalPaternity = paternityLeaveTaken + daysTaken;
-      if (paternity < totalPaternity) {
-        return res.status(400).json({
-          message: 'You Dont have enough Paternity Leave days'
-        });
-      }
-    } else if (type === 'Home') {
-      if (user.type === 'local') {
-        return res.status(400).json({
-          message: 'Home leave only given to Expatriates and TCNs'
-        });
-      }
-      const totalHome = homeLeaveTaken + annualLeaveTaken + daysTaken;
-      const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalHome;
-      if (chk1) {
-        return res.status(400).json({
-          message: 'You Dont have enough Annual Leave days',
-          annualLeaveTaken,
-          daysTaken,
-          totalAcruedAnualLeavePlusAnualLeaveBF
-        });
-      }
-    } else if (type === 'Maternity') {
-      if (user.gender === 'Male') {
-        return res.status(400).json({
-          message: 'Maternity leave only given to Ladies'
-        });
-      }
-      const totalMaternity = maternityLeaveTaken + daysTaken;
-      if (maternity < totalMaternity) {
-        return res.status(400).json({
-          message: 'You Dont have enough Maternity Leave days'
-        });
-      }
-    } else if (type === 'Sick') {
-      const totalSick = sickLeaveTaken + daysTaken;
-      if (sick < totalSick) {
-        return res.status(400).json({
-          message: 'You Dont have enough Sick Leave days'
-        });
-      }
-    } else if (type === 'Unpaid') {
-      const totalUnpaid = unPaidLeaveTaken + daysTaken;
-      if (unpaid < totalUnpaid) {
-        return res.status(400).json({
-          message: 'You Dont have enough Unpaid Leave days'
-        });
-      }
-    } else if (type === 'Study') {
-      const totalStudy = studyLeaveTaken + daysTaken;
-      if (study < totalStudy) {
-        return res.status(400).json({
-          message: 'You Dont have enough Study Leave days'
-        });
-      }
-    } else if (type === 'Annual') {
-      const totalAnnual = annualLeaveTaken + daysTaken;
-      const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalAnnual;
-      if (chk1) {
-        return res.status(400).json({
-          message: 'You Dont have enough Annual Leave days',
-          annualLeaveTaken,
-          daysTaken,
-          totalAcruedAnualLeavePlusAnualLeaveBF
-        });
-      }
+
+      // checks if user has enough leaves days happen here basing on what has been computed
+      const { supervisorEmail } = user;
+      const leave = new Leave({
+        startDate,
+        endDate,
+        type,
+        staffEmail,
+        supervisorEmail,
+        daysTaken,
+        publicHolidays,
+        // array of days i.e ["2020-02-25","2020-02-29"]
+        comment,
+        status,
+        progress,
+        program
+      });
+      // leave id saved on staff collection after it has been planned, it the status that is updated
+      await User.updateOne(
+        {
+          email: staffEmail
+        },
+        { $push: { leaves: leave._id } }
+      );
+      await leave.save();
+      // send email notification to supervisor if leave is is pending
+      res.status(201).json({
+        message: 'Leave Created successfully',
+        leave
+      });
     } else {
-      return res.status(400).json({
-        message: 'Invalid Leave type selected'
+      res.status(400).json({
+        message: 'Invalid Leave Status'
       });
     }
-
-    // checks if user has enough leaves days happen here basing on what has been computed
-    const { supervisorEmail } = user;
-    const leave = new Leave({
-      startDate,
-      endDate,
-      type,
-      staffEmail,
-      supervisorEmail,
-      daysTaken,
-      publicHolidays,
-      // array of days i.e ["2020-02-25","2020-02-29"]
-      comment,
-      status,
-      progress,
-      program
-    });
-    // leave id saved on staff collection after it has been planned, it the status that is updated
-    await User.updateOne(
-      {
-        email: staffEmail
-      },
-      { $push: { leaves: leave._id } }
-    );
-    await leave.save();
-    // send email notification to supervisor if leave is is pending
-    res.status(201).json({
-      message: 'Leave Created successfully',
-      leave
-    });
   } catch (err) {
     debug(err.message);
     console.log(err.message);
