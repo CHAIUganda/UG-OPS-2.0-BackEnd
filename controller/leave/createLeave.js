@@ -82,7 +82,7 @@ const createLeave = async (req, res) => {
         });
       }
       const totalPaternity = paternityLeaveTaken + daysTaken;
-      if (paternity === totalPaternity || paternity < totalPaternity) {
+      if (paternity < totalPaternity) {
         return res.status(400).json({
           message: 'You Dont have enough Paternity Leave days'
         });
@@ -94,9 +94,8 @@ const createLeave = async (req, res) => {
         });
       }
       const totalHome = homeLeaveTaken + annualLeaveTaken + daysTaken;
-      const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF === totalHome;
-      const chk2 = totalAcruedAnualLeavePlusAnualLeaveBF < totalHome;
-      if (chk1 || chk2) {
+      const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalHome;
+      if (chk1) {
         return res.status(400).json({
           message: 'You Dont have enough Annual Leave days',
           annualLeaveTaken,
@@ -111,37 +110,36 @@ const createLeave = async (req, res) => {
         });
       }
       const totalMaternity = maternityLeaveTaken + daysTaken;
-      if (maternity === totalMaternity || maternity < totalMaternity) {
+      if (maternity < totalMaternity) {
         return res.status(400).json({
           message: 'You Dont have enough Maternity Leave days'
         });
       }
     } else if (type === 'Sick') {
       const totalSick = sickLeaveTaken + daysTaken;
-      if (sick === totalSick || sick < totalSick) {
+      if (sick < totalSick) {
         return res.status(400).json({
           message: 'You Dont have enough Sick Leave days'
         });
       }
     } else if (type === 'Unpaid') {
       const totalUnpaid = unPaidLeaveTaken + daysTaken;
-      if (unpaid === totalUnpaid || unpaid < totalUnpaid) {
+      if (unpaid < totalUnpaid) {
         return res.status(400).json({
           message: 'You Dont have enough Unpaid Leave days'
         });
       }
     } else if (type === 'Study') {
       const totalStudy = studyLeaveTaken + daysTaken;
-      if (study === totalStudy || study < totalStudy) {
+      if (study < totalStudy) {
         return res.status(400).json({
           message: 'You Dont have enough Study Leave days'
         });
       }
     } else if (type === 'Annual') {
       const totalAnnual = annualLeaveTaken + daysTaken;
-      const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF === totalAnnual;
-      const chk2 = totalAcruedAnualLeavePlusAnualLeaveBF < totalAnnual;
-      if (chk1 || chk2) {
+      const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalAnnual;
+      if (chk1) {
         return res.status(400).json({
           message: 'You Dont have enough Annual Leave days',
           annualLeaveTaken,

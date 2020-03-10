@@ -93,21 +93,21 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
           // email to HR
           const text = `Hello  ${hr.fName}, 
 
-${user.fName}  ${user.lName} will be off from ${leave.startDate} to ${leave.endDate}${footer}.
+${user.fName}  ${user.lName} will be off from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
                          `;
           Mailer(from, hr.email, subject, text, res);
 
           // email to CD
           const textCd = `Hello  ${cd.fName}, 
 
-${user.fName}  ${user.lName} will be off from ${leave.startDate} to ${leave.endDate}${footer}.
+${user.fName}  ${user.lName} will be off from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
                          `;
           Mailer(from, cd.email, subject, textCd, res);
 
           // email to Supervisor
           const textSupervisor = `Hello  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} will be off from ${leave.startDate} to ${leave.endDate}${footer}.
+${user.fName}  ${user.lName} will be off from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
                          `;
           Mailer(from, supervisor.email, subject, textSupervisor, res);
 
@@ -130,14 +130,14 @@ ${user.fName}  ${user.lName} will be off from ${leave.startDate} to ${leave.endD
           // email to HR
           const text = `Hello  ${hr.fName}, 
 
-${user.fName}  ${user.lName} will be off from ${leave.startDate} to ${leave.endDate}${footer}.
+${user.fName}  ${user.lName} will be off from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
                          `;
           Mailer(from, hr.email, subject, text, res);
 
           // email to Supervisor
           const textSupervisor = `Hello  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} will be off from ${leave.startDate} to ${leave.endDate}${footer}.
+${user.fName}  ${user.lName} will be off from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
                          `;
           Mailer(from, supervisor.email, subject, textSupervisor, res);
 
@@ -170,21 +170,21 @@ ${user.fName}  ${user.lName} will be off from ${leave.startDate} to ${leave.endD
           // email to HR
           const text = `Hello  ${hr.fName}, 
 
-${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate} to ${leave.endDate}${footer}.
+${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
                          `;
           Mailer(from, hr.email, subject, text, res);
 
           // email to CD
           const textCd = `Hello  ${cd.fName}, 
 
-${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate} to ${leave.endDate}${footer}.
+${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
                          `;
           Mailer(from, cd.email, subject, textCd, res);
 
           // email to Supervisor
           const textSupervisor = `Hello  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate} to ${leave.endDate}${footer}.
+${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
                          `;
           Mailer(from, supervisor.email, subject, textSupervisor, res);
 
@@ -206,13 +206,13 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
           // email to HR
           const text = `Hello  ${hr.fName}, 
 
-${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate} to ${leave.endDate}${footer}.
+${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
                          `;
           Mailer(from, hr.email, subject, text, res);
           // email to Supervisor
           const textSupervisor = `Hello  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate} to ${leave.endDate}${footer}.
+${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
                          `;
           Mailer(from, supervisor.email, subject, textSupervisor, res);
 
