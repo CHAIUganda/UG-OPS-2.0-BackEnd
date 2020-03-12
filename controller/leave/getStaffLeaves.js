@@ -21,7 +21,9 @@ const getStaffLeaves = async (req, res) => {
       } else if (
         // eslint-disable-next-line operator-linebreak
         status === 'Pending Supervisor' ||
-        status === 'Pending Country Director'
+        // eslint-disable-next-line operator-linebreak
+        status === 'Pending Country Director' ||
+        status === 'Planned'
       ) {
         query = { _id: { $in: user.leaves }, status };
       } else {

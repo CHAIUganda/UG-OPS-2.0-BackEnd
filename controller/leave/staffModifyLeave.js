@@ -134,7 +134,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
                   $push: {
                     modLeaves: {
                       // eslint-disable-next-line max-len
-                      startDate: oldStartDate, endDate: oldEndDate, daysTaken: oldDaysTaken, comment: oldComment,leaveDays: oldLeaveDays, weekendDays: oldWeekendDays, publicHolidays: oldPublicHolidays
+                      startDate: oldStartDate, endDate: oldEndDate, daysTaken: oldDaysTaken, comment: oldComment, leaveDays: oldLeaveDays, weekendDays: oldWeekendDays, publicHolidays: oldPublicHolidays
 
                     }
                   }
