@@ -18,8 +18,16 @@ const getStaffLeaves = async (req, res) => {
     if (status) {
       if (status === 'all') {
         query = { _id: { $in: user.leaves } };
-      } else {
+      } else if (
+        // eslint-disable-next-line operator-linebreak
+        status === 'Pending Supervisor' ||
+        status === 'Pending Country Director'
+      ) {
         query = { _id: { $in: user.leaves }, status };
+      } else {
+        return res.status(400).json({
+          message: 'Invalid Status'
+        });
       }
     }
 

@@ -20,6 +20,8 @@ const createLeave = async (req, res) => {
     type,
     staffEmail,
     daysTaken,
+    leaveDays,
+    weekendDays,
     publicHolidays, // array of days i.e ['25/12/2020','26/12/2020','01/01/2021']
     status
   } = req.body;
@@ -53,9 +55,8 @@ const createLeave = async (req, res) => {
       }
     }
 
-    if (status === 'pending' || status === 'planned') {
+    if (status === 'Pending Supervisor' || status === 'Planned') {
       const { program } = user;
-      const progress = 'supervisor';
       // set timezone to kampala
       // const CurrentDate = moment().tz('Africa/Kampala').format();
       endDate = new Date(endDate);
@@ -174,14 +175,19 @@ const createLeave = async (req, res) => {
         startDate,
         endDate,
         type,
-        staffEmail,
+        staff: {
+          email: user.email,
+          fName: user.fName,
+          lName: user.lName
+        },
         supervisorEmail,
         daysTaken,
+        leaveDays,
+        weekendDays,
         publicHolidays,
         // array of days i.e ["2020-02-25","2020-02-29"]
         comment,
         status,
-        progress,
         program
       });
       // leave id saved on staff collection after it has been planned, it the status that is updated

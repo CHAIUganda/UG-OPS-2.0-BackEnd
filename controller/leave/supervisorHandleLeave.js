@@ -55,38 +55,38 @@ Clinton Health Access Initiative
 Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
 
     // handle leave here
-    if (status === 'approved') {
+    if (status === 'Approved') {
       // prettier-ignore
       if (
         (user.type === 'expat' || user.type === 'tcn') && leave.type === 'Home'
       ) {
-        if (leave.progress === 'supervisor') {
+        if (leave.status === 'Pending Supervisor') {
           // change progress to cd and notify
           await Leave.updateOne(
             {
               _id: leaveId
             },
-            { $set: { progress: 'countryDirector' } }
+            { $set: { status: 'Pending Country Director' } }
           );
           // sends mail to staff and notification about progress
           // Send the email
           // prettier-ignore
           const text = `Dear ${user.fName}, 
 
-Your Leave has been approved by your supervisor. It is pending Country director approval${footer}.
+Leave has been approved. It is pending Country director approval${footer}.
                          `;
           Mailer(from, to, subject, text, res);
 
           res.status(200).json({
-            message: 'Leave has been Approved by your supervisor, Pending CD approval'
+            message: 'Leave has been Approved, Pending CD approval'
           });
-        } else if (leave.progress === 'countryDirector') {
+        } else if (leave.status === 'Pending Country Director') {
           // approve & notify that CD approved their leave request
           await Leave.updateOne(
             {
               _id: leaveId
             },
-            { $set: { status: 'approved' } }
+            { $set: { status: 'Approved' } }
           );
           // sends mail to staff and notification about leave approval
           // Send the email
@@ -100,10 +100,14 @@ Your Leave has been approved by the Country director${footer}.
           res.status(200).json({
             message: 'Leave has been Approved'
           });
+        } else if (leave.status === 'Approved') {
+          res.status(400).json({
+            message: 'Leave has Already been Approved'
+          });
         } else {
           // respond with invalid progress
           return res.status(400).json({
-            message: 'invalid progress'
+            message: 'invalid Status'
           });
         }
       } else {
@@ -114,7 +118,7 @@ Your Leave has been approved by the Country director${footer}.
           {
             _id: leaveId
           },
-          { $set: { status: 'approved' } }
+          { $set: { status: 'Approved' } }
         );
         // sends mail to staff and notification about leave approval
         // Send the email
@@ -128,54 +132,54 @@ Your Leave has been approved by your Supervisor${footer}.
           message: 'Leave has been Approved'
         });
       }
-    } else if (status === 'rejected') {
+    } else if (status === 'Declined') {
       // prettier-ignore
       if (
         (user.type === 'expat' || user.type === 'tcn') && leave.type === 'Home'
       ) {
-        if (leave.progress === 'supervisor') {
+        if (leave.status === 'Pending Supervisor') {
           // change status to rejected and notify
           // notify that supervisor rejected their leave request
           await Leave.updateOne(
             {
               _id: leaveId
             },
-            { $set: { status: 'rejected', rejectionReason: reason } }
+            { $set: { status: 'Supervisor Declined', rejectionReason: reason } }
           );
           // sends mail to staff and notification about supervisor leave rejection
           // Send the email
           // prettier-ignore
           const text = `Dear ${user.fName}, 
 
-Your Leave has been rejected by your Supervisor${footer}.
+Your Leave has been Declined by your Supervisor${footer}.
                                    `;
           Mailer(from, to, subject, text, res);
           res.status(200).json({
-            message: 'Leave has been Rejected by supervisor'
+            message: 'Leave has been Declined by supervisor'
           });
-        } else if (leave.progress === 'countryDirector') {
+        } else if (leave.status === 'Pending Country Director') {
           // change status to rejected and notify
           // notify that CD rejected their leave request
           await Leave.updateOne(
             {
               _id: leaveId
             },
-            { $set: { status: 'rejected', rejectionReason: reason } }
+            { $set: { status: 'Country Director Declined', rejectionReason: reason } }
           );
           // sends mail to staff and notification about CD leave rejection
           // Send the email
           // prettier-ignore
           const text = `Dear ${user.fName}, 
 
-Your Leave has been rejected by the Country director.${footer}.
+Your Leave has been Declined by the Country director.${footer}.
                                    `;
           Mailer(from, to, subject, text, res);
           res.status(200).json({
-            message: 'Leave has been Rejected by CD'
+            message: 'Leave has been Declined'
           });
         } else {
           return res.status(400).json({
-            message: 'invalid progress'
+            message: 'Invalid Status'
           });
         }
       } else { // Leave not home
@@ -185,18 +189,18 @@ Your Leave has been rejected by the Country director.${footer}.
           {
             _id: leaveId
           },
-          { $set: { status: 'rejected', rejectionReason: reason } }
+          { $set: { status: 'Supervisor Declined', rejectionReason: reason } }
         );
         // sends mail to staff and notification about supervisor leave rejection
         // Send the email
         // prettier-ignore
         const text = `Dear ${user.fName}, 
 
-Your Leave has been rejected by your Supervisor.${footer}.
+Your Leave has been Declined by your Supervisor.${footer}.
                                    `;
         Mailer(from, to, subject, text, res);
         res.status(200).json({
-          message: 'Leave has been Rejected by supervisor'
+          message: 'Leave has been Declined'
         });
       }
     } else {

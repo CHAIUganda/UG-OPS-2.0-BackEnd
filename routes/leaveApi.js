@@ -33,6 +33,9 @@ router.post(
     check('status', 'Please enter a valid status')
       .not()
       .isEmpty(),
+    check('leaveDays', 'Please enter the Leave days Taken')
+      .not()
+      .isEmpty(),
     check('daysTaken', 'Please enter the total number of days')
       .not()
       .isEmpty()
@@ -131,6 +134,40 @@ router.post(
   ],
   authenticator,
   leaveController.staffHandleLeave
+);
+
+/**
+ * @method - POST
+ * @description - Staff Modify leave. Involves modifying
+ * a leave by staff authenticator is a middleware will be used to
+ * verify the token.
+ * @param - /leaveApi/staffModifyLeave
+ */
+router.post(
+  '/staffModifyLeave',
+  [
+    check('startDate', 'Please Enter a Valid StartDate')
+      .not()
+      .isEmpty(),
+    check('endDate', 'Please Enter a Valid EndDate')
+      .not()
+      .isEmpty(),
+    check('leaveId', 'Please Enter a Valid Leave Id')
+      .not()
+      .isEmpty(),
+    check('action', 'Please Enter an action')
+      .not()
+      .isEmpty(),
+    check('staffEmail', 'Please Enter a Valid Staff Email').isEmail(),
+    check('leaveDays', 'Please enter the Leave days Taken')
+      .not()
+      .isEmpty(),
+    check('daysTaken', 'Please enter the total number of days')
+      .not()
+      .isEmpty()
+  ],
+  authenticator,
+  leaveController.staffModifyLeave
 );
 
 module.exports = router;

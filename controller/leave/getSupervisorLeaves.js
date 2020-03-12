@@ -25,8 +25,8 @@ const getSupervisorLeaves = async (req, res) => {
 
     let combinedArray = [];
     if (user.roles.countryDirector) {
-      const progress = 'countryDirector';
-      const queryCd = { status, progress };
+      const statusCd = 'Pending Country Director';
+      const queryCd = { status: statusCd };
       const leavesCd = await Leave.find(queryCd);
       combinedArray = [...leaves, ...leavesCd];
       res.status(200).json(combinedArray);

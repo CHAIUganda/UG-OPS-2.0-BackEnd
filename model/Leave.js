@@ -19,15 +19,27 @@ const LeaveSchema = mongoose.Schema({
     type: Number,
     required: true
   },
+  leaveDays: [Date],
+  weekendDays: [Date],
   publicHolidays: [Date],
   type: {
     // STUDY, ANNUAL ..... HOME
     type: String,
     required: true
   },
-  staffEmail: {
-    type: String,
-    required: true
+  staff: {
+    email: {
+      type: String,
+      required: true
+    },
+    fName: {
+      type: String,
+      required: true
+    },
+    lName: {
+      type: String,
+      required: true
+    }
   },
   supervisorEmail: {
     type: String,
@@ -39,14 +51,9 @@ const LeaveSchema = mongoose.Schema({
     required: true
   },
   comment: {
-    // Comments/Description   optional
+    // Comments/Description   optional on application
     type: String,
     required: false
-  },
-  progress: {
-    // supervisor countyDirector
-    type: String,
-    required: true
   },
   program: {
     // program
@@ -58,6 +65,24 @@ const LeaveSchema = mongoose.Schema({
     // optional reason why supervisor o countyDirector rejeccted
     type: String,
     required: false
+  },
+  modificationDetails: {
+    isModified: {
+      // To track is leave has been modified
+      type: Boolean,
+      default: false
+    },
+    modLeaves: [
+      {
+        StartDate: Date,
+        endDate: Date,
+        daysTaken: Number,
+        comment: String,
+        leaveDays: [Date],
+        weekendDays: [Date],
+        publicHolidays: [Date]
+      }
+    ]
   }
 });
 
