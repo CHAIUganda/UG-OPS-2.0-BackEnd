@@ -1,11 +1,13 @@
 const debug = require('debug')('server');
 const Program = require('../../model/Program');
 const Leave = require('../../model/Leave');
+const getLeaveDaysNo = require('./getLeaveDaysNo');
+const PublicHoliday = require('../../model/PublicHoliday');
 
 const getAllStaffLeaves = async (req, res) => {
   try {
     // request.user is getting fetched from Middleware after token authentication
-
+    const publicHolidays = await PublicHoliday.find({});
     const { program } = req.params;
     const { status } = req.params;
     if (!program === 'all') {
@@ -29,7 +31,50 @@ const getAllStaffLeaves = async (req, res) => {
     }
 
     const leaves = await Leave.find(query);
-    res.status(200).json(leaves);
+    const combinedArray = [];
+    leaves.forEach((leave) => {
+      const daysDetails = getLeaveDaysNo(
+        leave.startDate,
+        leave.endDate,
+        publicHolidays
+      );
+
+      const {
+        staff,
+        modificationDetails,
+        _id,
+        startDate,
+        endDate,
+        type,
+        supervisorEmail,
+        lName,
+        comment
+      } = leave;
+      const Leaveprogram = leave.program;
+      const Leavestatus = leave.status;
+
+      const leaveRemade = {
+        staff,
+        modificationDetails,
+        _id,
+        startDate,
+        endDate,
+        type,
+        supervisorEmail,
+        lName,
+        comment,
+        status: Leavestatus,
+        program: Leaveprogram,
+        leaveDays: daysDetails.leaveDays,
+        daysTaken: daysDetails.totalDays,
+        weekendDays: daysDetails.weekendDays,
+        publicHolidays: daysDetails.holidayDays
+      };
+
+      combinedArray.push(leaveRemade);
+    });
+
+    res.status(200).json(combinedArray);
   } catch (e) {
     console.log(e.message);
     debug(e.message);

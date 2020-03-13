@@ -1,6 +1,8 @@
 const debug = require('debug')('server');
 const User = require('../../model/User');
 const Leave = require('../../model/Leave');
+const getLeaveDaysNo = require('./getLeaveDaysNo');
+const PublicHoliday = require('../../model/PublicHoliday');
 
 const getStaffLeaves = async (req, res) => {
   try {
@@ -9,6 +11,7 @@ const getStaffLeaves = async (req, res) => {
     const staffEmail = req.params.email;
     const { status } = req.params;
     const user = await User.findOne({ email: staffEmail });
+    const publicHolidays = await PublicHoliday.find({});
     if (!user) {
       return res.status(400).json({
         message: 'User does not exist'
@@ -23,7 +26,9 @@ const getStaffLeaves = async (req, res) => {
         status === 'Pending Supervisor' ||
         // eslint-disable-next-line operator-linebreak
         status === 'Pending Country Director' ||
-        status === 'Planned'
+        // eslint-disable-next-line operator-linebreak
+        status === 'Planned' ||
+        status === 'Taken'
       ) {
         query = { _id: { $in: user.leaves }, status };
       } else {
@@ -34,7 +39,51 @@ const getStaffLeaves = async (req, res) => {
     }
 
     const leaves = await Leave.find(query);
-    res.status(200).json(leaves);
+    const combinedArray = [];
+    leaves.forEach((leave) => {
+      const daysDetails = getLeaveDaysNo(
+        leave.startDate,
+        leave.endDate,
+        publicHolidays
+      );
+
+      const {
+        staff,
+        modificationDetails,
+        _id,
+        startDate,
+        endDate,
+        type,
+        supervisorEmail,
+        lName,
+        comment,
+        program
+      } = leave;
+
+      const Leavestatus = leave.status;
+
+      const leaveRemade = {
+        staff,
+        modificationDetails,
+        _id,
+        startDate,
+        endDate,
+        type,
+        supervisorEmail,
+        lName,
+        comment,
+        status: Leavestatus,
+        program,
+        leaveDays: daysDetails.leaveDays,
+        daysTaken: daysDetails.totalDays,
+        weekendDays: daysDetails.weekendDays,
+        publicHolidays: daysDetails.holidayDays
+      };
+
+      combinedArray.push(leaveRemade);
+    });
+
+    res.status(200).json(combinedArray);
   } catch (e) {
     console.log(e.message);
     debug(e.message);

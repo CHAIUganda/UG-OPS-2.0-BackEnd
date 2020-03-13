@@ -14,14 +14,6 @@ const LeaveSchema = mongoose.Schema({
     type: Date,
     required: true
   },
-  daysTaken: {
-    // data type is number
-    type: Number,
-    required: true
-  },
-  leaveDays: [Date],
-  weekendDays: [Date],
-  publicHolidays: [Date],
   type: {
     // STUDY, ANNUAL ..... HOME
     type: String,
@@ -76,11 +68,7 @@ const LeaveSchema = mongoose.Schema({
       {
         StartDate: Date,
         endDate: Date,
-        daysTaken: Number,
-        comment: String,
-        leaveDays: [Date],
-        weekendDays: [Date],
-        publicHolidays: [Date]
+        comment: String
       }
     ]
   }

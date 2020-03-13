@@ -5,6 +5,8 @@ const errorToString = require('../../helpers/errorToString');
 const Leave = require('../../model/Leave');
 const User = require('../../model/User');
 const getLeavesTaken = require('./getLeavesTaken');
+const getLeaveDaysNo = require('./getLeaveDaysNo');
+const PublicHoliday = require('../../model/PublicHoliday');
 
 const createLeave = async (req, res) => {
   const errors = validationResult(req);
@@ -16,18 +18,13 @@ const createLeave = async (req, res) => {
 
   // prettier-ignore
   const {
-    startDate,
     type,
-    staffEmail,
-    daysTaken,
-    leaveDays,
-    weekendDays,
-    publicHolidays, // array of days i.e ['25/12/2020','26/12/2020','01/01/2021']
+    staffEmail, // array of days i.e ['25/12/2020','26/12/2020','01/01/2021']
     status
   } = req.body;
 
   let { comment } = req.body;
-  let { endDate } = req.body;
+  let { startDate, endDate } = req.body;
   if (comment === null) {
     comment = '';
   }
@@ -57,9 +54,12 @@ const createLeave = async (req, res) => {
 
     if (status === 'Pending Supervisor' || status === 'Planned') {
       const { program } = user;
+      const publicHolidays = await PublicHoliday.find({});
+      const daysDetails = getLeaveDaysNo(startDate, endDate, publicHolidays);
       // set timezone to kampala
       // const CurrentDate = moment().tz('Africa/Kampala').format();
       endDate = new Date(endDate);
+      startDate = new Date(startDate);
       const endDateMonth = endDate.getMonth();
 
       // Computing Annual Leave
@@ -97,10 +97,14 @@ const createLeave = async (req, res) => {
             message: 'Paternity leave only given to Gentlemen'
           });
         }
-        const totalPaternity = paternityLeaveTaken + daysTaken;
+        const totalPaternity = paternityLeaveTaken + daysDetails.totalDays;
         if (paternity < totalPaternity) {
           return res.status(400).json({
-            message: 'You Dont have enough Paternity Leave days'
+            message: 'You Dont have enough Paternity Leave days',
+            paternityLeaveTaken,
+            daysRequested: daysDetails.totalDays,
+            totalPaternity,
+            paternity
           });
         }
       } else if (type === 'Home') {
@@ -109,13 +113,17 @@ const createLeave = async (req, res) => {
             message: 'Home leave only given to Expatriates and TCNs'
           });
         }
-        const totalHome = homeLeaveTaken + annualLeaveTaken + daysTaken;
+        // eslint-disable-next-line operator-linebreak
+        const totalHome =
+          homeLeaveTaken + annualLeaveTaken + daysDetails.totalDays;
         const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalHome;
         if (chk1) {
           return res.status(400).json({
             message: 'You Dont have enough Annual Leave days',
             annualLeaveTaken,
-            daysTaken,
+            homeLeaveTaken,
+            daysRequested: daysDetails.totalDays,
+            totalHome,
             totalAcruedAnualLeavePlusAnualLeaveBF
           });
         }
@@ -125,41 +133,61 @@ const createLeave = async (req, res) => {
             message: 'Maternity leave only given to Ladies'
           });
         }
-        const totalMaternity = maternityLeaveTaken + daysTaken;
+        const totalMaternity = maternityLeaveTaken + daysDetails.totalDays;
         if (maternity < totalMaternity) {
           return res.status(400).json({
-            message: 'You Dont have enough Maternity Leave days'
+            message: 'You Dont have enough Maternity Leave days',
+            maternityLeaveTaken,
+            daysRequested: daysDetails.totalDays,
+            totalMaternity,
+            maternity
           });
         }
       } else if (type === 'Sick') {
-        const totalSick = sickLeaveTaken + daysTaken;
+        const totalSick = sickLeaveTaken + daysDetails.totalDays;
         if (sick < totalSick) {
           return res.status(400).json({
-            message: 'You Dont have enough Sick Leave days'
+            message: 'You Dont have enough Sick Leave days',
+            sickLeaveTaken,
+            daysRequested: daysDetails.totalDays,
+            totalSick,
+            sick
           });
         }
       } else if (type === 'Unpaid') {
-        const totalUnpaid = unPaidLeaveTaken + daysTaken;
+        const totalUnpaid = unPaidLeaveTaken + daysDetails.totalDays;
         if (unpaid < totalUnpaid) {
           return res.status(400).json({
-            message: 'You Dont have enough Unpaid Leave days'
+            message: 'You Dont have enough Unpaid Leave days',
+            unPaidLeaveTaken,
+            daysRequested: daysDetails.totalDays,
+            totalUnpaid,
+            unpaid
           });
         }
       } else if (type === 'Study') {
-        const totalStudy = studyLeaveTaken + daysTaken;
+        const totalStudy = studyLeaveTaken + daysDetails.totalDays;
         if (study < totalStudy) {
           return res.status(400).json({
-            message: 'You Dont have enough Study Leave days'
+            message: 'You Dont have enough Study Leave days',
+            studyLeaveTaken,
+            daysRequested: daysDetails.totalDays,
+            totalStudy,
+            study
           });
         }
       } else if (type === 'Annual') {
-        const totalAnnual = annualLeaveTaken + daysTaken;
+        // eslint-disable-next-line operator-linebreak
+        const totalAnnual =
+          annualLeaveTaken + homeLeaveTaken + daysDetails.totalDays;
         const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalAnnual;
         if (chk1) {
           return res.status(400).json({
             message: 'You Dont have enough Annual Leave days',
             annualLeaveTaken,
-            daysTaken,
+            homeLeaveTaken,
+            daysRequested: daysDetails.totalDays,
+            totalAnnual,
             totalAcruedAnualLeavePlusAnualLeaveBF
           });
         }
@@ -181,11 +209,6 @@ const createLeave = async (req, res) => {
           lName: user.lName
         },
         supervisorEmail,
-        daysTaken,
-        leaveDays,
-        weekendDays,
-        publicHolidays,
-        // array of days i.e ["2020-02-25","2020-02-29"]
         comment,
         status,
         program
@@ -201,7 +224,8 @@ const createLeave = async (req, res) => {
       // send email notification to supervisor if leave is is pending
       res.status(201).json({
         message: 'Leave Created successfully',
-        leave
+        leave,
+        daysDetails
       });
     } else {
       res.status(400).json({

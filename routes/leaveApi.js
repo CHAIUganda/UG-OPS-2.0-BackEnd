@@ -32,12 +32,6 @@ router.post(
     check('staffEmail', 'Please Enter a Valid Email').isEmail(),
     check('status', 'Please enter a valid status')
       .not()
-      .isEmpty(),
-    check('leaveDays', 'Please enter the Leave days Taken')
-      .not()
-      .isEmpty(),
-    check('daysTaken', 'Please enter the total number of days')
-      .not()
       .isEmpty()
   ],
   authenticator,
@@ -158,13 +152,7 @@ router.post(
     check('action', 'Please Enter an action')
       .not()
       .isEmpty(),
-    check('staffEmail', 'Please Enter a Valid Staff Email').isEmail(),
-    check('leaveDays', 'Please enter the Leave days Taken')
-      .not()
-      .isEmpty(),
-    check('daysTaken', 'Please enter the total number of days')
-      .not()
-      .isEmpty()
+    check('staffEmail', 'Please Enter a Valid Staff Email').isEmail()
   ],
   authenticator,
   leaveController.staffModifyLeave

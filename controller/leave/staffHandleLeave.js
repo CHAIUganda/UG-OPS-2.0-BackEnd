@@ -67,8 +67,8 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
     // if leave is taken by staff notify the HR and Supervisor.
 
     // handle leave here
-    if (leave.status === 'approved') {
-      if (status === 'taken') {
+    if (leave.status === 'Approved') {
+      if (status === 'Taken') {
         // prettier-ignore
         if (
           (user.type === 'expat' || user.type === 'tcn') && leave.type === 'Home'
@@ -86,7 +86,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
             {
               _id: leaveId
             },
-            { $set: { status: 'taken' } }
+            { $set: { status: 'Taken' } }
           );
           // sends mail to cd supervisor HR and notification about status
           // prettier-ignore
@@ -123,7 +123,7 @@ ${user.fName}  ${user.lName} will be off from ${leave.startDate.toDateString()} 
             {
               _id: leaveId
             },
-            { $set: { status: 'taken' } }
+            { $set: { status: 'Taken' } }
           );
           // sends mail to cd supervisor HR and notification about status
           // prettier-ignore
@@ -145,7 +145,7 @@ ${user.fName}  ${user.lName} will be off from ${leave.startDate.toDateString()} 
             message: 'Leave has been taken. Enjoy your leave.'
           });
         }
-      } else if (status === 'nottaken') {
+      } else if (status === 'Not Taken') {
         // prettier-ignore
         if (
           (user.type === 'expat' || user.type === 'tcn') && leave.type === 'Home'
@@ -163,7 +163,7 @@ ${user.fName}  ${user.lName} will be off from ${leave.startDate.toDateString()} 
             {
               _id: leaveId
             },
-            { $set: { status: 'nottaken' } }
+            { $set: { status: 'Not Taken' } }
           );
           // sends mail to cd supervisor HR and notification about status
           // prettier-ignore
@@ -199,7 +199,7 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
             {
               _id: leaveId
             },
-            { $set: { status: 'nottaken' } }
+            { $set: { status: 'Not Taken' } }
           );
           // sends mail to cd supervisor HR and notification about status
           // prettier-ignore

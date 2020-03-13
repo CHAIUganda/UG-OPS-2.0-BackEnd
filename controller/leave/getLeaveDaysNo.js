@@ -1,51 +1,62 @@
-const Leave = require('../../model/Leave');
+const moment = require('moment-timezone');
 
-const getLeaveDaysNo = async (startDate, endDate, publicHolidays) => {
-  let totalDays;
-  const status = 'taken';
-  const query = { _id: { $in: user.leaves }, status };
-  const leaves = await Leave.find(query);
-  // filtering taken leaves of the different types findind totaltaken
-  const annualLeaves = leaves.filter((leave) => leave.type === 'Annual');
-  let sumOfAnnual = 0;
-  annualLeaves.forEach((annualLeave) => {
-    sumOfAnnual += annualLeave.daysTaken;
-  });
+const getLeaveDaysNo = (startDate, endDate, publicHolidays) => {
+  const arrayOfDays = [];
+  let leaveDays = [];
+  let weekendDays = [];
+  let holidayDays = [];
+  let start = new Date(startDate);
+  const end = new Date(endDate);
 
-  const unPaidLeaves = leaves.filter((leave) => leave.type === 'Paternity');
-  let sumOfunPaid = 0;
-  unPaidLeaves.forEach((unPaidLeave) => {
-    sumOfunPaid += unPaidLeave.daysTaken;
-  });
+  while (moment(start.toDateString()).isBefore(end.toDateString())) {
+    arrayOfDays.push(start);
+    const newDate = moment(start.toDateString()).add(24, 'hour');
+    start = new Date(newDate);
+  }
+  arrayOfDays.push(end);
 
-  const homeLeaves = leaves.filter((leave) => leave.type === 'Home');
-  let sumOfhome = 0;
-  homeLeaves.forEach((homeLeave) => {
-    sumOfhome += homeLeave.daysTaken;
-  });
+  let check = true;
+  arrayOfDays.forEach((day) => {
+    check = true;
+    publicHolidays.forEach((holiday) => {
+      let hol = `${new Date().getFullYear()}-${
+        holiday.date.replace('/', '-').split('-')[1]
+      }-${holiday.date.replace('/', '-').split('-')[0]}`;
 
-  const sickLeaves = leaves.filter((leave) => leave.type === 'Sick');
-  let sumOfsick = 0;
-  sickLeaves.forEach((sickLeave) => {
-    sumOfsick += sickLeave.daysTaken;
-  });
-  const maternityLeaves = leaves.filter((leave) => leave.type === 'Maternity');
-  let sumOfmaternity = 0;
-  maternityLeaves.forEach((maternityLeave) => {
-    sumOfmaternity += maternityLeave.daysTaken;
-  });
-  const paternityLeaves = leaves.filter((leave) => leave.type === 'Paternity');
-  let sumOfpaternity = 0;
-  paternityLeaves.forEach((paternityLeave) => {
-    sumOfpaternity += paternityLeave.daysTaken;
-  });
-  const studyLeaves = leaves.filter((leave) => leave.type === 'Study');
-  let sumOfstudy = 0;
-  studyLeaves.forEach((studyLeave) => {
-    sumOfstudy += studyLeave.daysTaken;
-  });
+      let dDay = `${day.getFullYear()}-${day.getMonth() + 1}-${day.getDate()}`;
 
-  return totalDays;
+      hol = new Date(hol);
+      dDay = new Date(dDay);
+      if (check && moment(hol.toDateString()).isSame(dDay.toDateString())) {
+        holidayDays.push({
+          day,
+          name: holiday.name
+        });
+        check = false;
+      }
+    });
+
+    if (check && (day.getDay() === 0 || day.getDay() === 6)) {
+      weekendDays.push(day);
+      check = false;
+    } else if (check) {
+      leaveDays.push(day);
+    }
+  });
+  let totalDays = leaveDays.length;
+
+  const objToReturn = {
+    totalDays,
+    leaveDays,
+    weekendDays,
+    holidayDays
+  };
+
+  totalDays = 0;
+  leaveDays = [];
+  weekendDays = [];
+  holidayDays = [];
+
+  return objToReturn;
 };
-
 module.exports = getLeaveDaysNo;
