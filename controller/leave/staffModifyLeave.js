@@ -18,10 +18,6 @@ const staffModifyLeave = async (req, res) => {
   const {
     leaveId,
     staffEmail,
-    daysTaken,
-    leaveDays,
-    weekendDays,
-    publicHolidays,
     action
   } = req.body;
   // action can be changeStartDate changeEndDate cancelLeave
@@ -84,11 +80,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
     // set old leave values
     const oldStartDate = leave.startDate;
     const oldEndDate = leave.endDate;
-    const oldDaysTaken = leave.daysTaken;
     const oldComment = leave.comment;
-    const oldLeaveDays = leave.leaveDays;
-    const oldWeekendDays = leave.weekendDays;
-    const oldPublicHolidays = leave.publicHolidays;
 
     // if leave is taken by staff notify the HR and Supervisor.
     // handle leave here
@@ -124,17 +116,13 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
               $set: {
                 startDate,
                 endDate,
-                daysTaken,
                 comment,
-                leaveDays,
-                weekendDays,
-                publicHolidays,
                 modificationDetails: {
                   isModified: true,
                   $push: {
                     modLeaves: {
                       // eslint-disable-next-line max-len
-                      startDate: oldStartDate, endDate: oldEndDate, daysTaken: oldDaysTaken, comment: oldComment, leaveDays: oldLeaveDays, weekendDays: oldWeekendDays, publicHolidays: oldPublicHolidays
+                      startDate: oldStartDate, endDate: oldEndDate, comment: oldComment
 
                     }
                   }
