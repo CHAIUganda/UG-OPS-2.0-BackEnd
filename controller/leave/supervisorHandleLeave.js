@@ -43,7 +43,7 @@ const supervisorHandleLeave = async (req, res) => {
       });
     }
     const subject = 'Uganda Operations Leaves';
-    const from = 'spaul@clintonhealthaccess.org';
+    const from = 'UGOperations@clintonhealthaccess.org';
     const to = user.email;
     const footer = `
 
