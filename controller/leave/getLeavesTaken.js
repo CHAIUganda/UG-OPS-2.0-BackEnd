@@ -3,8 +3,18 @@ const getLeaveDaysNo = require('./getLeaveDaysNo');
 const PublicHoliday = require('../../model/PublicHoliday');
 
 const getLeavesTaken = async (user) => {
-  const status = 'Taken';
-  const query = { _id: { $in: user.leaves }, status };
+  // const status = 'Taken';
+  const query = {
+    _id: { $in: user.leaves },
+    $or: [
+      {
+        status: 'Taken'
+      },
+      {
+        status: 'Approved'
+      }
+    ]
+  };
   const leaves = await Leave.find(query);
   const publicHolidays = await PublicHoliday.find({});
 
