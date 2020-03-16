@@ -36,6 +36,9 @@ router.post(
     check('contractEndDate', 'Please Enter a Valid Contract End Date')
       .not()
       .isEmpty(),
+    check('birthDate', 'Please Enter a Valid BirthDate')
+      .not()
+      .isEmpty(),
     check('contractType', 'Please Enter a Valid Contract Type')
       .not()
       .isEmpty(),
@@ -64,6 +67,22 @@ router.post(
   ],
   /* authenticator, */
   authController.registerUser
+);
+
+/**
+ * @method - POST
+ * @param - /editUser
+ * @description - User Modification
+ */
+router.post(
+  '/editUser',
+  [
+    // input validations
+    check('email', 'Please enter a valid email').isEmail()
+  ],
+  authenticator,
+  /* authenticator, */
+  authController.editUser
 );
 
 /**

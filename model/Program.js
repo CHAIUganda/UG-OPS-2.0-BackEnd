@@ -9,19 +9,9 @@ const ProgramSchema = mongoose.Schema({
     required: true
     // default: Date.now()
   },
-  programManagerEmail: {
-    type: String,
+  programManagerId: {
+    type: mongoose.Schema.Types.ObjectId,
     required: true
-  },
-  programManagerDetails: {
-    fName: {
-      type: String,
-      required: true
-    },
-    lName: {
-      type: String,
-      required: true
-    }
   }
 });
 

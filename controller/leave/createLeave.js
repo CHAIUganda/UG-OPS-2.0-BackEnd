@@ -25,7 +25,7 @@ const createLeave = async (req, res) => {
 
   let { comment } = req.body;
   let { startDate, endDate } = req.body;
-  if (comment === null) {
+  if (comment == null) {
     comment = '';
   }
 

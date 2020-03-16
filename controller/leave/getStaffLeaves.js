@@ -55,7 +55,6 @@ const getStaffLeaves = async (req, res) => {
         endDate,
         type,
         supervisorEmail,
-        lName,
         comment,
         program
       } = leave;
@@ -70,7 +69,6 @@ const getStaffLeaves = async (req, res) => {
         endDate,
         type,
         supervisorEmail,
-        lName,
         comment,
         status: Leavestatus,
         program,

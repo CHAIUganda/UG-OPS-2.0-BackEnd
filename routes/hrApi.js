@@ -64,10 +64,9 @@ router.post(
     check('name', 'Please Enter a Valid name for the Program')
       .not()
       .isEmpty(),
-    check(
-      'programManagerEmail',
-      'Please Enter a Valid Program manager Email'
-    ).isEmail()
+    check('programManagerId', 'Please Enter a Valid Program manager Id')
+      .not()
+      .isEmpty()
   ],
   hrController.createProgram
 );
@@ -78,14 +77,17 @@ router.post(
  * @param - /removeProgram
  */
 router.post(
-  '/removeProgram',
+  '/editProgram',
   [
     // input validations
-    check('name', 'Please Enter a name for the program')
+    check('id', 'Please Enter an id for the program')
+      .not()
+      .isEmpty(),
+    check('name', 'Please name for the program')
       .not()
       .isEmpty()
   ],
-  hrController.removeProgram
+  hrController.editProgram
 );
 
 /**

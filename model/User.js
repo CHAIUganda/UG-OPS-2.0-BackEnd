@@ -31,6 +31,10 @@ const UserSchema = mongoose.Schema({
     type: String,
     required: true
   },
+  birthDate: {
+    type: Date,
+    required: true
+  },
   program: {
     // operations  Vaccines etc
     type: String,
@@ -63,6 +67,16 @@ const UserSchema = mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now()
+  },
+  bankDetails: {
+    bankName: {
+      type: String,
+      required: false
+    },
+    accountNumber: {
+      type: String,
+      required: false
+    }
   },
   roles: {
     admin: {

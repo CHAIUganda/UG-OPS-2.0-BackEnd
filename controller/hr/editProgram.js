@@ -4,7 +4,7 @@ const errorToString = require('../../helpers/errorToString');
 const Program = require('../../model/Program');
 const User = require('../../model/User');
 
-const createProgram = async (req, res) => {
+const editProgram = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
@@ -14,11 +14,21 @@ const createProgram = async (req, res) => {
 
   // prettier-ignore
   const {
+    id,
     name,
     programManagerId
   } = req.body;
 
   try {
+    const program = await Program.findOne({
+      _id: id
+    });
+    if (!program) {
+      return res.status(400).json({
+        message: 'This program doesnot exist'
+      });
+    }
+
     const user = await User.findOne({
       _id: programManagerId
     });
@@ -27,30 +37,29 @@ const createProgram = async (req, res) => {
         message: 'Program Manager does not Exist'
       });
     }
-    const program = await Program.findOne({
-      name
-    });
-    if (program) {
-      return res.status(400).json({
-        message: 'This Program already exists'
-      });
-    }
+    // modify program
+    await Program.updateOne(
+      {
+        _id: id
+      },
+      {
+        // eslint-disable-next-line max-len
+        $set: {
+          name,
+          programManagerId: user._id
+        }
+      }
+    );
 
-    const programtoSave = new Program({
-      name,
-      programManagerId: user._id
-    });
-
-    await programtoSave.save();
-    res.status(201).json({
-      programtoSave
+    res.status(200).json({
+      message: 'program modified successfully'
     });
   } catch (err) {
     debug(err.message);
     res.status(500).json({
-      message: 'Error Creating Program'
+      message: 'Error modifying program'
     });
   }
 };
 
-module.exports = createProgram;
+module.exports = editProgram;
