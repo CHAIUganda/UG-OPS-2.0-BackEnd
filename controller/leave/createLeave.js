@@ -221,11 +221,30 @@ const createLeave = async (req, res) => {
         { $push: { leaves: leave._id } }
       );
       await leave.save();
+
+      const leaveRemade = {
+        startDate,
+        endDate,
+        type,
+        staff: {
+          email: user.email,
+          fName: user.fName,
+          lName: user.lName
+        },
+        supervisorEmail,
+        comment,
+        status,
+        program,
+        leaveDays: daysDetails.leaveDays,
+        daysTaken: daysDetails.totalDays,
+        weekendDays: daysDetails.weekendDays,
+        publicHolidays: daysDetails.holidayDays
+      };
+
       // send email notification to supervisor if leave is is pending
       res.status(201).json({
         message: 'Leave Created successfully',
-        leave,
-        daysDetails
+        leaveRemade
       });
     } else {
       res.status(400).json({
@@ -234,6 +253,7 @@ const createLeave = async (req, res) => {
     }
   } catch (err) {
     debug(err.message);
+    // eslint-disable-next-line no-console
     console.log(err.message);
     res.status(500).json({
       message: 'Error Creating Leave'
