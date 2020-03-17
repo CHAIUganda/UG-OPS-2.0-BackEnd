@@ -38,7 +38,7 @@ const createLeave = async (req, res) => {
         message: 'User does not Exist'
       });
     }
-    if (status === 'pending') {
+    if (status === 'Pending Supervisor') {
       const chkleaves = await Leave.find({
         _id: { $in: user.leaves },
         status,
