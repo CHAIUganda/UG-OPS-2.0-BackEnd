@@ -27,6 +27,10 @@ const getStaffLeaves = async (req, res) => {
         // eslint-disable-next-line operator-linebreak
         status === 'Pending Country Director' ||
         // eslint-disable-next-line operator-linebreak
+        status === 'Supervisor Declined' ||
+        // eslint-disable-next-line operator-linebreak
+        status === 'Country Director Declined' ||
+        // eslint-disable-next-line operator-linebreak
         status === 'Planned' ||
         status === 'Taken'
       ) {

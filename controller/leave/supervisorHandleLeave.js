@@ -22,7 +22,7 @@ const supervisorHandleLeave = async (req, res) => {
   let { reason } = req.body;
 
   try {
-    if (!reason) {
+    if (reason == null) {
       reason = '';
     }
     const user = await User.findOne({
