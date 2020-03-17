@@ -73,9 +73,9 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
           // prettier-ignore
           const text = `Dear ${user.fName}, 
 
-Leave has been approved. It is pending Country director approval${footer}.
+Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved. It is pending Country director approval${footer}.
                          `;
-          Mailer(from, to, subject, text, res);
+          Mailer(from, to, subject, text);
 
           res.status(200).json({
             message: 'Leave has been Approved, Pending CD approval'
@@ -93,10 +93,10 @@ Leave has been approved. It is pending Country director approval${footer}.
           // prettier-ignore
           const text = `Dear ${user.fName}, 
 
-Your Leave has been approved by the Country director${footer}.
+Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by the Country director${footer}.
                                    `;
 
-          Mailer(from, to, subject, text, res);
+          Mailer(from, to, subject, text);
           res.status(200).json({
             message: 'Leave has been Approved'
           });
@@ -125,9 +125,9 @@ Your Leave has been approved by the Country director${footer}.
         // prettier-ignore
         const text = `Dear ${user.fName}, 
 
-Your Leave has been approved by your Supervisor${footer}.
+Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by your Supervisor${footer}.
                  `;
-        Mailer(from, to, subject, text, res);
+        Mailer(from, to, subject, text);
         res.status(200).json({
           message: 'Leave has been Approved'
         });
@@ -151,9 +151,9 @@ Your Leave has been approved by your Supervisor${footer}.
           // prettier-ignore
           const text = `Dear ${user.fName}, 
 
-Your Leave has been Declined by your Supervisor${footer}.
+Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been Declined by your Supervisor${footer}.
                                    `;
-          Mailer(from, to, subject, text, res);
+          Mailer(from, to, subject, text);
           res.status(200).json({
             message: 'Leave has been Declined by supervisor'
           });
@@ -171,9 +171,9 @@ Your Leave has been Declined by your Supervisor${footer}.
           // prettier-ignore
           const text = `Dear ${user.fName}, 
 
-Your Leave has been Declined by the Country director.${footer}.
+Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been Declined by the Country director.${footer}.
                                    `;
-          Mailer(from, to, subject, text, res);
+          Mailer(from, to, subject, text);
           res.status(200).json({
             message: 'Leave has been Declined'
           });
@@ -196,9 +196,9 @@ Your Leave has been Declined by the Country director.${footer}.
         // prettier-ignore
         const text = `Dear ${user.fName}, 
 
-Your Leave has been Declined by your Supervisor.${footer}.
+Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been Declined by your Supervisor.${footer}.
                                    `;
-        Mailer(from, to, subject, text, res);
+        Mailer(from, to, subject, text);
         res.status(200).json({
           message: 'Leave has been Declined'
         });

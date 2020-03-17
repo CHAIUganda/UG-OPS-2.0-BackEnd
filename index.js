@@ -3,8 +3,8 @@ require('dotenv').config();
 const express = require('express');
 const debug = require('debug')('server');
 const cors = require('cors');
-const { CronJob } = require('cron');
 const InitiateMongoServer = require('./config/db');
+const schedule = require('./helpers/schedule');
 // const authenticationRequired = require('./middleware/oktaAuthenticator');
 const authenticator = require('./middleware/authenticator'); // to be rplaced with Okta auth
 
@@ -42,13 +42,4 @@ app.listen(port, () => {
   console.log(`Running UG-OPS 2 on port ${port}`);
 });
 
-const job = new CronJob(
-  '0 55 9 * * *',
-  () => {
-    console.log('You will see this message every second');
-  },
-  null,
-  true,
-  'Africa/Kampala'
-);
-job.start();
+schedule.start();
