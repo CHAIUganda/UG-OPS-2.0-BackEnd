@@ -40,6 +40,7 @@ const getSupervisorLeaves = async (req, res) => {
         endDate,
         type,
         supervisorEmail,
+        rejectionReason,
         lName,
         comment
       } = leave;
@@ -54,6 +55,7 @@ const getSupervisorLeaves = async (req, res) => {
         endDate,
         type,
         supervisorEmail,
+        rejectionReason,
         lName,
         comment,
         status: Leavestatus,
