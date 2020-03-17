@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const debug = require('debug')('server');
 const cors = require('cors');
+const schedule = require('node-schedule');
 
 const InitiateMongoServer = require('./config/db');
 // const authenticationRequired = require('./middleware/oktaAuthenticator');
@@ -40,4 +41,8 @@ app.use('/hrApi', authenticator, hrApi);
 app.listen(port, () => {
   debug(`Running UG-OPS 2 on port ${port}`);
   console.log(`Running UG-OPS 2 on port ${port}`);
+});
+
+schedule.scheduleJob('16 9 * * *', () => {
+  console.log('The answer to life, the universe, and everything!');
 });

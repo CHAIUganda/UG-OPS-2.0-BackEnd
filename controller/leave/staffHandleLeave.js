@@ -1,5 +1,4 @@
 const { validationResult } = require('express-validator/check');
-const schedule = require('node-schedule');
 const debug = require('debug')('leave-controller');
 const errorToString = require('../../helpers/errorToString');
 const Leave = require('../../model/Leave');

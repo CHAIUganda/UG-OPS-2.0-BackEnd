@@ -199,7 +199,7 @@ const createLeave = async (req, res) => {
 
       // checks if user has enough leaves days happen here basing on what has been computed
       const { supervisorEmail } = user;
-      const leave = new Leave({
+      const leaveRemade = new Leave({
         startDate,
         endDate,
         type,
@@ -218,11 +218,11 @@ const createLeave = async (req, res) => {
         {
           email: staffEmail
         },
-        { $push: { leaves: leave._id } }
+        { $push: { leaves: leaveRemade._id } }
       );
-      await leave.save();
+      await leaveRemade.save();
 
-      const leaveRemade = {
+      const leave = {
         startDate,
         endDate,
         type,
@@ -244,7 +244,7 @@ const createLeave = async (req, res) => {
       // send email notification to supervisor if leave is is pending
       res.status(201).json({
         message: 'Leave Created successfully',
-        leaveRemade
+        leave
       });
     } else {
       res.status(400).json({
