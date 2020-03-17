@@ -4,8 +4,6 @@ const express = require('express');
 const debug = require('debug')('server');
 const cors = require('cors');
 const { CronJob } = require('cron');
-// const schedule = require('node-schedule');
-
 const InitiateMongoServer = require('./config/db');
 // const authenticationRequired = require('./middleware/oktaAuthenticator');
 const authenticator = require('./middleware/authenticator'); // to be rplaced with Okta auth
@@ -43,10 +41,6 @@ app.listen(port, () => {
   debug(`Running UG-OPS 2 on port ${port}`);
   console.log(`Running UG-OPS 2 on port ${port}`);
 });
-
-// schedule.scheduleJob('16 9 * * *', () => {
-//   console.log('The answer to life, the universe, and everything!');
-// });
 
 const job = new CronJob(
   '0 55 9 * * *',
