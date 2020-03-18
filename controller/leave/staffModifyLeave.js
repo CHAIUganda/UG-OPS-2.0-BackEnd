@@ -23,7 +23,7 @@ const staffModifyLeave = async (req, res) => {
   // action can be changeStartDate changeEndDate cancelLeave
   let { startDate, endDate } = req.body;
   let { comment } = req.body;
-  if (comment === null) {
+  if (comment == null) {
     comment = '';
   }
   try {
@@ -88,11 +88,26 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
       if (action === 'changeStartDate') {
         if (moment(CurrentDate).isAfter(startDate)) {
           return res.status(400).json({
-            message: 'Start Date cannot be changed beacause it already passed',
+            message: 'Start Date cannot be changed because it already passed',
             CurrentDate,
             startDate
           });
         }
+        if (moment(startDate).isBefore(oldStartDate)) {
+          return res.status(400).json({
+            message: 'Leave cannot start before approved time',
+            startDate,
+            oldStartDate
+          });
+        }
+        if (moment(startDate).isAfter(oldEndDate)) {
+          return res.status(400).json({
+            message: 'Leave cannot start when it has ended',
+            startDate,
+            oldEndDate
+          });
+        }
+
         // chk if staff is an expat or tcn to allow cd notication
         // prettier-ignore
         if (
@@ -326,7 +341,7 @@ ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${star
         }
       } else if (action === 'changeStartandEndDate') {
         // prettier-ignore
-        if (moment(CurrentDate).isAfter(endDate)) {
+        if (moment(CurrentDate).isAfter(startDate) || moment(CurrentDate).isAfter(endDate)) {
           return res.status(400).json({
             message: 'End Date cannot be changed beacause it already passed',
             CurrentDate,
@@ -354,6 +369,7 @@ ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${star
             {
               // eslint-disable-next-line max-len
               $set: {
+                startDate,
                 endDate,
                 comment,
                 modificationDetails: {
@@ -407,6 +423,7 @@ ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${star
             {
               // eslint-disable-next-line max-len
               $set: {
+                startDate,
                 endDate,
                 comment,
                 modificationDetails: {
