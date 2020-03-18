@@ -48,7 +48,8 @@ const getAllStaffLeaves = async (req, res) => {
         type,
         supervisorEmail,
         lName,
-        comment
+        comment,
+        rejectionReason
       } = leave;
       const Leaveprogram = leave.program;
       const Leavestatus = leave.status;
@@ -63,6 +64,7 @@ const getAllStaffLeaves = async (req, res) => {
         supervisorEmail,
         lName,
         comment,
+        rejectionReason,
         status: Leavestatus,
         program: Leaveprogram,
         leaveDays: daysDetails.leaveDays,
