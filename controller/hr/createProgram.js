@@ -15,6 +15,7 @@ const createProgram = async (req, res) => {
   // prettier-ignore
   const {
     name,
+    shortForm,
     programManagerId
   } = req.body;
 
@@ -38,6 +39,7 @@ const createProgram = async (req, res) => {
 
     const programtoSave = new Program({
       name,
+      shortForm,
       programManagerId: user._id
     });
 

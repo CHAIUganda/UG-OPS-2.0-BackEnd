@@ -110,28 +110,6 @@ router.get(
 
 /**
  * @method - POST
- * @description - Staff Handle a leave. Involves taking or not taking
- * a leave by staff authenticator is a middleware will be used to
- * verify the token.
- * @param - /leaveApi/staffHandleLeave
- */
-router.post(
-  '/staffHandleLeave',
-  [
-    check('leaveId', 'Please Enter a Valid Leave Id')
-      .not()
-      .isEmpty(),
-    check('status', 'Please Enter a Valid Status')
-      .not()
-      .isEmpty(),
-    check('staffEmail', 'Please Enter a Valid Staff Email').isEmail()
-  ],
-  authenticator,
-  leaveController.staffHandleLeave
-);
-
-/**
- * @method - POST
  * @description - Staff Modify leave. Involves modifying
  * a leave by staff authenticator is a middleware will be used to
  * verify the token.

@@ -64,6 +64,9 @@ router.post(
     check('name', 'Please Enter a Valid name for the Program')
       .not()
       .isEmpty(),
+    check('shortForm', 'Please Enter a Short Form for the program')
+      .not()
+      .isEmpty(),
     check('programManagerId', 'Please Enter a Valid Program manager Id')
       .not()
       .isEmpty()
@@ -81,6 +84,9 @@ router.post(
   [
     // input validations
     check('id', 'Please Enter an id for the program')
+      .not()
+      .isEmpty(),
+    check('shortForm', 'Please Enter a Short Form for the program')
       .not()
       .isEmpty(),
     check('name', 'Please name for the program')

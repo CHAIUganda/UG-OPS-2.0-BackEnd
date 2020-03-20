@@ -16,6 +16,7 @@ const editProgram = async (req, res) => {
   const {
     id,
     name,
+    shortForm,
     programManagerId
   } = req.body;
 
@@ -46,6 +47,7 @@ const editProgram = async (req, res) => {
         // eslint-disable-next-line max-len
         $set: {
           name,
+          shortForm,
           programManagerId: user._id
         }
       }

@@ -58,15 +58,15 @@ const LeaveSchema = mongoose.Schema({
     type: String,
     required: false
   },
+  isModfied: {
+    // To track is leave has been modified
+    type: Boolean,
+    default: false
+  },
   modificationDetails: {
-    isModified: {
-      // To track is leave has been modified
-      type: Boolean,
-      default: false
-    },
     modLeaves: [
       {
-        StartDate: Date,
+        startDate: Date,
         endDate: Date,
         comment: String
       }

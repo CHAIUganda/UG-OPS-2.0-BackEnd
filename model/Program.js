@@ -7,7 +7,11 @@ const ProgramSchema = mongoose.Schema({
     // Name of the Program
     type: String,
     required: true
-    // default: Date.now()
+  },
+  shortForm: {
+    // Name of the Program
+    type: String,
+    required: true
   },
   programManagerId: {
     type: mongoose.Schema.Types.ObjectId,
