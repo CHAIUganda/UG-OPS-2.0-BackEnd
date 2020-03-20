@@ -191,7 +191,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
 
 ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
                          `;
-          Mailer(from, hr.email, subject, text, res);
+          Mailer(from, hr.email, subject, text);
 
           // email to CD
           // prettier-ignore
@@ -199,7 +199,7 @@ ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${star
 
 ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
                          `;
-          Mailer(from, cd.email, subject, textCd, res);
+          Mailer(from, cd.email, subject, textCd);
 
           // email to Supervisor
           // prettier-ignore
@@ -207,7 +207,7 @@ ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${star
 
 ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
                          `;
-          Mailer(from, supervisor.email, subject, textSupervisor, res);
+          Mailer(from, supervisor.email, subject, textSupervisor);
 
           res.status(200).json({
             message: 'Leave has been taken Modified successfully.'
@@ -245,7 +245,7 @@ ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${star
 
 ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
                          `;
-          Mailer(from, hr.email, subject, text, res);
+          Mailer(from, hr.email, subject, text);
 
           // email to Supervisor
           // prettier-ignore
@@ -253,7 +253,7 @@ ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${star
 
 ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
                          `;
-          Mailer(from, supervisor.email, subject, textSupervisor, res);
+          Mailer(from, supervisor.email, subject, textSupervisor);
 
           res.status(200).json({
             message: 'Leave has been taken Modified successfully.'
@@ -288,7 +288,7 @@ ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${star
 
 ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
                          `;
-          Mailer(from, hr.email, subject, text, res);
+          Mailer(from, hr.email, subject, text);
 
           // email to CD
           // prettier-ignore
@@ -296,7 +296,7 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
 
 ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
                          `;
-          Mailer(from, cd.email, subject, textCd, res);
+          Mailer(from, cd.email, subject, textCd);
 
           // email to Supervisor
           // prettier-ignore
@@ -304,7 +304,7 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
 
 ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
                          `;
-          Mailer(from, supervisor.email, subject, textSupervisor, res);
+          Mailer(from, supervisor.email, subject, textSupervisor);
 
           res.status(200).json({
             message: 'Leave has been Cancelled'
@@ -327,14 +327,14 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
 
 ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
                          `;
-          Mailer(from, hr.email, subject, text, res);
+          Mailer(from, hr.email, subject, text);
           // email to Supervisor
           // prettier-ignore
           const textSupervisor = `Hello  ${supervisor.fName}, 
 
 ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
                          `;
-          Mailer(from, supervisor.email, subject, textSupervisor, res);
+          Mailer(from, supervisor.email, subject, textSupervisor);
 
           res.status(200).json({
             message: 'Leave has been Cancelled'
@@ -563,7 +563,7 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
 
 ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()} Note: ${msg}${footer}.
                          `;
-          Mailer(from, hr.email, subject, text, res);
+          Mailer(from, hr.email, subject, text);
 
           // email to CD
           // prettier-ignore
@@ -571,7 +571,7 @@ ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${star
 
 ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()} Note: ${msg}${footer}.
                          `;
-          Mailer(from, cd.email, subject, textCd, res);
+          Mailer(from, cd.email, subject, textCd);
 
           // email to Supervisor
           // prettier-ignore
@@ -579,7 +579,7 @@ ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${star
 
 ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()} Note: ${msg}${footer}.
                          `;
-          Mailer(from, supervisor.email, subject, textSupervisor, res);
+          Mailer(from, supervisor.email, subject, textSupervisor);
 
           res.status(200).json({
             message: 'Leave has been taken Modified successfully.'
@@ -618,7 +618,7 @@ ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${star
 
 ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()} Note: ${msg}${footer}.
                          `;
-          Mailer(from, hr.email, subject, text, res);
+          Mailer(from, hr.email, subject, text);
 
           // email to Supervisor
           // prettier-ignore
@@ -626,7 +626,7 @@ ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${star
 
 ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()} Note: ${msg}${footer}.
                          `;
-          Mailer(from, supervisor.email, subject, textSupervisor, res);
+          Mailer(from, supervisor.email, subject, textSupervisor);
 
           res.status(200).json({
             message: 'Leave has been taken Modified successfully.'
@@ -634,85 +634,27 @@ ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${star
         }
       } else if (action === 'cancelLeave') {
         // prettier-ignore
-        if (
-          (user.type === 'expat' || user.type === 'tcn')
-          && leave.type === 'Home'
-        ) {
-          // check if CD exists in System
-          const cd = await User.findOne({ 'roles.countryDirector': true });
-          if (!cd) {
-            return res.status(400).json({
-              message: 'Country Director is not Registered in the system'
-            });
-          }
 
-          // change status to nottaken
-          await Leave.updateOne(
-            {
-              _id: leaveId
-            },
-            { $set: { status: 'Not Taken' } }
-          );
-          // sends mail to cd supervisor HR and notification about status
-          // prettier-ignore
-          // email to HR
-          // prettier-ignore
-          const text = `Hello  ${hr.fName}, 
+        // change status to nottaken
+        await Leave.updateOne(
+          {
+            _id: leaveId
+          },
+          { $set: { status: 'Pending Not Taken' } }
+        );
+        // sends mail to cd supervisor HR and notification about status
+        // prettier-ignore
+        // email to Supervisor
+        // prettier-ignore
+        const textSupervisor = `Hello  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
+${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}. This is pending your approval${footer}.
                          `;
-          Mailer(from, hr.email, subject, text, res);
+        Mailer(from, supervisor.email, subject, textSupervisor);
 
-          // email to CD
-          // prettier-ignore
-          const textCd = `Hello  ${cd.fName}, 
-
-${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
-                         `;
-          Mailer(from, cd.email, subject, textCd, res);
-
-          // email to Supervisor
-          // prettier-ignore
-          const textSupervisor = `Hello  ${supervisor.fName}, 
-
-${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
-                         `;
-          Mailer(from, supervisor.email, subject, textSupervisor, res);
-
-          res.status(200).json({
-            message: 'Leave has been Cancelled'
-          });
-        } else {
-          // Leave not home
-
-          // change status to nottaken
-          await Leave.updateOne(
-            {
-              _id: leaveId
-            },
-            { $set: { status: 'Not Taken' } }
-          );
-          // sends mail to cd supervisor HR and notification about status
-          // prettier-ignore
-          // email to HR
-          // prettier-ignore
-          const text = `Hello  ${hr.fName}, 
-
-${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
-                         `;
-          Mailer(from, hr.email, subject, text, res);
-          // email to Supervisor
-          // prettier-ignore
-          const textSupervisor = `Hello  ${supervisor.fName}, 
-
-${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
-                         `;
-          Mailer(from, supervisor.email, subject, textSupervisor, res);
-
-          res.status(200).json({
-            message: 'Leave has been Cancelled'
-          });
-        }
+        res.status(200).json({
+          message: 'Cancellation Pending Supervisor Approval'
+        });
       } else {
         return res.status(400).json({
           message: 'Invalid action for staff leave modification'

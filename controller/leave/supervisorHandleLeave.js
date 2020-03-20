@@ -60,6 +60,13 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
       if (
         (user.type === 'expat' || user.type === 'tcn') && leave.type === 'Home'
       ) {
+        // check if CD exists in System
+        const cd = await User.findOne({ 'roles.countryDirector': true });
+        if (!cd) {
+          return res.status(400).json({
+            message: 'Country Director is not Registered in the system'
+          });
+        }
         if (leave.status === 'Pending Supervisor') {
           // change progress to cd and notify
           await Leave.updateOne(
@@ -73,9 +80,17 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
           // prettier-ignore
           const text = `Dear ${user.fName}, 
 
-Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved. It is pending Country director approval${footer}.
+Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved your supervisor. It is now pending Country director approval${footer}.
                          `;
           Mailer(from, to, subject, text);
+
+          // email to CD
+          // prettier-ignore
+          const textCd = `Hello  ${cd.fName}, 
+
+${user.fName}  ${user.lName} is requesting for a Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
+                         `;
+          Mailer(from, cd.email, subject, textCd);
 
           res.status(200).json({
             message: 'Leave has been Approved, Pending CD approval'
@@ -93,13 +108,30 @@ Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateStrin
           // prettier-ignore
           const text = `Dear ${user.fName}, 
 
-Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by the Country director${footer}.
+Your Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by the Country director${footer}.
                                    `;
 
           Mailer(from, to, subject, text);
           res.status(200).json({
             message: 'Leave has been Approved'
           });
+        } else if (leave.status === 'Pending Not Taken') {
+          // change status to nottaken
+          await Leave.updateOne(
+            {
+              _id: leaveId
+            },
+            { $set: { status: 'Not Taken' } }
+          );
+          // sends mail to cd supervisor HR and notification about status
+          // prettier-ignore
+          // email to staff
+          // prettier-ignore
+          const textStaff = `Hello  ${user.fName}, 
+
+Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by your supervisor.${footer}.
+                         `;
+          Mailer(from, user.email, subject, textStaff);
         } else if (leave.status === 'Approved') {
           res.status(400).json({
             message: 'Leave has Already been Approved'
@@ -114,23 +146,44 @@ Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateStrin
       // Leave not home
       // change status to approved and notify
       // approve & notify that supervisor approved their leave request
-        await Leave.updateOne(
-          {
-            _id: leaveId
-          },
-          { $set: { status: 'Approved' } }
-        );
-        // sends mail to staff and notification about leave approval
-        // Send the email
-        // prettier-ignore
-        const text = `Dear ${user.fName}, 
 
-Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by your Supervisor${footer}.
+        // eslint-disable-next-line no-lonely-if
+        if (leave.status === 'Pending Not Taken') {
+        // change status to nottaken
+          await Leave.updateOne(
+            {
+              _id: leaveId
+            },
+            { $set: { status: 'Not Taken' } }
+          );
+          // sends mail to cd supervisor HR and notification about status
+          // prettier-ignore
+          // email to staff
+          // prettier-ignore
+          const textStaff = `Hello  ${user.fName}, 
+
+Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by your supervisor.${footer}.
+                       `;
+          Mailer(from, user.email, subject, textStaff);
+        } else {
+          await Leave.updateOne(
+            {
+              _id: leaveId
+            },
+            { $set: { status: 'Approved' } }
+          );
+          // sends mail to staff and notification about leave approval
+          // Send the email
+          // prettier-ignore
+          const text = `Dear ${user.fName}, 
+
+Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by your supervisor${footer}.
                  `;
-        Mailer(from, to, subject, text);
-        res.status(200).json({
-          message: 'Leave has been Approved'
-        });
+          Mailer(from, to, subject, text);
+          res.status(200).json({
+            message: 'Leave has been Approved'
+          });
+        }
       }
     } else if (status === 'Declined') {
       // prettier-ignore
@@ -151,7 +204,7 @@ Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateStrin
           // prettier-ignore
           const text = `Dear ${user.fName}, 
 
-Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been Declined by your Supervisor${footer}.
+Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by your supervisor${footer}.
                                    `;
           Mailer(from, to, subject, text);
           res.status(200).json({
@@ -171,12 +224,29 @@ Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateStrin
           // prettier-ignore
           const text = `Dear ${user.fName}, 
 
-Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been Declined by the Country director.${footer}.
+Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by the Country director.${footer}.
                                    `;
           Mailer(from, to, subject, text);
           res.status(200).json({
             message: 'Leave has been Declined'
           });
+        } else if (leave.status === 'Pending Not Taken') {
+          // change status to nottaken
+          await Leave.updateOne(
+            {
+              _id: leaveId
+            },
+            { $set: { status: 'Taken' } }
+          );
+          // sends mail to cd supervisor HR and notification about status
+          // prettier-ignore
+          // email to staff
+          // prettier-ignore
+          const textStaff = `Hello  ${user.fName}, 
+
+Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by your supervisor.${footer}.
+                         `;
+          Mailer(from, user.email, subject, textStaff);
         } else {
           return res.status(400).json({
             message: 'Invalid Status'
@@ -185,23 +255,43 @@ Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateStrin
       } else { // Leave not home
         // change status to rejected
         // notify that supervisor rejected their leave request
-        await Leave.updateOne(
-          {
-            _id: leaveId
-          },
-          { $set: { status: 'Supervisor Declined', rejectionReason: reason } }
-        );
-        // sends mail to staff and notification about supervisor leave rejection
-        // Send the email
-        // prettier-ignore
-        const text = `Dear ${user.fName}, 
-
-Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been Declined by your Supervisor.${footer}.
-                                   `;
-        Mailer(from, to, subject, text);
-        res.status(200).json({
-          message: 'Leave has been Declined'
-        });
+        // eslint-disable-next-line no-lonely-if
+        if (leave.status === 'Pending Not Taken') {
+          // change status to nottaken
+          await Leave.updateOne(
+            {
+              _id: leaveId
+            },
+            { $set: { status: 'Taken' } }
+          );
+          // sends mail to cd supervisor HR and notification about status
+          // prettier-ignore
+          // email to staff
+          // prettier-ignore
+          const textStaff = `Hello  ${user.fName}, 
+  
+  Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by your supervisor.${footer}.
+                         `;
+          Mailer(from, user.email, subject, textStaff);
+        } else {
+          await Leave.updateOne(
+            {
+              _id: leaveId
+            },
+            { $set: { status: 'Supervisor Declined', rejectionReason: reason } }
+          );
+          // sends mail to staff and notification about supervisor leave rejection
+          // Send the email
+          // prettier-ignore
+          const text = `Dear ${user.fName}, 
+    
+    Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by your supervisor.${footer}.
+                                       `;
+          Mailer(from, to, subject, text);
+          res.status(200).json({
+            message: 'Leave has been Declined'
+          });
+        }
       }
     } else {
       return res.status(400).json({
