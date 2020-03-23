@@ -82,7 +82,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
 
 Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved your supervisor. It is now pending Country director approval${footer}.
                          `;
-          Mailer(from, to, subject, text);
+          Mailer(from, to, subject, text, '');
 
           // email to CD
           // prettier-ignore
@@ -90,7 +90,7 @@ Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateStrin
 
 ${user.fName}  ${user.lName} is requesting for a Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
                          `;
-          Mailer(from, cd.email, subject, textCd);
+          Mailer(from, cd.email, subject, textCd, '');
 
           res.status(200).json({
             message: 'Leave has been Approved, Pending CD approval'
@@ -111,7 +111,7 @@ ${user.fName}  ${user.lName} is requesting for a Home Leave from ${leave.startDa
 Your Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by the Country director${footer}.
                                    `;
 
-          Mailer(from, to, subject, text);
+          Mailer(from, to, subject, text, user.supervisorEmail);
           res.status(200).json({
             message: 'Leave has been Approved'
           });
@@ -129,9 +129,9 @@ Your Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDate
           // prettier-ignore
           const textStaff = `Hello  ${user.fName}, 
 
-Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by your supervisor.${footer}.
+Cancellation of your Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by your supervisor.${footer}.
                          `;
-          Mailer(from, user.email, subject, textStaff);
+          Mailer(from, user.email, subject, textStaff, cd.email);
         } else if (leave.status === 'Approved') {
           res.status(400).json({
             message: 'Leave has Already been Approved'
@@ -164,7 +164,7 @@ Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.end
 
 Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by your supervisor.${footer}.
                        `;
-          Mailer(from, user.email, subject, textStaff);
+          Mailer(from, user.email, subject, textStaff, '');
         } else {
           await Leave.updateOne(
             {
@@ -179,7 +179,7 @@ Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.end
 
 Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by your supervisor${footer}.
                  `;
-          Mailer(from, to, subject, text);
+          Mailer(from, to, subject, text, '');
           res.status(200).json({
             message: 'Leave has been Approved'
           });
@@ -206,7 +206,7 @@ Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateStrin
 
 Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by your supervisor${footer}.
                                    `;
-          Mailer(from, to, subject, text);
+          Mailer(from, to, subject, text, '');
           res.status(200).json({
             message: 'Leave has been Declined by supervisor'
           });
@@ -226,7 +226,7 @@ Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateStrin
 
 Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by the Country director.${footer}.
                                    `;
-          Mailer(from, to, subject, text);
+          Mailer(from, to, subject, text, user.supervisorEmail);
           res.status(200).json({
             message: 'Leave has been Declined'
           });
@@ -246,7 +246,7 @@ Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateStrin
 
 Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by your supervisor.${footer}.
                          `;
-          Mailer(from, user.email, subject, textStaff);
+          Mailer(from, user.email, subject, textStaff, '');
         } else {
           return res.status(400).json({
             message: 'Invalid Status'
@@ -272,7 +272,7 @@ Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.end
   
   Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by your supervisor.${footer}.
                          `;
-          Mailer(from, user.email, subject, textStaff);
+          Mailer(from, user.email, subject, textStaff, '');
         } else {
           await Leave.updateOne(
             {
@@ -287,7 +287,7 @@ Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.end
     
     Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by your supervisor.${footer}.
                                        `;
-          Mailer(from, to, subject, text);
+          Mailer(from, to, subject, text, '');
           res.status(200).json({
             message: 'Leave has been Declined'
           });

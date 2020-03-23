@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
 const debug = require('debug')('server');
 
-const Mailer = (from, to, subject, text) => {
+const Mailer = (from, to, subject, text, cc) => {
   // Send the email
   const transporter = nodemailer.createTransport({
     host: 'smtp.office365.com', // hostname
@@ -20,7 +20,8 @@ const Mailer = (from, to, subject, text) => {
     from,
     to,
     subject,
-    text
+    text,
+    cc
   };
   transporter.sendMail(mailOptions, (err) => {
     if (err) {

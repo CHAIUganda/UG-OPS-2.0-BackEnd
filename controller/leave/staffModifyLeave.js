@@ -106,21 +106,6 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
             startDate
           });
         }
-        if (moment(startDate).isBefore(oldStartDate)) {
-          return res.status(400).json({
-            message:
-              'New startDate is before the approved time please cancel and reapply',
-            startDate,
-            oldStartDate
-          });
-        }
-        if (moment(startDate).isAfter(oldEndDate)) {
-          return res.status(400).json({
-            message: 'Leave cannot start when it has ended',
-            startDate,
-            oldEndDate
-          });
-        }
 
         if (moment(CurrentDate).isAfter(endDate)) {
           return res.status(400).json({
@@ -130,20 +115,33 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
           });
         }
 
-        if (moment(endDate).isBefore(oldStartDate)) {
-          return res.status(400).json({
-            message: 'Leave cannot end before its start',
-            startDate,
-            oldStartDate
-          });
-        }
-        if (moment(endDate).isAfter(oldEndDate)) {
+        if (moment(CurrentDate).isSame(endDate)) {
           return res.status(400).json({
             message:
-              'New Enddate is beyond the approved one please cancel and re apply',
-            endDate,
-            oldEndDate
+              'End Date cannot be changed to a date that already started',
+            CurrentDate,
+            endDate
           });
+        }
+
+        // work on re approval
+        if (
+          // eslint-disable-next-line operator-linebreak
+          moment(startDate).isAfter(oldEndDate) ||
+          // eslint-disable-next-line operator-linebreak
+          moment(startDate).isBefore(oldStartDate) ||
+          // eslint-disable-next-line operator-linebreak
+          moment(endDate).isBefore(oldStartDate) ||
+          // eslint-disable-next-line operator-linebreak
+          moment(endDate).isAfter(oldEndDate)
+        ) {
+          if (moment(startDate).isAfter(endDate)) {
+            return res.status(400).json({
+              message: 'Start date cannot be after End date',
+              startDate,
+              endDate
+            });
+          }
         }
 
         // chk if staff is an expat or tcn to allow cd notication
