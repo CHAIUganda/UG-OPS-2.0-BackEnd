@@ -12,6 +12,12 @@ const getLeavesTaken = async (user) => {
       },
       {
         status: 'Approved'
+      },
+      {
+        status: 'Pending Change'
+      },
+      {
+        status: 'Pending Not Taken'
       }
     ]
   };

@@ -70,7 +70,30 @@ const LeaveSchema = mongoose.Schema({
         endDate: Date,
         comment: String
       }
-    ]
+    ],
+    takenPending: {
+      startDate: {
+        // datetime format new Date("2016-05-22T10:05:44")
+        type: Date,
+        required: false
+        // default: Date.now()
+      },
+      endDate: {
+        // datetime formatnew Date("2016-05-22T10:05:44")
+        type: Date,
+        required: false
+      },
+      comment: {
+        // Comments/Description   optional on application
+        type: String,
+        required: false
+      },
+      rejectionReason: {
+        // optional reason why supervisor o countyDirector rejeccted
+        type: String,
+        required: false
+      }
+    }
   }
 });
 

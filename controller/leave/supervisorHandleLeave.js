@@ -132,6 +132,45 @@ Your Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDate
 Cancellation of your Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by your supervisor.${footer}.
                          `;
           Mailer(from, user.email, subject, textStaff, cd.email);
+        } else if (leave.status === 'Pending Change') {
+          // change status to nottaken
+          await Leave.updateOne(
+            {
+              _id: leaveId
+            },
+            {
+              $set: {
+                status: 'Taken',
+                startDate: leave.modificationDetails.takenPending.startDate,
+                endDate: leave.modificationDetails.takenPending.endDate,
+                comment: leave.modificationDetails.takenPending.comment,
+                modificationDetails: {
+                  takenPending: {
+                    startDate: '',
+                    endDate: '',
+                    comment: ''
+                  }
+                }
+              }
+            }
+          );
+
+          const modLeaves = {
+            // eslint-disable-next-line max-len
+            startDate: leave.startDate, endDate: leave.endDate, comment: leave.comment
+
+          };
+          leave.modificationDetails.modLeaves.push(modLeaves);
+          await leave.save();
+          // sends mail to cd supervisor HR and notification about status
+          // prettier-ignore
+          // email to staff
+          // prettier-ignore
+          const textStaff = `Hello  ${user.fName}, 
+
+Modification of your taken Home Leave from ${leave.modificationDetails.takenPending.startDate.toDateString()} to ${leave.modificationDetails.takenPending.endDate.toDateString()} has been approved by your supervisor.${footer}.
+                         `;
+          Mailer(from, user.email, subject, textStaff, cd.email);
         } else if (leave.status === 'Approved') {
           res.status(400).json({
             message: 'Leave has Already been Approved'
@@ -165,6 +204,45 @@ Cancellation of your Home Leave from ${leave.startDate.toDateString()} to ${leav
 Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by your supervisor.${footer}.
                        `;
           Mailer(from, user.email, subject, textStaff, '');
+        } else if (leave.status === 'Pending Change') {
+          // change status to nottaken
+          await Leave.updateOne(
+            {
+              _id: leaveId
+            },
+            {
+              $set: {
+                status: 'Taken',
+                startDate: leave.modificationDetails.takenPending.startDate,
+                endDate: leave.modificationDetails.takenPending.endDate,
+                comment: leave.modificationDetails.takenPending.comment,
+                modificationDetails: {
+                  takenPending: {
+                    startDate: '',
+                    endDate: '',
+                    comment: ''
+                  }
+                }
+              }
+            }
+          );
+
+          const modLeaves = {
+            // eslint-disable-next-line max-len
+            startDate: leave.startDate, endDate: leave.endDate, comment: leave.comment
+
+          };
+          leave.modificationDetails.modLeaves.push(modLeaves);
+          await leave.save();
+          // sends mail to cd supervisor HR and notification about status
+          // prettier-ignore
+          // email to staff
+          // prettier-ignore
+          const textStaff = `Hello  ${user.fName}, 
+
+Modification of your taken Leave from ${leave.modificationDetails.takenPending.startDate.toDateString()} to ${leave.modificationDetails.takenPending.endDate.toDateString()} has been approved by your supervisor.${footer}.
+                         `;
+          Mailer(from, user.email, subject, textStaff, '');
         } else {
           await Leave.updateOne(
             {
@@ -190,6 +268,12 @@ Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateStrin
       if (
         (user.type === 'expat' || user.type === 'tcn') && leave.type === 'Home'
       ) {
+        const cd = await User.findOne({ 'roles.countryDirector': true });
+        if (!cd) {
+          return res.status(400).json({
+            message: 'Country Director is not Registered in the system'
+          });
+        }
         if (leave.status === 'Pending Supervisor') {
           // change status to rejected and notify
           // notify that supervisor rejected their leave request
@@ -244,9 +328,35 @@ Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateStrin
           // prettier-ignore
           const textStaff = `Hello  ${user.fName}, 
 
-Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by your supervisor.${footer}.
+Cancellation of your Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by your supervisor.${footer}.
                          `;
-          Mailer(from, user.email, subject, textStaff, '');
+          Mailer(from, user.email, subject, textStaff, cd.email);
+        } else if (leave.status === 'Pending Change') {
+          // change status to nottaken
+          await Leave.updateOne(
+            {
+              _id: leaveId
+            },
+            {
+              $set: {
+                status: 'Taken',
+                modificationDetails: {
+                  takenPending: {
+                    comment: 'Supervisor Declined'
+                  }
+                }
+              }
+            }
+          );
+          // sends mail to cd supervisor HR and notification about status
+          // prettier-ignore
+          // email to staff
+          // prettier-ignore
+          const textStaff = `Hello  ${user.fName}, 
+
+Modification of your taken Home Leave from ${leave.modificationDetails.takenPending.startDate.toDateString()} to ${leave.modificationDetails.takenPending.endDate.toDateString()} has been declined by your supervisor.${footer}.
+                         `;
+          Mailer(from, user.email, subject, textStaff, cd.email);
         } else {
           return res.status(400).json({
             message: 'Invalid Status'
@@ -273,6 +383,32 @@ Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.end
   Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by your supervisor.${footer}.
                          `;
           Mailer(from, user.email, subject, textStaff, '');
+        } else if (leave.status === 'Pending Change') {
+          // change status to nottaken
+          await Leave.updateOne(
+            {
+              _id: leaveId
+            },
+            {
+              $set: {
+                status: 'Taken',
+                modificationDetails: {
+                  takenPending: {
+                    comment: 'Supervisor Declined'
+                  }
+                }
+              }
+            }
+          );
+          // sends mail to cd supervisor HR and notification about status
+          // prettier-ignore
+          // email to staff
+          // prettier-ignore
+          const textStaff = `Hello  ${user.fName}, 
+
+Modification of your taken Home Leave from ${leave.modificationDetails.takenPending.startDate.toDateString()} to ${leave.modificationDetails.takenPending.endDate.toDateString()} has been declined by your supervisor.${footer}.
+                         `;
+          Mailer(from, user.email, subject, textStaff, '');
         } else {
           await Leave.updateOne(
             {
@@ -285,7 +421,7 @@ Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.end
           // prettier-ignore
           const text = `Dear ${user.fName}, 
     
-    Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by your supervisor.${footer}.
+Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by your supervisor.${footer}.
                                        `;
           Mailer(from, to, subject, text, '');
           res.status(200).json({

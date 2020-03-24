@@ -8,6 +8,7 @@ const Mailer = require('../../helpers/Mailer');
 const getLeavesTaken = require('./getLeavesTaken');
 const getLeaveDaysNo = require('./getLeaveDaysNo');
 const PublicHoliday = require('../../model/PublicHoliday');
+const leaveEligibity = require('./leaveEligibity');
 
 const staffModifyLeave = async (req, res) => {
   const errors = validationResult(req);
@@ -135,28 +136,17 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
           // eslint-disable-next-line operator-linebreak
           moment(endDate).isAfter(oldEndDate)
         ) {
-          if (moment(startDate).isAfter(endDate)) {
-            return res.status(400).json({
-              message: 'Start date cannot be after End date',
-              startDate,
-              endDate
-            });
-          }
-        }
-
-        // chk if staff is an expat or tcn to allow cd notication
-        // prettier-ignore
-        if (
-          (user.type === 'expat' || user.type === 'tcn') && leave.type === 'Home'
-        ) {
-          // check if CD exists in System
-          const cd = await User.findOne({ 'roles.countryDirector': true });
-          if (!cd) {
-            return res.status(400).json({
-              message: 'Country Director is not Registered in the system'
-            });
-          }
-
+          const publicHolidays = await PublicHoliday.find({});
+          const daysDetails = getLeaveDaysNo(
+            startDate,
+            endDate,
+            publicHolidays
+          );
+          const leaveDetails = await getLeavesTaken(user);
+          leaveEligibity(daysDetails, leaveDetails, user, endDate, leave, res);
+          const message = `Staff Comment:${comment}  System Comment: Leave is being modified outside of approved time`;
+          const status = 'Pending Supervisor';
+          // re applying code
           // change leave details
           await Leave.updateOne(
             {
@@ -167,95 +157,142 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
               $set: {
                 startDate,
                 endDate,
-                comment,
+                status,
+                comment: message,
                 isModfied: true
               }
             }
           );
           const modLeaves = {
             // eslint-disable-next-line max-len
-            startDate: oldStartDate, endDate: oldEndDate, comment: oldComment
-
+            startDate: oldStartDate,
+            endDate: oldEndDate,
+            comment: oldComment
           };
           leave.modificationDetails.modLeaves.push(modLeaves);
           await leave.save();
-
-
-          // sends mail to cd supervisor HR and notification about status
-          // prettier-ignore
-          // email to HR
-          // prettier-ignore
-          const text = `Hello  ${hr.fName}, 
-
-${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
-                         `;
-          Mailer(from, hr.email, subject, text);
-
-          // email to CD
-          // prettier-ignore
-          const textCd = `Hello  ${cd.fName}, 
-
-${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
-                         `;
-          Mailer(from, cd.email, subject, textCd);
-
-          // email to Supervisor
           // prettier-ignore
           const textSupervisor = `Hello  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
-                         `;
-          Mailer(from, supervisor.email, subject, textSupervisor);
-
-          res.status(200).json({
-            message: 'Leave has been taken Modified successfully.'
-          });
+${user.fName}  ${user.lName} is requesting to modify their leave. To be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
+                                      `;
+          Mailer(from, supervisor.email, subject, textSupervisor, '');
         } else {
+          // leave is still in approved time
+          // chk if staff is an expat or tcn to allow cd notication
+          // prettier-ignore
+          // eslint-disable-next-line no-lonely-if
+          if (
+            (user.type === 'expat' || user.type === 'tcn') && leave.type === 'Home'
+          ) {
+          // check if CD exists in System
+            const cd = await User.findOne({ 'roles.countryDirector': true });
+            if (!cd) {
+              return res.status(400).json({
+                message: 'Country Director is not Registered in the system'
+              });
+            }
+
+            // change leave details
+            await Leave.updateOne(
+              {
+                _id: leaveId
+              },
+              {
+              // eslint-disable-next-line max-len
+                $set: {
+                  startDate,
+                  endDate,
+                  comment,
+                  isModfied: true
+                }
+              }
+            );
+            const modLeaves = {
+            // eslint-disable-next-line max-len
+              startDate: oldStartDate, endDate: oldEndDate, comment: oldComment
+
+            };
+            leave.modificationDetails.modLeaves.push(modLeaves);
+            await leave.save();
+
+
+            // sends mail to cd supervisor HR and notification about status
+            // prettier-ignore
+            // email to HR
+            // prettier-ignore
+            const text = `Hello  ${hr.fName}, 
+
+${user.fName}  ${user.lName} has modified their HomeLeave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
+                         `;
+            Mailer(from, hr.email, subject, text, '');
+
+            // email to CD
+            // prettier-ignore
+            const textCd = `Hello  ${cd.fName}, 
+
+${user.fName}  ${user.lName} has modified their HomeLeave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
+                         `;
+            Mailer(from, cd.email, subject, textCd, '');
+
+            // email to Supervisor
+            // prettier-ignore
+            const textSupervisor = `Hello  ${supervisor.fName}, 
+
+${user.fName}  ${user.lName} has modified their HomeLeave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
+                         `;
+            Mailer(from, supervisor.email, subject, textSupervisor, '');
+
+            res.status(200).json({
+              message: 'Leave has been taken Modified successfully.'
+            });
+          } else {
           // Leave not home
           // change leave details
-          await Leave.updateOne(
-            {
-              _id: leaveId
-            },
-            {
+            await Leave.updateOne(
+              {
+                _id: leaveId
+              },
+              {
               // eslint-disable-next-line max-len
-              $set: {
-                startDate,
-                endDate,
-                comment,
-                isModfied: true
+                $set: {
+                  startDate,
+                  endDate,
+                  comment,
+                  isModfied: true
+                }
               }
-            }
-          );
-          const modLeaves = {
+            );
+            const modLeaves = {
             // eslint-disable-next-line max-len
-            startDate: oldStartDate, endDate: oldEndDate, comment: oldComment
+              startDate: oldStartDate, endDate: oldEndDate, comment: oldComment
 
-          };
-          leave.modificationDetails.modLeaves.push(modLeaves);
-          await leave.save();
+            };
+            leave.modificationDetails.modLeaves.push(modLeaves);
+            await leave.save();
 
-          // sends mail to cd supervisor HR and notification about status
-          // prettier-ignore
-          // email to HR
-          // prettier-ignore
-          const text = `Hello  ${hr.fName}, 
-
-${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
-                         `;
-          Mailer(from, hr.email, subject, text);
-
-          // email to Supervisor
-          // prettier-ignore
-          const textSupervisor = `Hello  ${supervisor.fName}, 
+            // sends mail to cd supervisor HR and notification about status
+            // prettier-ignore
+            // email to HR
+            // prettier-ignore
+            const text = `Hello  ${hr.fName}, 
 
 ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
                          `;
-          Mailer(from, supervisor.email, subject, textSupervisor);
+            Mailer(from, hr.email, subject, text, '');
 
-          res.status(200).json({
-            message: 'Leave has been taken Modified successfully.'
-          });
+            // email to Supervisor
+            // prettier-ignore
+            const textSupervisor = `Hello  ${supervisor.fName}, 
+
+${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
+                         `;
+            Mailer(from, supervisor.email, subject, textSupervisor, '');
+
+            res.status(200).json({
+              message: 'Leave has been taken Modified successfully.'
+            });
+          }
         }
       } else if (action === 'cancelLeave') {
         // prettier-ignore
@@ -284,25 +321,25 @@ ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${star
           // prettier-ignore
           const text = `Hello  ${hr.fName}, 
 
-${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
+${user.fName}  ${user.lName} Decided not to take their HomeLeave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
                          `;
-          Mailer(from, hr.email, subject, text);
+          Mailer(from, hr.email, subject, text, '');
 
           // email to CD
           // prettier-ignore
           const textCd = `Hello  ${cd.fName}, 
 
-${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
+${user.fName}  ${user.lName} Decided not to take their HomeLeave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
                          `;
-          Mailer(from, cd.email, subject, textCd);
+          Mailer(from, cd.email, subject, textCd, '');
 
           // email to Supervisor
           // prettier-ignore
           const textSupervisor = `Hello  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
+${user.fName}  ${user.lName} Decided not to take their HomeLeave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
                          `;
-          Mailer(from, supervisor.email, subject, textSupervisor);
+          Mailer(from, supervisor.email, subject, textSupervisor, '');
 
           res.status(200).json({
             message: 'Leave has been Cancelled'
@@ -317,7 +354,7 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
             },
             { $set: { status: 'Not Taken' } }
           );
-          // sends mail to cd supervisor HR and notification about status
+          // sends mail to supervisor  HR and notification about status
           // prettier-ignore
           // email to HR
           // prettier-ignore
@@ -325,14 +362,14 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
 
 ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
                          `;
-          Mailer(from, hr.email, subject, text);
+          Mailer(from, hr.email, subject, text, '');
           // email to Supervisor
           // prettier-ignore
           const textSupervisor = `Hello  ${supervisor.fName}, 
 
 ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
                          `;
-          Mailer(from, supervisor.email, subject, textSupervisor);
+          Mailer(from, supervisor.email, subject, textSupervisor, '');
 
           res.status(200).json({
             message: 'Leave has been Cancelled'
@@ -354,167 +391,30 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
           msg = `${msg} leave being modified to start today: ${startDate.toDateString()}  :::`;
         }
         if (moment(startDate).isBefore(oldStartDate)) {
-          msg = `${msg}New startDate(${startDate.toDateString()}) is before the approved startDate(${oldStartDate.toDateString()}):::`;
+          msg = `${msg}New startDate(${startDate.toDateString()}) is before the Old startDate(${oldStartDate.toDateString()}):::`;
         }
         if (moment(startDate).isAfter(oldEndDate)) {
-          msg = `${msg}New startDate(${startDate.toDateString()}) is after the approved EndDate(${oldEndDate.toDateString()}):::`;
+          msg = `${msg}New startDate(${startDate.toDateString()}) is after the Old EndDate(${oldEndDate.toDateString()}):::`;
         }
 
         if (moment(CurrentDate).isAfter(endDate)) {
-          msg = `${msg}New EndDate(${endDate.toDateString()}) already passed as of(${CurrentDate.toDateString()}):::`;
+          msg = `${msg}New EndDate(${endDate.toDateString()}) already passed as of today (${CurrentDate.toDateString()}):::`;
         }
 
         if (moment(endDate).isBefore(oldStartDate)) {
-          msg = `${msg}New endDate(${endDate.toDateString()}) is Before the approved StartDate(${oldStartDate.toDateString()}):::`;
+          msg = `${msg}New endDate(${endDate.toDateString()}) is Before the Old StartDate(${oldStartDate.toDateString()}):::`;
         }
         if (moment(endDate).isAfter(oldEndDate)) {
-          msg = `${msg}New endDate(${endDate.toDateString()}) is after the approved endDate(${oldEndDate.toDateString()}):::`;
+          msg = `${msg}New endDate(${endDate.toDateString()}) is after the Old endDate(${oldEndDate.toDateString()}):::`;
         }
 
         // chk if staff is an expat or tcn to allow cd notication
         // prettier-ignore
         const publicHolidays = await PublicHoliday.find({});
         const daysDetails = getLeaveDaysNo(startDate, endDate, publicHolidays);
-        // set timezone to kampala
-        // const CurrentDate = moment().tz('Africa/Kampala').format();
-        endDate = new Date(endDate);
-        startDate = new Date(startDate);
-        const endDateMonth = endDate.getMonth();
-
-        // Computing Annual Leave
-        let accruedAnnualLeave;
-        if (endDateMonth === 0) {
-          accruedAnnualLeave = 0;
-        } else {
-          // accruedAnnualLeave = currentMonth * 1.75;
-          accruedAnnualLeave = Math.trunc(endDateMonth * 1.75);
-        }
-        const { annualLeaveBF } = user;
         const leaveDetails = await getLeavesTaken(user);
-
-        const {
-          unPaidLeaveTaken,
-          homeLeaveTaken,
-          annualLeaveTaken,
-          maternityLeaveTaken,
-          paternityLeaveTaken,
-          sickLeaveTaken,
-          studyLeaveTaken
-        } = leaveDetails;
-
-        // prettier-ignore
-        const totalAcruedAnualLeavePlusAnualLeaveBF = accruedAnnualLeave + annualLeaveBF;
-        const maternity = 60;
-        const paternity = 7;
-        const sick = 42;
-        const study = 4;
-        const unpaid = 60;
-
-        if (leave.type === 'Paternity') {
-          if (user.gender === 'Female') {
-            return res.status(400).json({
-              message: 'Paternity leave only given to Gentlemen'
-            });
-          }
-          const totalPaternity = paternityLeaveTaken + daysDetails.totalDays;
-          if (paternity < totalPaternity) {
-            return res.status(400).json({
-              message: 'You Dont have enough Paternity Leave days',
-              paternityLeaveTaken,
-              daysRequested: daysDetails.totalDays,
-              totalPaternity,
-              paternity
-            });
-          }
-        } else if (leave.typetype === 'Home') {
-          if (user.type === 'local') {
-            return res.status(400).json({
-              message: 'Home leave only given to Expatriates and TCNs'
-            });
-          }
-          // eslint-disable-next-line operator-linebreak
-          const totalHome =
-            homeLeaveTaken + annualLeaveTaken + daysDetails.totalDays;
-          const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalHome;
-          if (chk1) {
-            return res.status(400).json({
-              message: 'You Dont have enough Annual Leave days',
-              annualLeaveTaken,
-              homeLeaveTaken,
-              daysRequested: daysDetails.totalDays,
-              totalHome,
-              totalAcruedAnualLeavePlusAnualLeaveBF
-            });
-          }
-        } else if (leave.type === 'Maternity') {
-          if (user.gender === 'Male') {
-            return res.status(400).json({
-              message: 'Maternity leave only given to Ladies'
-            });
-          }
-          const totalMaternity = maternityLeaveTaken + daysDetails.totalDays;
-          if (maternity < totalMaternity) {
-            return res.status(400).json({
-              message: 'You Dont have enough Maternity Leave days',
-              maternityLeaveTaken,
-              daysRequested: daysDetails.totalDays,
-              totalMaternity,
-              maternity
-            });
-          }
-        } else if (leave.type === 'Sick') {
-          const totalSick = sickLeaveTaken + daysDetails.totalDays;
-          if (sick < totalSick) {
-            return res.status(400).json({
-              message: 'You Dont have enough Sick Leave days',
-              sickLeaveTaken,
-              daysRequested: daysDetails.totalDays,
-              totalSick,
-              sick
-            });
-          }
-        } else if (leave.type === 'Unpaid') {
-          const totalUnpaid = unPaidLeaveTaken + daysDetails.totalDays;
-          if (unpaid < totalUnpaid) {
-            return res.status(400).json({
-              message: 'You Dont have enough Unpaid Leave days',
-              unPaidLeaveTaken,
-              daysRequested: daysDetails.totalDays,
-              totalUnpaid,
-              unpaid
-            });
-          }
-        } else if (leave.type === 'Study') {
-          const totalStudy = studyLeaveTaken + daysDetails.totalDays;
-          if (study < totalStudy) {
-            return res.status(400).json({
-              message: 'You Dont have enough Study Leave days',
-              studyLeaveTaken,
-              daysRequested: daysDetails.totalDays,
-              totalStudy,
-              study
-            });
-          }
-        } else if (leave.type === 'Annual') {
-          // eslint-disable-next-line operator-linebreak
-          const totalAnnual =
-            annualLeaveTaken + homeLeaveTaken + daysDetails.totalDays;
-          const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalAnnual;
-          if (chk1) {
-            return res.status(400).json({
-              message: 'You Dont have enough Annual Leave days',
-              annualLeaveTaken,
-              homeLeaveTaken,
-              daysRequested: daysDetails.totalDays,
-              totalAnnual,
-              totalAcruedAnualLeavePlusAnualLeaveBF
-            });
-          }
-        } else {
-          return res.status(400).json({
-            message: 'Invalid Leave type selected'
-          });
-        }
+        leaveEligibity(daysDetails, leaveDetails, user, endDate, leave, res);
+        const message = `Staff Comment:${comment}  System Comment(s): ${msg}`;
 
         if (
           // eslint-disable-next-line operator-linebreak
@@ -530,60 +430,8 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
           }
 
           // change leave details
-          await Leave.updateOne(
-            {
-              _id: leaveId
-            },
-            {
-              // eslint-disable-next-line max-len
-              $set: {
-                startDate,
-                endDate,
-                comment,
-                isModfied: true
-              }
-            }
-          );
-          const modLeaves = {
-            // eslint-disable-next-line max-len
-            startDate: oldStartDate,
-            endDate: oldEndDate,
-            comment: oldComment
-          };
-          leave.modificationDetails.modLeaves.push(modLeaves);
-          await leave.save();
-
-          // sends mail to cd supervisor HR and notification about status
-          // prettier-ignore
-          // email to HR
-          // prettier-ignore
-          const text = `Hello  ${hr.fName}, 
-
-${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()} Note: ${msg}${footer}.
-                         `;
-          Mailer(from, hr.email, subject, text);
-
-          // email to CD
-          // prettier-ignore
-          const textCd = `Hello  ${cd.fName}, 
-
-${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()} Note: ${msg}${footer}.
-                         `;
-          Mailer(from, cd.email, subject, textCd);
-
-          // email to Supervisor
-          // prettier-ignore
-          const textSupervisor = `Hello  ${supervisor.fName}, 
-
-${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()} Note: ${msg}${footer}.
-                         `;
-          Mailer(from, supervisor.email, subject, textSupervisor);
-
-          res.status(200).json({
-            message: 'Leave has been taken Modified successfully.'
-          });
-        } else {
-          // Leave not home
+          const status = 'Pending Change';
+          // re applying code
           // change leave details
           await Leave.updateOne(
             {
@@ -592,42 +440,66 @@ ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${star
             {
               // eslint-disable-next-line max-len
               $set: {
-                startDate,
-                endDate,
-                comment,
-                isModfied: true
+                isModfied: true,
+                status,
+                modificationDetails: {
+                  takenPending: {
+                    startDate,
+                    endDate,
+                    comment: message
+                  }
+                }
               }
             }
           );
-          const modLeaves = {
-            // eslint-disable-next-line max-len
-            startDate: oldStartDate,
-            endDate: oldEndDate,
-            comment: oldComment
-          };
-          leave.modificationDetails.modLeaves.push(modLeaves);
-          await leave.save();
-
-          // sends mail to cd supervisor HR and notification about status
-          // prettier-ignore
-          // email to HR
-          // prettier-ignore
-          const text = `Hello  ${hr.fName}, 
-
-${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()} Note: ${msg}${footer}.
-                         `;
-          Mailer(from, hr.email, subject, text);
-
-          // email to Supervisor
           // prettier-ignore
           const textSupervisor = `Hello  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()} Note: ${msg}${footer}.
-                         `;
-          Mailer(from, supervisor.email, subject, textSupervisor);
+${user.fName}  ${user.lName} is requesting to modify their Taken leave. New Dates are ${startDate.toDateString()} to ${endDate.toDateString()}. Please Confirm. ${footer}.
+                                      `;
+          const cc = `${cd.lName},${hr.lName}`;
+          Mailer(from, supervisor.email, subject, textSupervisor, cc);
 
           res.status(200).json({
-            message: 'Leave has been taken Modified successfully.'
+            message: 'Leave Modification request sent successfully.'
+          });
+        } else {
+          // Leave not home
+          // change leave details
+
+          // change leave details
+          const status = 'Pending Change';
+          // re applying code
+          // change leave details
+          await Leave.updateOne(
+            {
+              _id: leaveId
+            },
+            {
+              // eslint-disable-next-line max-len
+              $set: {
+                isModfied: true,
+                status,
+                modificationDetails: {
+                  takenPending: {
+                    startDate,
+                    endDate,
+                    comment: message
+                  }
+                }
+              }
+            }
+          );
+          // prettier-ignore
+          const textSupervisor = `Hello  ${supervisor.fName}, 
+
+${user.fName}  ${user.lName} is requesting to modify their Taken leave. New Dates are ${startDate.toDateString()} to ${endDate.toDateString()}. Please Confirm. ${footer}.
+                                      `;
+          const cc = `${hr.lName}`;
+          Mailer(from, supervisor.email, subject, textSupervisor, cc);
+
+          res.status(200).json({
+            message: 'Leave Modification request sent successfully.'
           });
         }
       } else if (action === 'cancelLeave') {
@@ -646,9 +518,9 @@ ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${star
         // prettier-ignore
         const textSupervisor = `Hello  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}. This is pending your approval${footer}.
+${user.fName}  ${user.lName} is requesting to modify their Taken leave Which was from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}. This is pending your approval${footer}.
                          `;
-        Mailer(from, supervisor.email, subject, textSupervisor);
+        Mailer(from, supervisor.email, subject, textSupervisor, '');
 
         res.status(200).json({
           message: 'Cancellation Pending Supervisor Approval'
@@ -658,10 +530,6 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
           message: 'Invalid action for staff leave modification'
         });
       }
-    } else {
-      return res.status(400).json({
-        message: `This leave with a status: ${leave.status} cannot be not modified`
-      });
     }
   } catch (err) {
     debug(err.message);

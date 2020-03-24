@@ -7,6 +7,7 @@ const User = require('../../model/User');
 const getLeavesTaken = require('./getLeavesTaken');
 const getLeaveDaysNo = require('./getLeaveDaysNo');
 const PublicHoliday = require('../../model/PublicHoliday');
+const Mailer = require('../../helpers/Mailer');
 
 const createLeave = async (req, res) => {
   const errors = validationResult(req);
@@ -50,6 +51,13 @@ const createLeave = async (req, res) => {
           chkleaves
         });
       }
+    }
+    // check if Supervisor exists in System
+    const supervisor = await User.findOne({ email: user.supervisorEmail });
+    if (!supervisor) {
+      return res.status(400).json({
+        message: 'Supervisor is not Registered in system'
+      });
     }
 
     if (status === 'Pending Supervisor' || status === 'Planned') {
@@ -197,6 +205,17 @@ const createLeave = async (req, res) => {
         });
       }
 
+      const subject = 'Uganda Operations Leaves';
+      const from = 'UGOperations@clintonhealthaccess.org';
+      const footer = `
+  
+  Regards,
+  
+  Uganda Operations
+  Clinton Health Access Initiative
+  
+  Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
+
       // checks if user has enough leaves days happen here basing on what has been computed
       const { supervisorEmail } = user;
       const leaveRemade = new Leave({
@@ -221,6 +240,13 @@ const createLeave = async (req, res) => {
         { $push: { leaves: leaveRemade._id } }
       );
       await leaveRemade.save();
+      // mail supervisor
+      // prettier-ignore
+      const textSupervisor = `Hello  ${supervisor.fName}, 
+
+${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
+                                      `;
+      Mailer(from, supervisor.email, subject, textSupervisor, '');
 
       const leave = {
         startDate,

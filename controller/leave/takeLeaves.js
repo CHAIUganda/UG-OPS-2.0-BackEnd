@@ -90,28 +90,28 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
   
  Your leave from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()} has started.${footer}.
                            `;
-            Mailer(from, user.email, subject, textUser);
+            Mailer(from, user.email, subject, textUser, '');
 
             // email to HR
             const text = `Hello  ${hr.fName}, 
   
   ${user.fName}  ${user.lName} will be off from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()}.${footer}.
                            `;
-            Mailer(from, hr.email, subject, text);
+            Mailer(from, hr.email, subject, text, '');
 
             // email to CD
             const textCd = `Hello  ${cd.fName}, 
   
   ${user.fName}  ${user.lName} will be off from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()}.${footer}.
                            `;
-            Mailer(from, cd.email, subject, textCd);
+            Mailer(from, cd.email, subject, textCd, '');
 
             // email to Supervisor
             const textSupervisor = `Hello  ${supervisor.fName}, 
   
   ${user.fName}  ${user.lName} will be off from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()}.${footer}.
                            `;
-            Mailer(from, supervisor.email, subject, textSupervisor);
+            Mailer(from, supervisor.email, subject, textSupervisor, '');
           } else {
           // Leave not home
           // change status to taken
@@ -131,20 +131,20 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
   
 Your leave from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()} has started.${footer}.
                                               `;
-            Mailer(from, user.email, subject, textUser);
+            Mailer(from, user.email, subject, textUser, '');
             // email to HR
             const text = `Hello  ${hr.fName}, 
   
   ${user.fName}  ${user.lName} will be off from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()}.${footer}.
                            `;
-            Mailer(from, hr.email, subject, text);
+            Mailer(from, hr.email, subject, text, '');
 
             // email to Supervisor
             const textSupervisor = `Hello  ${supervisor.fName}, 
   
   ${user.fName}  ${user.lName} will be off from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()}.${footer}.
                            `;
-            Mailer(from, supervisor.email, subject, textSupervisor);
+            Mailer(from, supervisor.email, subject, textSupervisor, '');
           }
         }
 
