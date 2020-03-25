@@ -44,8 +44,17 @@ const createProgram = async (req, res) => {
     });
 
     await programtoSave.save();
+    const programManagerDetails = {
+      fName: user.fName,
+      lName: user.lName
+    };
+
     res.status(201).json({
-      programtoSave
+      _id: programtoSave._id,
+      name,
+      shortForm,
+      programManagerId,
+      programManagerDetails
     });
   } catch (err) {
     debug(err.message);

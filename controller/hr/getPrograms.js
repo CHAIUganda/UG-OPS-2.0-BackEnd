@@ -10,7 +10,7 @@ const getPrograms = async (req, res) => {
 
     const recurseProcessLeave = async (controller, arr) => {
       if (controller < arr.length) {
-        const { _id, name, programManagerId } = arr[controller];
+        const { _id, name, programManagerId, shortForm } = arr[controller];
 
         const user = await User.findOne({
           _id: programManagerId
@@ -29,6 +29,7 @@ const getPrograms = async (req, res) => {
         const programRemade = {
           _id,
           name,
+          shortForm,
           programManagerId,
           programManagerDetails
         };

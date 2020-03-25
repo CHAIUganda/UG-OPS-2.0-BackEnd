@@ -40,7 +40,8 @@ const LeaveSchema = mongoose.Schema({
   status: {
     // can be planned, pending, cancelled, rejected approved taken nottaken
     type: String,
-    required: true
+    required: true,
+    text: true
   },
   comment: {
     // Comments/Description   optional on application
@@ -68,7 +69,8 @@ const LeaveSchema = mongoose.Schema({
       {
         startDate: Date,
         endDate: Date,
-        comment: String
+        comment: String,
+        typ: String
       }
     ],
     takenPending: {
@@ -84,6 +86,11 @@ const LeaveSchema = mongoose.Schema({
         required: false
       },
       comment: {
+        // Comments/Description   optional on application
+        type: String,
+        required: false
+      },
+      type: {
         // Comments/Description   optional on application
         type: String,
         required: false

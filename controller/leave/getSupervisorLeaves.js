@@ -20,6 +20,13 @@ const getSupervisorLeaves = async (req, res) => {
     const publicHolidays = await PublicHoliday.find({});
     if (status === 'all') {
       query = { supervisorEmail: staffEmail };
+    } else if (status === 'Pending') {
+      // await Leave.createIndex({ status: 'text' });
+
+      query = {
+        supervisorEmail: staffEmail,
+        $text: { $search: status }
+      };
     } else {
       query = { supervisorEmail: staffEmail, status };
     }

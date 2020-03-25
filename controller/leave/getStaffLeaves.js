@@ -32,7 +32,14 @@ const getStaffLeaves = async (req, res) => {
         status === 'Country Director Declined' ||
         // eslint-disable-next-line operator-linebreak
         status === 'Planned' ||
-        status === 'Taken'
+        // eslint-disable-next-line operator-linebreak
+        status === 'Taken' ||
+        // eslint-disable-next-line operator-linebreak
+        status === 'Pending Change' ||
+        // eslint-disable-next-line operator-linebreak
+        status === 'Not Taken' ||
+        // eslint-disable-next-line operator-linebreak
+        status === 'Pending Not Taken'
       ) {
         query = { _id: { $in: user.leaves }, status };
       } else {

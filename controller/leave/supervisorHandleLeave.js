@@ -133,7 +133,12 @@ Cancellation of your Home Leave from ${leave.startDate.toDateString()} to ${leav
                          `;
           Mailer(from, user.email, subject, textStaff, cd.email);
         } else if (leave.status === 'Pending Change') {
-          // change status to nottaken
+          // change status to taken
+          const modLeaves = {
+            // eslint-disable-next-line max-len
+            startDate: leave.startDate, endDate: leave.endDate, comment: leave.comment, typ: leave.type
+
+          };
           await Leave.updateOne(
             {
               _id: leaveId
@@ -144,6 +149,7 @@ Cancellation of your Home Leave from ${leave.startDate.toDateString()} to ${leav
                 startDate: leave.modificationDetails.takenPending.startDate,
                 endDate: leave.modificationDetails.takenPending.endDate,
                 comment: leave.modificationDetails.takenPending.comment,
+                type: leave.modificationDetails.takenPending.type,
                 modificationDetails: {
                   takenPending: {
                     startDate: '',
@@ -155,11 +161,6 @@ Cancellation of your Home Leave from ${leave.startDate.toDateString()} to ${leav
             }
           );
 
-          const modLeaves = {
-            // eslint-disable-next-line max-len
-            startDate: leave.startDate, endDate: leave.endDate, comment: leave.comment
-
-          };
           leave.modificationDetails.modLeaves.push(modLeaves);
           await leave.save();
           // sends mail to cd supervisor HR and notification about status
@@ -216,6 +217,7 @@ Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.end
                 startDate: leave.modificationDetails.takenPending.startDate,
                 endDate: leave.modificationDetails.takenPending.endDate,
                 comment: leave.modificationDetails.takenPending.comment,
+                type: leave.modificationDetails.takenPending.type,
                 modificationDetails: {
                   takenPending: {
                     startDate: '',
@@ -229,7 +231,7 @@ Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.end
 
           const modLeaves = {
             // eslint-disable-next-line max-len
-            startDate: leave.startDate, endDate: leave.endDate, comment: leave.comment
+            startDate: leave.startDate, endDate: leave.endDate, comment: leave.comment, typ: leave.type
 
           };
           leave.modificationDetails.modLeaves.push(modLeaves);

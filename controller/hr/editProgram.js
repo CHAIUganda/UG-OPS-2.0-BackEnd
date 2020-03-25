@@ -16,9 +16,10 @@ const editProgram = async (req, res) => {
   const {
     id,
     name,
-    shortForm,
-    programManagerId
+    shortForm
   } = req.body;
+
+  let { programManagerId } = req.body;
 
   try {
     const program = await Program.findOne({
@@ -28,6 +29,9 @@ const editProgram = async (req, res) => {
       return res.status(400).json({
         message: 'This program doesnot exist'
       });
+    }
+    if (programManagerId == null) {
+      programManagerId = program.programManagerId;
     }
 
     const user = await User.findOne({

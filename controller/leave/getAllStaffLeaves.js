@@ -25,6 +25,8 @@ const getAllStaffLeaves = async (req, res) => {
         query = {};
       } else if (status === 'all' && program !== 'all') {
         query = { program };
+      } else if (status !== 'all' && program === 'all') {
+        query = { status };
       } else {
         query = { program, status };
       }
