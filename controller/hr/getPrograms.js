@@ -10,6 +10,7 @@ const getPrograms = async (req, res) => {
 
     const recurseProcessLeave = async (controller, arr) => {
       if (controller < arr.length) {
+        // eslint-disable-next-line object-curly-newline
         const { _id, name, programManagerId, shortForm } = arr[controller];
 
         const user = await User.findOne({

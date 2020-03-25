@@ -109,6 +109,18 @@ router.get(
 );
 
 /**
+ * @method - GET
+ * @description - Get All Staff Leaves Taken. authenticator is a middleware will be used to
+ * verify the token
+ * @param - /getStaffLeavesTaken
+ */
+router.get(
+  '/getAllStaffLeavesTaken',
+  authenticator,
+  leaveController.getAllStaffLeavesTaken
+);
+
+/**
  * @method - POST
  * @description - Staff Modify leave. Involves modifying
  * a leave by staff authenticator is a middleware will be used to

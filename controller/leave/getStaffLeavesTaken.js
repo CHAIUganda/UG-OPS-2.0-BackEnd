@@ -1,4 +1,5 @@
 const debug = require('debug')('leave-controller');
+const moment = require('moment-timezone');
 const User = require('../../model/User');
 const getLeavesTaken = require('./getLeavesTaken');
 
@@ -11,7 +12,27 @@ const getStaffLeavesTaken = async (req, res) => {
         message: 'User does not exist'
       });
     }
+    let CurrentDate = moment()
+      .tz('Africa/Kampala')
+      .format();
+    CurrentDate = new Date(CurrentDate);
+    const currentMonth = CurrentDate.getMonth();
+    // Computing Annual Leave
+    let accruedAnnualLeave;
+    if (currentMonth === 0) {
+      accruedAnnualLeave = 0;
+    } else {
+      accruedAnnualLeave = Math.trunc(currentMonth * 1.75);
+    }
+
     const { annualLeaveBF } = user;
+    // prettier-ignore
+    const totalAcruedAnualLeavePlusAnualLeaveBF = accruedAnnualLeave + annualLeaveBF;
+    const maternity = 60;
+    const paternity = 7;
+    const sick = 42;
+    const study = 4;
+    const unpaid = 60;
     const leaveDetailss = await getLeavesTaken(user);
 
     const {
@@ -27,12 +48,21 @@ const getStaffLeavesTaken = async (req, res) => {
     const leaveDetails = {
       annualLeaveBF,
       unPaidLeaveTaken,
+      unpaidLeaveBal: unpaid - unPaidLeaveTaken,
       homeLeaveTaken,
+      // prettier-ignore
+      homeLeaveBal: totalAcruedAnualLeavePlusAnualLeaveBF - homeLeaveTaken - annualLeaveTaken,
       annualLeaveTaken,
+      // prettier-ignore
+      annualLeaveBal: totalAcruedAnualLeavePlusAnualLeaveBF - homeLeaveTaken - annualLeaveTaken,
       maternityLeaveTaken,
+      maternityLeaveBal: maternity - maternityLeaveTaken,
       paternityLeaveTaken,
+      paternityLeaveBal: paternity - paternityLeaveTaken,
       sickLeaveTaken,
-      studyLeaveTaken
+      sickLeaveBal: sick - sickLeaveTaken,
+      studyLeaveTaken,
+      studyLeaveBal: study - studyLeaveTaken
     };
 
     res.status(200).json({ leaveDetails });
