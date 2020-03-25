@@ -42,6 +42,9 @@ const getStaffLeaves = async (req, res) => {
         status === 'Pending Not Taken'
       ) {
         query = { _id: { $in: user.leaves }, status };
+      } else if (status === 'Pending') {
+        // await Leave.createIndex({ status: 'text' });
+        query = { _id: { $in: user.leaves }, $text: { $search: status } };
       } else {
         return res.status(400).json({
           message: 'Invalid Status'

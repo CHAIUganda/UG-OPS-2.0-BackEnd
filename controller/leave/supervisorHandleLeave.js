@@ -132,6 +132,9 @@ Your Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDate
 Cancellation of your Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by your supervisor.${footer}.
                          `;
           Mailer(from, user.email, subject, textStaff, cd.email);
+          res.status(200).json({
+            message: 'Leave Cancellation has been Approved'
+          });
         } else if (leave.status === 'Pending Change') {
           // change status to taken
           const modLeaves = {
@@ -146,16 +149,16 @@ Cancellation of your Home Leave from ${leave.startDate.toDateString()} to ${leav
             {
               $set: {
                 status: 'Taken',
-                startDate: leave.modificationDetails.takenPending.startDate,
-                endDate: leave.modificationDetails.takenPending.endDate,
-                comment: leave.modificationDetails.takenPending.comment,
-                type: leave.modificationDetails.takenPending.type,
-                modificationDetails: {
-                  takenPending: {
-                    startDate: '',
-                    endDate: '',
-                    comment: ''
-                  }
+                startDate: leave.takenPending.startDate,
+                endDate: leave.takenPending.endDate,
+                comment: leave.takenPending.comment,
+                type: leave.takenPending.type,
+                takenPending: {
+                  startDate: '',
+                  endDate: '',
+                  comment: '',
+                  type: '',
+                  status: ''
                 }
               }
             }
@@ -169,9 +172,12 @@ Cancellation of your Home Leave from ${leave.startDate.toDateString()} to ${leav
           // prettier-ignore
           const textStaff = `Hello  ${user.fName}, 
 
-Modification of your taken Home Leave from ${leave.modificationDetails.takenPending.startDate.toDateString()} to ${leave.modificationDetails.takenPending.endDate.toDateString()} has been approved by your supervisor.${footer}.
+Modification of your taken Home Leave from ${leave.takenPending.startDate.toDateString()} to ${leave.takenPending.endDate.toDateString()} has been approved by your supervisor.${footer}.
                          `;
           Mailer(from, user.email, subject, textStaff, cd.email);
+          res.status(200).json({
+            message: 'Leave Modification has been Approved'
+          });
         } else if (leave.status === 'Approved') {
           res.status(400).json({
             message: 'Leave has Already been Approved'
@@ -205,6 +211,9 @@ Modification of your taken Home Leave from ${leave.modificationDetails.takenPend
 Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by your supervisor.${footer}.
                        `;
           Mailer(from, user.email, subject, textStaff, '');
+          res.status(200).json({
+            message: 'Leave Cancellation has been Approved'
+          });
         } else if (leave.status === 'Pending Change') {
           // change status to nottaken
           await Leave.updateOne(
@@ -214,16 +223,15 @@ Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.end
             {
               $set: {
                 status: 'Taken',
-                startDate: leave.modificationDetails.takenPending.startDate,
-                endDate: leave.modificationDetails.takenPending.endDate,
-                comment: leave.modificationDetails.takenPending.comment,
-                type: leave.modificationDetails.takenPending.type,
-                modificationDetails: {
-                  takenPending: {
-                    startDate: '',
-                    endDate: '',
-                    comment: ''
-                  }
+                startDate: leave.takenPending.startDate,
+                endDate: leave.takenPending.endDate,
+                comment: leave.takenPending.comment,
+                type: leave.takenPending.type,
+                takenPending: {
+                  startDate: '',
+                  endDate: '',
+                  comment: '',
+                  type: ''
                 }
               }
             }
@@ -242,9 +250,12 @@ Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.end
           // prettier-ignore
           const textStaff = `Hello  ${user.fName}, 
 
-Modification of your taken Leave from ${leave.modificationDetails.takenPending.startDate.toDateString()} to ${leave.modificationDetails.takenPending.endDate.toDateString()} has been approved by your supervisor.${footer}.
+Modification of your taken Leave from ${leave.takenPending.startDate.toDateString()} to ${leave.takenPending.endDate.toDateString()} has been approved by your supervisor.${footer}.
                          `;
           Mailer(from, user.email, subject, textStaff, '');
+          res.status(200).json({
+            message: 'Leave modification has been Approved'
+          });
         } else {
           await Leave.updateOne(
             {
@@ -322,7 +333,7 @@ Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateStrin
             {
               _id: leaveId
             },
-            { $set: { status: 'Taken' } }
+            { $set: { status: 'Taken', rejectionReason: reason } }
           );
           // sends mail to cd supervisor HR and notification about status
           // prettier-ignore
@@ -333,6 +344,9 @@ Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateStrin
 Cancellation of your Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by your supervisor.${footer}.
                          `;
           Mailer(from, user.email, subject, textStaff, cd.email);
+          res.status(200).json({
+            message: 'Leave Cancellation has been Declined'
+          });
         } else if (leave.status === 'Pending Change') {
           // change status to nottaken
           await Leave.updateOne(
@@ -342,10 +356,13 @@ Cancellation of your Home Leave from ${leave.startDate.toDateString()} to ${leav
             {
               $set: {
                 status: 'Taken',
-                modificationDetails: {
-                  takenPending: {
-                    comment: 'Supervisor Declined'
-                  }
+                rejectionReason: reason,
+                takenPending: {
+                  startDate: leave.takenPending.startDate,
+                  endDate: leave.takenPending.endDate,
+                  type: leave.takenPending.type,
+                  comment: leave.takenPending.comment,
+                  status: 'Supervisor Declined'
                 }
               }
             }
@@ -356,9 +373,12 @@ Cancellation of your Home Leave from ${leave.startDate.toDateString()} to ${leav
           // prettier-ignore
           const textStaff = `Hello  ${user.fName}, 
 
-Modification of your taken Home Leave from ${leave.modificationDetails.takenPending.startDate.toDateString()} to ${leave.modificationDetails.takenPending.endDate.toDateString()} has been declined by your supervisor.${footer}.
+Modification of your taken Home Leave from ${leave.takenPending.startDate.toDateString()} to ${leave.takenPending.endDate.toDateString()} has been declined by your supervisor.${footer}.
                          `;
           Mailer(from, user.email, subject, textStaff, cd.email);
+          res.status(200).json({
+            message: 'Leave modification has been Declined'
+          });
         } else {
           return res.status(400).json({
             message: 'Invalid Status'
@@ -374,7 +394,7 @@ Modification of your taken Home Leave from ${leave.modificationDetails.takenPend
             {
               _id: leaveId
             },
-            { $set: { status: 'Taken' } }
+            { $set: { status: 'Taken', rejectionReason: reason } }
           );
           // sends mail to cd supervisor HR and notification about status
           // prettier-ignore
@@ -385,6 +405,9 @@ Modification of your taken Home Leave from ${leave.modificationDetails.takenPend
   Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by your supervisor.${footer}.
                          `;
           Mailer(from, user.email, subject, textStaff, '');
+          res.status(200).json({
+            message: 'Leave Cancellation has been Declined'
+          });
         } else if (leave.status === 'Pending Change') {
           // change status to nottaken
           await Leave.updateOne(
@@ -394,10 +417,13 @@ Modification of your taken Home Leave from ${leave.modificationDetails.takenPend
             {
               $set: {
                 status: 'Taken',
-                modificationDetails: {
-                  takenPending: {
-                    comment: 'Supervisor Declined'
-                  }
+                rejectionReason: reason,
+                takenPending: {
+                  startDate: leave.takenPending.startDate,
+                  endDate: leave.takenPending.endDate,
+                  type: leave.takenPending.type,
+                  comment: leave.takenPending.comment,
+                  status: 'Supervisor Declined'
                 }
               }
             }
@@ -408,9 +434,12 @@ Modification of your taken Home Leave from ${leave.modificationDetails.takenPend
           // prettier-ignore
           const textStaff = `Hello  ${user.fName}, 
 
-Modification of your taken Home Leave from ${leave.modificationDetails.takenPending.startDate.toDateString()} to ${leave.modificationDetails.takenPending.endDate.toDateString()} has been declined by your supervisor.${footer}.
+Modification of your taken Home Leave from ${leave.takenPending.startDate.toDateString()} to ${leave.takenPending.endDate.toDateString()} has been declined by your supervisor.${footer}.
                          `;
           Mailer(from, user.email, subject, textStaff, '');
+          res.status(200).json({
+            message: 'Leave Modification has been Declined'
+          });
         } else {
           await Leave.updateOne(
             {

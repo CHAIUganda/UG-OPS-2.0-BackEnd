@@ -93,6 +93,13 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
 
     // if leave is taken by staff notify the HR and Supervisor.
     // handle leave here
+    if (moment(startDate).isAfter(endDate)) {
+      return res.status(400).json({
+        message: 'Start Date cannot be after End date',
+        endDate,
+        startDate
+      });
+    }
     if (leave.status === 'Approved') {
       if (action === 'changeLeave') {
         // prettier-ignore
@@ -722,13 +729,12 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
               $set: {
                 isModfied: true,
                 status,
-                modificationDetails: {
-                  takenPending: {
-                    startDate,
-                    endDate,
-                    type,
-                    comment: message
-                  }
+                takenPending: {
+                  startDate,
+                  endDate,
+                  type,
+                  comment: message,
+                  status: 'Pending'
                 }
               }
             }
@@ -761,13 +767,12 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken leave. New Date
               $set: {
                 isModfied: true,
                 status,
-                modificationDetails: {
-                  takenPending: {
-                    startDate,
-                    endDate,
-                    type,
-                    comment: message
-                  }
+                takenPending: {
+                  startDate,
+                  endDate,
+                  type,
+                  comment: message,
+                  status: 'Pending'
                 }
               }
             }
@@ -777,7 +782,7 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken leave. New Date
 
 ${user.fName}  ${user.lName} is requesting to modify their Taken leave. New Dates are ${startDate.toDateString()} to ${endDate.toDateString()}. Please Confirm. ${footer}.
                                       `;
-          const cc = `${hr.lName}`;
+          const cc = `${hr.email}`;
           Mailer(from, supervisor.email, subject, textSupervisor, cc);
 
           res.status(200).json({

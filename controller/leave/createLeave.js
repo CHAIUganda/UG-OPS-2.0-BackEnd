@@ -1,6 +1,7 @@
 const { validationResult } = require('express-validator/check');
 // const moment = require('moment-timezone');
 const debug = require('debug')('leave-controller');
+const moment = require('moment-timezone');
 const errorToString = require('../../helpers/errorToString');
 const Leave = require('../../model/Leave');
 const User = require('../../model/User');
@@ -69,6 +70,13 @@ const createLeave = async (req, res) => {
       endDate = new Date(endDate);
       startDate = new Date(startDate);
       const endDateMonth = endDate.getMonth();
+      if (moment(startDate).isAfter(endDate)) {
+        return res.status(400).json({
+          message: 'Start Date cannot be after End date',
+          endDate,
+          startDate
+        });
+      }
 
       // Computing Annual Leave
       let accruedAnnualLeave;
