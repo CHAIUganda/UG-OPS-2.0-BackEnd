@@ -57,8 +57,18 @@ const editProgram = async (req, res) => {
       }
     );
 
+    const programManagerDetails = {
+      fName: user.fName,
+      lName: user.lName
+    };
+
     res.status(200).json({
-      message: 'program modified successfully'
+      message: 'program modified successfully',
+      _id: program._id,
+      name,
+      shortForm,
+      programManagerId,
+      programManagerDetails
     });
   } catch (err) {
     debug(err.message);
