@@ -78,7 +78,10 @@ router.post(
   '/editUser',
   [
     // input validations
-    check('email', 'Please enter a valid email').isEmail()
+    check('email', 'Please enter a valid email').isEmail(),
+    check('contractId', 'Please Provide a ContractId')
+      .not()
+      .isEmpty()
   ],
   authenticator,
   /* authenticator, */

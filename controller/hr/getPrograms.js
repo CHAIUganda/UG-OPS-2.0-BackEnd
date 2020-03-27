@@ -17,9 +17,7 @@ const getPrograms = async (req, res) => {
           _id: programManagerId
         });
         if (!user) {
-          return res.status(400).json({
-            message: 'Program Manager does not Exist'
-          });
+          recurseProcessLeave(controller + 1, arr);
         }
 
         const programManagerDetails = {

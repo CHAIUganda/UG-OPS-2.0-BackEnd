@@ -1,6 +1,7 @@
 const { validationResult } = require('express-validator/check');
 const debug = require('debug')('server');
 const User = require('../../model/User');
+const Contract = require('../../model/Contract');
 const errorToString = require('../../helpers/errorToString');
 
 const editUser = async (req, res) => {
@@ -10,12 +11,16 @@ const editUser = async (req, res) => {
       message: errorToString(errors.array())
     });
   }
-
+  const { contractId, email } = req.body;
   let {
     fName,
     lName,
     bankName,
     accountNumber,
+    contractStartDate,
+    contractEndDate,
+    contractType,
+    contractStatus,
     birthDate,
     gender,
     title,
@@ -25,7 +30,6 @@ const editUser = async (req, res) => {
     team,
     supervisorEmail,
     oNames,
-    email,
     hr,
     supervisor,
     admin,
@@ -33,7 +37,7 @@ const editUser = async (req, res) => {
   } = req.body;
 
   try {
-    const user = await User.findOne({
+    const user = await Contract.findOne({
       email
     });
 
@@ -42,8 +46,26 @@ const editUser = async (req, res) => {
         message: 'User Doesnot Exist'
       });
     }
+    const contract = await User.findOne({
+      _id: contractId
+    });
+
+    if (!contract) {
+      return res.status(400).json({
+        message: 'Contract Doesnot Exist'
+      });
+    }
 
     // check for what has not been modified
+    if (admin == null) {
+      admin = user.roles.admin;
+    }
+    if (admin == null) {
+      admin = user.roles.admin;
+    }
+    if (admin == null) {
+      admin = user.roles.admin;
+    }
     if (admin == null) {
       admin = user.roles.admin;
     }
@@ -98,11 +120,20 @@ const editUser = async (req, res) => {
       oNames = user.oNames;
     }
 
-    if (email == null) {
-      email = user.email;
+    if (contractStatus == null) {
+      contractStatus = contract.contractStatus;
+    }
+    if (contractStartDate == null) {
+      contractStartDate = contract.contractStartDate;
+    }
+    if (contractEndDate == null) {
+      contractEndDate = contract.contractEndDate;
+    }
+    if (contractType == null) {
+      contractType = contract.contractType;
     }
 
-    // modify program
+    // modify user
     await User.updateOne(
       {
         email
@@ -132,6 +163,21 @@ const editUser = async (req, res) => {
           type,
           level,
           team
+        }
+      }
+    );
+    // update contract
+    await Contract.updateOne(
+      {
+        _id: contractId
+      },
+      {
+        // eslint-disable-next-line max-len
+        $set: {
+          contractStartDate,
+          contractEndDate,
+          contractType,
+          contractStatus
         }
       }
     );
