@@ -465,7 +465,7 @@ ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${star
             {
               _id: leaveId
             },
-            { $set: { status: 'Not Taken' } }
+            { $set: { status: 'Not Taken', comment } }
           );
           // sends mail to cd supervisor HR and notification about status
           // prettier-ignore
@@ -504,7 +504,7 @@ ${user.fName}  ${user.lName} Decided not to take their HomeLeave from ${leave.st
             {
               _id: leaveId
             },
-            { $set: { status: 'Not Taken' } }
+            { $set: { status: 'Not Taken', comment } }
           );
           // sends mail to supervisor  HR and notification about status
           // prettier-ignore
@@ -797,7 +797,7 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken leave. New Date
           {
             _id: leaveId
           },
-          { $set: { status: 'Pending Not Taken' } }
+          { $set: { status: 'Pending Not Taken', comment } }
         );
         // sends mail to cd supervisor HR and notification about status
         // prettier-ignore

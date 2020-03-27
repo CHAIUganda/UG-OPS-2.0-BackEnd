@@ -30,7 +30,6 @@ const getUsers = async (req, res) => {
           bankName,
           accountNumber,
           team,
-          password,
           annualLeaveBF
         } = arr[controller];
 
@@ -68,7 +67,6 @@ const getUsers = async (req, res) => {
           bankName,
           accountNumber,
           team,
-          password,
           annualLeaveBF,
           contractId,
           contractStartDate,
