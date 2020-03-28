@@ -17,7 +17,6 @@ const getUsers = async (req, res) => {
           _id,
           fName,
           lName,
-          supervisorEmail,
           gender,
           roles,
           title,
@@ -27,8 +26,7 @@ const getUsers = async (req, res) => {
           email,
           type,
           level,
-          bankName,
-          accountNumber,
+          bankDetails,
           team,
           annualLeaveBF
         } = arr[controller];
@@ -40,6 +38,19 @@ const getUsers = async (req, res) => {
         if (!contract) {
           recurseProcessLeave(controller + 1, arr);
         }
+
+        const supervisor = await User.findOne({
+          email: arr[controller].supervisorEmail
+        });
+        if (!supervisor) {
+          recurseProcessLeave(controller + 1, arr);
+        }
+        const supervisorDetails = {
+          _id: supervisor._id,
+          fName: supervisor.fName,
+          lName: supervisor.lName,
+          email: supervisor.email
+        };
 
         const {
           contractStartDate,
@@ -54,7 +65,7 @@ const getUsers = async (req, res) => {
           _id,
           fName,
           lName,
-          supervisorEmail,
+          supervisorDetails,
           gender,
           roles,
           title,
@@ -64,8 +75,7 @@ const getUsers = async (req, res) => {
           email,
           type,
           level,
-          bankName,
-          accountNumber,
+          bankDetails,
           team,
           annualLeaveBF,
           contractId,

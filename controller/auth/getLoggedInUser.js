@@ -15,14 +15,15 @@ const getLoggedInUser = async (req, res) => {
       });
     }
     const supervisorDetails = {
+      _id: supervisor._id,
       fName: supervisor.fName,
       lName: supervisor.lName,
       email: supervisor.email
     };
 
     const {
-      leaveDetails,
       admin,
+      bankDetails,
       leaves,
       createdAt,
       _id,
@@ -41,10 +42,10 @@ const getLoggedInUser = async (req, res) => {
     } = user;
 
     const person = {
-      leaveDetails,
       admin,
       leaves,
       createdAt,
+      bankDetails,
       _id,
       fName,
       lName,
@@ -58,7 +59,7 @@ const getLoggedInUser = async (req, res) => {
       type,
       level,
       team,
-      supervisor: supervisorDetails
+      supervisorDetails
     };
 
     res.json(person);
