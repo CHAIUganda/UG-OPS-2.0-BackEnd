@@ -95,7 +95,9 @@ const getUsers = async (req, res) => {
     await recurseProcessLeave(0, user);
   } catch (e) {
     debug(e.message);
-    res.status(500).json({ message: 'Error in Fetching users' });
+    res
+      .status(500)
+      .json({ message: `Error in Fetching users:: ${e.message}`, e });
   }
 };
 
