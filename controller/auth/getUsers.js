@@ -35,31 +35,46 @@ const getUsers = async (req, res) => {
           _userId: _id,
           contractStatus: 'ACTIVE'
         });
+
+        let contractStartDate;
+        let contractEndDate;
+        let contractType;
+        let contractStatus;
+        let contractId;
         if (!contract) {
-          recurseProcessLeave(controller + 1, arr);
+          contractStartDate = null;
+          contractEndDate = null;
+          contractType = null;
+          contractStatus = null;
+          contractId = null;
+        } else {
+          contractStartDate = contract.contractStartDate;
+          contractEndDate = contract.contractEndDate;
+          contractType = contract.contractType;
+          contractStatus = contract.contractStatus;
+          contractId = contract._id;
         }
 
         const supervisor = await User.findOne({
           email: arr[controller].supervisorEmail
         });
+
+        let supervisorDetails;
         if (!supervisor) {
-          recurseProcessLeave(controller + 1, arr);
+          supervisorDetails = {
+            Supervisor_id: null,
+            fName: null,
+            lName: null,
+            email: null
+          };
+        } else {
+          supervisorDetails = {
+            _id: supervisor._id,
+            fName: supervisor.fName,
+            lName: supervisor.lName,
+            email: supervisor.email
+          };
         }
-        const supervisorDetails = {
-          _id: supervisor._id,
-          fName: supervisor.fName,
-          lName: supervisor.lName,
-          email: supervisor.email
-        };
-
-        const {
-          contractStartDate,
-          contractEndDate,
-          contractType,
-          contractStatus
-        } = contract;
-
-        const contractId = contract._id;
 
         const userRemade = {
           _id,
