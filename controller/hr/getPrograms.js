@@ -16,14 +16,22 @@ const getPrograms = async (req, res) => {
         const user = await User.findOne({
           _id: programManagerId
         });
+        let programManagerDetails;
         if (!user) {
-          recurseProcessLeave(controller + 1, arr);
+          programManagerDetails = {
+            Supervisor_id: null,
+            fName: null,
+            lName: null,
+            email: null
+          };
+        } else {
+          programManagerDetails = {
+            _id: user._id,
+            fName: user.fName,
+            lName: user.lName,
+            email: user.email
+          };
         }
-
-        const programManagerDetails = {
-          fName: user.fName,
-          lName: user.lName
-        };
 
         const programRemade = {
           _id,
