@@ -85,21 +85,28 @@ const getAllStaffLeavesTaken = async (req, res) => {
         const userSupervisor = await User.findOne({
           email: supervisorEmail
         });
+        let supervisorDetails;
         if (!userSupervisor) {
-          recurseProcessLeave(controller + 1, arr);
+          supervisorDetails = {
+            Supervisor_id: null,
+            fName: null,
+            lName: null,
+            email: null
+          };
+        } else {
+          supervisorDetails = {
+            _id: userSupervisor._id,
+            fName: userSupervisor.fName,
+            lName: userSupervisor.lName,
+            email: userSupervisor.email
+          };
         }
-
-        const supervisorDetails = {
-          fName: userSupervisor.fName,
-          lName: userSupervisor.lName
-        };
 
         const userRemade = {
           _id,
           fName,
           lName,
           shortForm,
-          supervisorEmail,
           gender,
           title,
           program,
