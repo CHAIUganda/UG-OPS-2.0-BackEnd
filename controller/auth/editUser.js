@@ -37,7 +37,7 @@ const editUser = async (req, res) => {
   } = req.body;
 
   try {
-    const user = await Contract.findOne({
+    const user = await User.findOne({
       email
     });
 
@@ -46,7 +46,7 @@ const editUser = async (req, res) => {
         message: 'User Doesnot Exist'
       });
     }
-    const contract = await User.findOne({
+    const contract = await Contract.findOne({
       _id: contractId
     });
 
