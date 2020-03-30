@@ -148,4 +148,26 @@ router.post(
   leaveController.staffModifyLeave
 );
 
+/**
+ * @method - POST
+ * @description - Handle planned leave. Involves applying or cancelling planned leave
+ * a leave by staff authenticator is a middleware will be used to
+ * verify the token.
+ * @param - /leaveApi/handlelannedLeave
+ */
+router.post(
+  '/handlePlannedLeave',
+  [
+    check('leaveId', 'Please Enter a Valid Leave Id')
+      .not()
+      .isEmpty(),
+    check('action', 'Please Enter an action')
+      .not()
+      .isEmpty(),
+    check('staffEmail', 'Please Enter a Valid Staff Email').isEmail()
+  ],
+  authenticator,
+  leaveController.handlePlannedLeave
+);
+
 module.exports = router;
