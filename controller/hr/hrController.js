@@ -7,6 +7,7 @@ const getPublicHolidays = require('./getPublicHolidays');
 const createProgram = require('./createProgram');
 const editProgram = require('./editProgram');
 const getPrograms = require('./getPrograms');
+const getUsersContracts = require('./getUsersContracts');
 
 // Handle new public holiday
 exports.createPublicHoliday = createPublicHoliday;
@@ -25,3 +26,6 @@ exports.editProgram = editProgram;
 
 // Handle get all Programs
 exports.getPrograms = getPrograms;
+
+// Handle get staff contracts
+exports.getUsersContracts = getUsersContracts;

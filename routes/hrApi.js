@@ -103,4 +103,12 @@ router.post(
  */
 router.get('/getPrograms', hrController.getPrograms);
 
+/**
+ * @method - GET
+ * @description - Get all staff contracts about toexpiry basing on days supplied.
+ * verify the token
+ * @param - /getAllStaffLeaves
+ */
+router.get('/getUsersContracts/:expiryIn', hrController.getUsersContracts);
+
 module.exports = router;
