@@ -328,6 +328,9 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
 ${user.fName}  ${user.lName} is requesting to modify their leave. To be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
                                       `;
           Mailer(from, supervisor.email, subject, textSupervisor, '');
+          res.status(200).json({
+            message: 'Leave Modification Request has been sent successfully.'
+          });
         } else {
           // leave is still in approved time
           // chk if staff is an expat or tcn to allow cd notication

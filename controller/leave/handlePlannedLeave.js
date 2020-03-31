@@ -7,6 +7,7 @@ const User = require('../../model/User');
 const Mailer = require('../../helpers/Mailer');
 const getLeaveDaysNo = require('./getLeaveDaysNo');
 const PublicHoliday = require('../../model/PublicHoliday');
+const getLeavesTaken = require('./getLeavesTaken');
 
 const handlePlannedLeave = async (req, res) => {
   const errors = validationResult(req);
@@ -22,6 +23,10 @@ const handlePlannedLeave = async (req, res) => {
     staffEmail,
     action
   } = req.body;
+
+  let { startDate, endDate } = req.body;
+  let { comment, type } = req.body;
+
   // action applyForLeave, cancelLeave
 
   try {
@@ -51,7 +56,19 @@ const handlePlannedLeave = async (req, res) => {
         message: 'The leave doesnot exist'
       });
     }
-    let { startDate, endDate } = leaveToTake;
+
+    if (startDate == null) {
+      startDate = leaveToTake.startDate;
+    }
+    if (endDate == null) {
+      endDate = leaveToTake.startDate;
+    }
+    if (type == null) {
+      type = leaveToTake.type;
+    }
+    if (comment == null) {
+      comment = leaveToTake.comment;
+    }
     // set timezone to kampala
     let CurrentDate = moment()
       .tz('Africa/Kampala')
@@ -79,7 +96,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
       });
     }
     // eslint-disable-next-line object-curly-newline
-    const { type, comment, program } = leaveToTake;
+    const { program } = leaveToTake;
     const publicHolidays = await PublicHoliday.find({});
     const daysDetails = getLeaveDaysNo(startDate, endDate, publicHolidays);
     const { supervisorEmail } = user;
@@ -185,6 +202,199 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
         res.status(200).json({
           message: 'Leave has been Cancelled',
           leave
+        });
+      } else if (action === 'changeLeave') {
+        // prettier-ignore
+
+        // prettier-ignore
+        if (moment(CurrentDate).isAfter(startDate)) {
+          return res.status(400).json({
+            message:
+              'Start Date cannot be changed to a date that already passed',
+            CurrentDate,
+            startDate
+          });
+        }
+        if (moment(CurrentDate).isSame(startDate)) {
+          return res.status(400).json({
+            message: 'Sorry you, cannot Plan for a leave in the past',
+            CurrentDate,
+            startDate
+          });
+        }
+
+        if (moment(CurrentDate).isAfter(endDate)) {
+          return res.status(400).json({
+            message: 'Sorry you, cannot Plan for a leave in the past',
+            CurrentDate,
+            endDate
+          });
+        }
+
+        if (moment(CurrentDate).isSame(endDate)) {
+          return res.status(400).json({
+            message: 'Sorry you, cannot Plan for a leave in the past',
+            CurrentDate,
+            endDate
+          });
+        }
+        const leaveDetails = await getLeavesTaken(user);
+
+        // set timezone to kampala
+        // const CurrentDate = moment().tz('Africa/Kampala').format();
+        const endDateMonth = endDate.getMonth();
+
+        // Computing Annual Leave
+        let accruedAnnualLeave;
+        if (endDateMonth === 0) {
+          accruedAnnualLeave = 0;
+        } else {
+          // accruedAnnualLeave = currentMonth * 1.75;
+          accruedAnnualLeave = Math.trunc(endDateMonth * 1.75);
+        }
+        const { annualLeaveBF } = user;
+
+        const {
+          unPaidLeaveTaken,
+          homeLeaveTaken,
+          annualLeaveTaken,
+          maternityLeaveTaken,
+          paternityLeaveTaken,
+          sickLeaveTaken,
+          studyLeaveTaken
+        } = leaveDetails;
+
+        // prettier-ignore
+        const totalAcruedAnualLeavePlusAnualLeaveBF = accruedAnnualLeave + annualLeaveBF;
+        const maternity = 60;
+        const paternity = 7;
+        const sick = 42;
+        const study = 4;
+        const unpaid = 60;
+
+        if (type === 'Paternity') {
+          if (user.gender === 'Female') {
+            return res.status(400).json({
+              message: 'Paternity leave only given to Gentlemen'
+            });
+          }
+          const totalPaternity = paternityLeaveTaken + daysDetails.totalDays;
+          if (paternity < totalPaternity) {
+            return res.status(400).json({
+              message: 'You Dont have enough Paternity Leave days',
+              paternityLeaveTaken,
+              daysRequested: daysDetails.totalDays,
+              totalPaternity,
+              paternity
+            });
+          }
+        } else if (type === 'Home') {
+          if (user.type === 'local') {
+            return res.status(400).json({
+              message: 'Home leave only given to Expatriates and TCNs'
+            });
+          }
+          // eslint-disable-next-line operator-linebreak
+          const totalHome =
+            homeLeaveTaken + annualLeaveTaken + daysDetails.totalDays;
+          const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalHome;
+          if (chk1) {
+            return res.status(400).json({
+              message: 'You Dont have enough Annual Leave days',
+              annualLeaveTaken,
+              homeLeaveTaken,
+              daysRequested: daysDetails.totalDays,
+              totalHome,
+              totalAcruedAnualLeavePlusAnualLeaveBF
+            });
+          }
+        } else if (type === 'Maternity') {
+          if (user.gender === 'Male') {
+            return res.status(400).json({
+              message: 'Maternity leave only given to Ladies'
+            });
+          }
+          const totalMaternity = maternityLeaveTaken + daysDetails.totalDays;
+          if (maternity < totalMaternity) {
+            return res.status(400).json({
+              message: 'You Dont have enough Maternity Leave days',
+              maternityLeaveTaken,
+              daysRequested: daysDetails.totalDays,
+              totalMaternity,
+              maternity
+            });
+          }
+        } else if (type === 'Sick') {
+          const totalSick = sickLeaveTaken + daysDetails.totalDays;
+          if (sick < totalSick) {
+            return res.status(400).json({
+              message: 'You Dont have enough Sick Leave days',
+              sickLeaveTaken,
+              daysRequested: daysDetails.totalDays,
+              totalSick,
+              sick
+            });
+          }
+        } else if (type === 'Unpaid') {
+          const totalUnpaid = unPaidLeaveTaken + daysDetails.totalDays;
+          if (unpaid < totalUnpaid) {
+            return res.status(400).json({
+              message: 'You Dont have enough Unpaid Leave days',
+              unPaidLeaveTaken,
+              daysRequested: daysDetails.totalDays,
+              totalUnpaid,
+              unpaid
+            });
+          }
+        } else if (type === 'Study') {
+          const totalStudy = studyLeaveTaken + daysDetails.totalDays;
+          if (study < totalStudy) {
+            return res.status(400).json({
+              message: 'You Dont have enough Study Leave days',
+              studyLeaveTaken,
+              daysRequested: daysDetails.totalDays,
+              totalStudy,
+              study
+            });
+          }
+        } else if (type === 'Annual') {
+          // eslint-disable-next-line operator-linebreak
+          const totalAnnual =
+            annualLeaveTaken + homeLeaveTaken + daysDetails.totalDays;
+          const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalAnnual;
+          if (chk1) {
+            return res.status(400).json({
+              message: 'You Dont have enough Annual Leave days',
+              annualLeaveTaken,
+              homeLeaveTaken,
+              daysRequested: daysDetails.totalDays,
+              totalAnnual,
+              totalAcruedAnualLeavePlusAnualLeaveBF
+            });
+          }
+        } else {
+          return res.status(400).json({
+            message: 'Invalid Leave type'
+          });
+        }
+        // re applying code
+        // change leave details
+        await Leave.updateOne(
+          {
+            _id: leaveId
+          },
+          {
+            // eslint-disable-next-line max-len
+            $set: {
+              startDate,
+              endDate,
+              type,
+              comment
+            }
+          }
+        );
+        res.status(200).json({
+          message: 'Leave has been Modified successfully.'
         });
       } else {
         return res.status(400).json({
