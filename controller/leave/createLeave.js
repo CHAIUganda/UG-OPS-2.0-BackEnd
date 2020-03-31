@@ -257,6 +257,7 @@ ${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateStri
       Mailer(from, supervisor.email, subject, textSupervisor, '');
 
       const leave = {
+        _id: leaveRemade._id,
         startDate,
         endDate,
         type,
