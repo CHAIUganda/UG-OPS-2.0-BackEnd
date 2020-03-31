@@ -1,6 +1,7 @@
 const { CronJob } = require('cron');
 const log4js = require('log4js');
 const takeLeaves = require('../controller/leave/takeLeaves');
+const contractRenewalInvite = require('../controller/hr/contractRenewalInvite');
 
 log4js.configure({
   appenders: { Timed: { type: 'file', filename: './log/logs.log' } },
@@ -9,10 +10,11 @@ log4js.configure({
 // const logger = log4js.getLogger('Timed');
 
 const schedule = new CronJob(
-  '0 17 23 * * *',
+  '0 20 14 * * *',
   () => {
     console.log('Checking for birthdays and Ripe leaves');
     takeLeaves();
+    contractRenewalInvite();
 
     // logger.error('Cheese is too ripe!');
     // logger.fatal('Cheese was breeding ground for listeria.');
