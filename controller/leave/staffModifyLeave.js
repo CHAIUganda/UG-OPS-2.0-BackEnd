@@ -1035,7 +1035,7 @@ ${user.fName}  ${user.lName} has modified their Leave request, now asking to be 
         Mailer(from, supervisor.email, subject, textSupervisor, '');
 
         res.status(200).json({
-          message: 'Leave has been taken Modified successfully.'
+          message: 'Leave has been Modified successfully.'
         });
       } else if (action === 'cancelLeave') {
         // prettier-ignore
@@ -1055,6 +1055,253 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
                          `;
         Mailer(from, supervisor.email, subject, textSupervisor, '');
 
+        res.status(200).json({
+          message: 'Leave has been Cancelled'
+        });
+      } else {
+        return res.status(400).json({
+          message: 'Invalid action for staff leave modification'
+        });
+      }
+    } else if (leave.status === 'Pending Country Director') {
+      const cd = await User.findOne({ 'roles.countryDirector': true });
+      if (!cd) {
+        return res.status(400).json({
+          message: 'Country Director is not Registered in the system'
+        });
+      }
+      if (action === 'changeLeave') {
+        // prettier-ignore
+        if (moment(CurrentDate).isAfter(startDate)) {
+          return res.status(400).json({
+            message:
+              'Start Date cannot be changed to a date that already passed',
+            CurrentDate,
+            startDate
+          });
+        }
+        if (moment(CurrentDate).isSame(startDate)) {
+          return res.status(400).json({
+            message:
+              'Start Date cannot be changed to a date that already started',
+            CurrentDate,
+            startDate
+          });
+        }
+
+        if (moment(CurrentDate).isAfter(endDate)) {
+          return res.status(400).json({
+            message: 'End Date cannot be changed beacause it already passed',
+            CurrentDate,
+            endDate
+          });
+        }
+
+        if (moment(CurrentDate).isSame(endDate)) {
+          return res.status(400).json({
+            message:
+              'End Date cannot be changed to a date that already started',
+            CurrentDate,
+            endDate
+          });
+        }
+        // chk if staff is an expat or tcn to allow cd notication
+        // prettier-ignore
+        const publicHolidays = await PublicHoliday.find({});
+        const daysDetails = getLeaveDaysNo(startDate, endDate, publicHolidays);
+        const leaveDetails = await getLeavesTaken(user);
+
+        // set timezone to kampala
+        // const CurrentDate = moment().tz('Africa/Kampala').format();
+        const endDateMonth = endDate.getMonth();
+
+        // Computing Annual Leave
+        let accruedAnnualLeave;
+        if (endDateMonth === 0) {
+          accruedAnnualLeave = 0;
+        } else {
+          // accruedAnnualLeave = currentMonth * 1.75;
+          accruedAnnualLeave = Math.trunc(endDateMonth * 1.75);
+        }
+        const { annualLeaveBF } = user;
+
+        const {
+          unPaidLeaveTaken,
+          homeLeaveTaken,
+          annualLeaveTaken,
+          maternityLeaveTaken,
+          paternityLeaveTaken,
+          sickLeaveTaken,
+          studyLeaveTaken
+        } = leaveDetails;
+
+        // prettier-ignore
+        const totalAcruedAnualLeavePlusAnualLeaveBF = accruedAnnualLeave + annualLeaveBF;
+        const maternity = 60;
+        const paternity = 7;
+        const sick = 42;
+        const study = 4;
+        const unpaid = 60;
+
+        if (type === 'Paternity') {
+          if (user.gender === 'Female') {
+            return res.status(400).json({
+              message: 'Paternity leave only given to Gentlemen'
+            });
+          }
+          const totalPaternity = paternityLeaveTaken + daysDetails.totalDays;
+          if (paternity < totalPaternity) {
+            return res.status(400).json({
+              message: 'You Dont have enough Paternity Leave days',
+              paternityLeaveTaken,
+              daysRequested: daysDetails.totalDays,
+              totalPaternity,
+              paternity
+            });
+          }
+        } else if (type === 'Home') {
+          if (user.type === 'local') {
+            return res.status(400).json({
+              message: 'Home leave only given to Expatriates and TCNs'
+            });
+          }
+          // eslint-disable-next-line operator-linebreak
+          const totalHome =
+            homeLeaveTaken + annualLeaveTaken + daysDetails.totalDays;
+          const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalHome;
+          if (chk1) {
+            return res.status(400).json({
+              message: 'You Dont have enough Annual Leave days',
+              annualLeaveTaken,
+              homeLeaveTaken,
+              daysRequested: daysDetails.totalDays,
+              totalHome,
+              totalAcruedAnualLeavePlusAnualLeaveBF
+            });
+          }
+        } else if (type === 'Maternity') {
+          if (user.gender === 'Male') {
+            return res.status(400).json({
+              message: 'Maternity leave only given to Ladies'
+            });
+          }
+          const totalMaternity = maternityLeaveTaken + daysDetails.totalDays;
+          if (maternity < totalMaternity) {
+            return res.status(400).json({
+              message: 'You Dont have enough Maternity Leave days',
+              maternityLeaveTaken,
+              daysRequested: daysDetails.totalDays,
+              totalMaternity,
+              maternity
+            });
+          }
+        } else if (type === 'Sick') {
+          const totalSick = sickLeaveTaken + daysDetails.totalDays;
+          if (sick < totalSick) {
+            return res.status(400).json({
+              message: 'You Dont have enough Sick Leave days',
+              sickLeaveTaken,
+              daysRequested: daysDetails.totalDays,
+              totalSick,
+              sick
+            });
+          }
+        } else if (type === 'Unpaid') {
+          const totalUnpaid = unPaidLeaveTaken + daysDetails.totalDays;
+          if (unpaid < totalUnpaid) {
+            return res.status(400).json({
+              message: 'You Dont have enough Unpaid Leave days',
+              unPaidLeaveTaken,
+              daysRequested: daysDetails.totalDays,
+              totalUnpaid,
+              unpaid
+            });
+          }
+        } else if (type === 'Study') {
+          const totalStudy = studyLeaveTaken + daysDetails.totalDays;
+          if (study < totalStudy) {
+            return res.status(400).json({
+              message: 'You Dont have enough Study Leave days',
+              studyLeaveTaken,
+              daysRequested: daysDetails.totalDays,
+              totalStudy,
+              study
+            });
+          }
+        } else if (type === 'Annual') {
+          // eslint-disable-next-line operator-linebreak
+          const totalAnnual =
+            annualLeaveTaken + homeLeaveTaken + daysDetails.totalDays;
+          const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalAnnual;
+          if (chk1) {
+            return res.status(400).json({
+              message: 'You Dont have enough Annual Leave days',
+              annualLeaveTaken,
+              homeLeaveTaken,
+              daysRequested: daysDetails.totalDays,
+              totalAnnual,
+              totalAcruedAnualLeavePlusAnualLeaveBF
+            });
+          }
+        } else {
+          return res.status(400).json({
+            message: 'Invalid Leave type'
+          });
+        }
+
+        await Leave.updateOne(
+          {
+            _id: leaveId
+          },
+          {
+            // eslint-disable-next-line max-len
+            $set: {
+              startDate,
+              endDate,
+              status: 'Pending Supervisor',
+              type,
+              comment,
+              isModfied: true
+            }
+          }
+        );
+        const modLeaves = {
+          startDate: oldStartDate,
+          endDate: oldEndDate,
+          comment: oldComment,
+          typ: oldType
+        };
+        leave.modificationDetails.modLeaves.push(modLeaves);
+        await leave.save();
+
+        // prettier-ignore
+        const textSupervisor = `Hello  ${supervisor.fName}, 
+  
+  ${user.fName}  ${user.lName} has modified their Home Leave request, now asking to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
+                         `;
+        const cc = `${cd.email},${hr.email}`;
+        Mailer(from, supervisor.email, subject, textSupervisor, cc);
+
+        res.status(200).json({
+          message: 'Leave has modified successfully.'
+        });
+      } else if (action === 'cancelLeave') {
+        // prettier-ignore
+        // change status to nottaken
+        await Leave.updateOne(
+          {
+            _id: leaveId
+          },
+          { $set: { status: 'Cancelled', comment } }
+        );
+        // email to Supervisor cc CD
+        // prettier-ignore
+        const textSupervisor = `Hello  ${supervisor.fName}, 
+  
+  ${user.fName}  ${user.lName} Decided to cancel their Home Leave request from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
+                               `;
+        const cc = `${cd.email},${hr.email}`;
+        Mailer(from, supervisor.email, subject, textSupervisor, cc);
         res.status(200).json({
           message: 'Leave has been Cancelled'
         });

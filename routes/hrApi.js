@@ -111,4 +111,20 @@ router.get('/getPrograms', hrController.getPrograms);
  */
 router.get('/getUsersContracts/:expiryIn', hrController.getUsersContracts);
 
+/**
+ * @method - POST
+ * @description - Remove a program.
+ * @param - /removeProgram
+ */
+router.post(
+  '/deleteProgram',
+  [
+    // input validations
+    check('id', 'Please Enter an id for the program')
+      .not()
+      .isEmpty()
+  ],
+  hrController.deleteProgram
+);
+
 module.exports = router;

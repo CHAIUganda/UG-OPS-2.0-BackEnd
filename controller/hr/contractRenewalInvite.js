@@ -1,6 +1,6 @@
 const debug = require('debug')('server');
 const moment = require('moment-timezone');
-const ical = require('ical-generator');
+const ics = require('ics');
 
 const log4js = require('log4js');
 const Contract = require('../../model/Contract');
@@ -11,7 +11,7 @@ const Mailer = require('../../helpers/Mailer');
 const contractRenewalInvite = async () => {
   try {
     const logger = log4js.getLogger('Timed');
-    const expiryIn = 60;
+    const expiryIn = 61;
     const user = await User.find({});
     user.password = undefined;
     // check if HR exists in System
@@ -26,7 +26,7 @@ const contractRenewalInvite = async () => {
       throw errorMessage;
     }
     // initialize emailing necessities
-    const subject = 'Uganda Operations Leaves';
+    const subject = 'Uganda Operations Contracts';
     const from = 'UGOperations@clintonhealthaccess.org';
     const footer = `
 
@@ -78,35 +78,59 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
           // prettier-ignore
           const textUser = `Hello  ${programMngr.fName}, 
   
-${fName} ${lName}'s Contract will expiry in ${diff} days as of ${today.toDateString()}. This is an invitation to discuss their contract renewal.${footer}.
+${fName} ${lName}'s Contract will expiry in ${diff} days as of ${today.toDateString()}. This is an invitation to discuss their contract renewal. Please find attached the calender Invite "Add to your Calender"${footer}.
                                               `;
           // Create new Calendar and set optional fields
-          const cal = ical({
-            domain: 'ugops.clintonhealthaccess.org',
-            prodId: {
-              company: 'ClintonHealthAccessInitiative',
-              product: 'ical-generator'
-            },
-            name: 'Staff Contract Renewals',
-            timezone: 'Africa/Kampala'
-          });
 
-          // create a new event
-          const event = cal.createEvent({
-            start: moment(),
-            end: moment().add(1, 'hour'),
-            timestamp: moment(),
-            summary: 'Staff Contract Renewal Invite',
-            organizer: 'HR Partner',
-            description: 'It works ;)',
+          // // create a new event
+          const meetstartDate = moment()
+            .tz('Africa/Kampala')
+            .format('YYYY-M-D-H-m')
+            .split('-');
+          // const meetendDate = moment()
+          //   .tz('Africa/Kampala')
+          //   .add({ hours: 2, minutes: 30 })
+          //   .format('YYYY-M-D-H-m')
+          //   .split('-');
+
+          const event = {
+            start: meetstartDate,
+            duration: { hours: 1, minutes: 30 },
+            title: 'Staff Contract Renewal Invite',
+            description: `${fName} ${lName}'s Contract will expiry in ${diff} days, this is an invite to initiate their contract renewal process`,
             location: 'Lawns',
-            url: 'https://ugops.clintonhealthaccess.org'
+            url: 'https://ugops.clintonhealthaccess.org',
+            geo: { lat: 0.34002, lon: 32.591718 },
+            categories: ['Chai', '8 Moyo Close', 'Kampala'],
+            status: 'CONFIRMED',
+            busyStatus: 'BUSY',
+            organizer: {
+              name: 'CHAI Uganda Operations',
+              email: 'UGOperations@clintonhealthaccess.org'
+            },
+            attendees: [
+              {
+                name: `${programMngr.fName} ${programMngr.lName}`,
+                email: programMngr.email,
+                rsvp: true,
+                partstat: 'ACCEPTED',
+                role: 'REQ-PARTICIPANT'
+              },
+              {
+                name: `${hr.fName} ${hr.lName}`,
+                email: hr.email,
+                role: 'REQ-PARTICIPANT'
+              }
+            ]
+          };
+          let content;
+          await ics.createEvent(event, (error, value) => {
+            if (error) {
+              console.log(error);
+              return;
+            }
+            content = value;
           });
-          // cal.toString(); // --> "BEGIN:VCALENDAR…"
-          // eslint-disable-next-line operator-linebreak
-          //   const content =
-          //     'BEGIN:VCALENDAR\r\nPRODID:-//ACME/DesktopCalendar//EN\r\nMETHOD:REQUEST\r\n...';
-          const content = event.toString();
           Mailer(from, programMngr.email, subject, textUser, hr.email, content);
           recurseProcessLeave(controller + 1, arr);
         } else {

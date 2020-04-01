@@ -10,7 +10,7 @@ log4js.configure({
 // const logger = log4js.getLogger('Timed');
 
 const schedule = new CronJob(
-  '0 20 14 * * *',
+  '0 26 13 * * *',
   () => {
     console.log('Checking for birthdays and Ripe leaves');
     takeLeaves();
