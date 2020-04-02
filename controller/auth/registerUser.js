@@ -34,11 +34,33 @@ const registerUser = async (req, res) => {
     password
   } = req.body;
 
-  // prettier-ignore
   let {
-    hr, supervisor, admin, countryDirector
+    hr,
+    supervisor,
+    admin,
+    countryDirector,
+    bankAccounts,
+    nssfNumber,
+    tinNumber,
+    workPermitStartDate,
+    workPermitEndDate
   } = req.body;
 
+  if (bankAccounts == null) {
+    bankAccounts = [];
+  }
+  if (nssfNumber == null) {
+    nssfNumber = '';
+  }
+  if (tinNumber == null) {
+    tinNumber = '';
+  }
+  if (workPermitStartDate == null) {
+    workPermitStartDate = '';
+  }
+  if (workPermitEndDate == null) {
+    workPermitEndDate = '';
+  }
   if (!admin === true) {
     admin = false;
   }
@@ -89,7 +111,10 @@ const registerUser = async (req, res) => {
       accountNumber,
       team,
       password,
-      annualLeaveBF
+      annualLeaveBF,
+      bankAccounts,
+      nssfNumber,
+      tinNumber
     });
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(password, salt);

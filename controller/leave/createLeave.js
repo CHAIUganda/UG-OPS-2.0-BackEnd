@@ -124,7 +124,7 @@ const createLeave = async (req, res) => {
           });
         }
       } else if (type === 'Home') {
-        if (user.type === 'local') {
+        if (user.type === 'national') {
           return res.status(400).json({
             message: 'Home leave only given to Expatriates and TCNs'
           });

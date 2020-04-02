@@ -45,7 +45,7 @@ const UserSchema = mongoose.Schema({
     required: true
   },
   type: {
-    // local TCN expat
+    // national TCN expat
     type: String,
     required: true
   },
@@ -68,15 +68,21 @@ const UserSchema = mongoose.Schema({
     type: Date,
     default: Date.now()
   },
-  bankDetails: {
-    bankName: {
-      type: String,
-      required: false
-    },
-    accountNumber: {
-      type: String,
-      required: false
+  bankAccounts: [
+    {
+      bankName: String,
+      accountNumber: String,
+      Currency: String,
+      status: String
     }
+  ],
+  nssfNumber: {
+    type: Number,
+    required: true
+  },
+  tinNumber: {
+    type: Number,
+    required: true
   },
   roles: {
     admin: {

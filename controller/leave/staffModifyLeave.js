@@ -205,7 +205,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
               });
             }
           } else if (type === 'Home') {
-            if (user.type === 'local') {
+            if (user.type === 'national') {
               return res.status(400).json({
                 message: 'Home leave only given to Expatriates and TCNs'
               });
@@ -618,7 +618,7 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
             });
           }
         } else if (type === 'Home') {
-          if (user.type === 'local') {
+          if (user.type === 'national') {
             return res.status(400).json({
               message: 'Home leave only given to Expatriates and TCNs'
             });
@@ -911,7 +911,7 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken leave Which was
             });
           }
         } else if (type === 'Home') {
-          if (user.type === 'local') {
+          if (user.type === 'national') {
             return res.status(400).json({
               message: 'Home leave only given to Expatriates and TCNs'
             });
@@ -1160,7 +1160,7 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
             });
           }
         } else if (type === 'Home') {
-          if (user.type === 'local') {
+          if (user.type === 'national') {
             return res.status(400).json({
               message: 'Home leave only given to Expatriates and TCNs'
             });

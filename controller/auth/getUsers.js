@@ -28,7 +28,10 @@ const getUsers = async (req, res) => {
           level,
           bankDetails,
           team,
-          annualLeaveBF
+          annualLeaveBF,
+          bankAccounts,
+          nssfNumber,
+          tinNumber
         } = arr[controller];
 
         const contract = await Contract.findOne({
@@ -93,6 +96,9 @@ const getUsers = async (req, res) => {
           bankDetails,
           team,
           annualLeaveBF,
+          bankAccounts,
+          nssfNumber,
+          tinNumber,
           contractId,
           contractStartDate,
           contractEndDate,
