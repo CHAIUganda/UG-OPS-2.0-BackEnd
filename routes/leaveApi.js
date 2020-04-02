@@ -170,4 +170,23 @@ router.post(
   leaveController.handlePlannedLeave
 );
 
+/**
+ * @method - POST
+ * @description - Remove a public holiday.
+ * @param - /removePublicHoliday
+ */
+router.post(
+  '/removeLeave',
+  [
+    // valid date 25/12
+
+    // input validations date validation pending
+    check('id', 'Please Enter a Valid id for the public holiday')
+      .not()
+      .isEmpty()
+  ],
+  authenticator,
+  leaveController.removeLeave
+);
+
 module.exports = router;

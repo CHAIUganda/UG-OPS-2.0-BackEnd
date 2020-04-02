@@ -10,6 +10,8 @@ const getAllStaffLeavesTaken = require('./getAllStaffLeavesTaken');
 const staffModifyLeave = require('./staffModifyLeave');
 const handlePlannedLeave = require('./handlePlannedLeave');
 
+const removeLeave = require('./removeLeave');
+
 // Handle new Leave
 exports.createLeave = createLeave;
 
@@ -36,3 +38,6 @@ exports.staffModifyLeave = staffModifyLeave;
 
 // Staff Handle planned Leave
 exports.handlePlannedLeave = handlePlannedLeave;
+
+// Staff Handle planned Leave
+exports.removeLeave = removeLeave;
