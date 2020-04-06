@@ -9,11 +9,24 @@ const getLoggedInUser = async (req, res) => {
     // dont return pwd and id
     user.password = undefined;
     user._id = undefined;
-    const supervisor = await User.findOne({ email: user.supervisorEmail });
-    if (!supervisor) {
-      return res.status(400).json({
-        message: 'Supervisor does not Exist'
-      });
+    const userSupervisor = await User.findOne({
+      email: supervisorEmail
+    });
+    let supervisorDetails;
+    if (!userSupervisor) {
+      supervisorDetails = {
+        Supervisor_id: null,
+        fName: null,
+        lName: null,
+        email: null
+      };
+    } else {
+      supervisorDetails = {
+        _id: userSupervisor._id,
+        fName: userSupervisor.fName,
+        lName: userSupervisor.lName,
+        email: userSupervisor.email
+      };
     }
     let program;
     let programShortForm;
@@ -31,12 +44,6 @@ const getLoggedInUser = async (req, res) => {
       program = userProgram.program;
       programShortForm = userProgram.shortForm;
     }
-    const supervisorDetails = {
-      _id: supervisor._id,
-      fName: supervisor.fName,
-      lName: supervisor.lName,
-      email: supervisor.email
-    };
 
     const {
       admin,
