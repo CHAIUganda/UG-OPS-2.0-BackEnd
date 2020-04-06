@@ -2,6 +2,7 @@ const { validationResult } = require('express-validator/check');
 const bcrypt = require('bcryptjs');
 const debug = require('debug')('server');
 const log4js = require('log4js');
+const mongoose = require('mongoose');
 const User = require('../../model/User');
 const Contract = require('../../model/Contract');
 const Program = require('../../model/Program');
@@ -25,7 +26,6 @@ const registerUser = async (req, res) => {
     contractType,
     gender,
     title,
-    programId,
     type,
     level,
     bankName,
@@ -41,6 +41,7 @@ const registerUser = async (req, res) => {
     hr,
     supervisor,
     admin,
+    programId,
     countryDirector,
     bankAccounts,
     nssfNumber,
@@ -91,16 +92,17 @@ const registerUser = async (req, res) => {
         message: 'User Already Exists'
       });
     }
-
-    const program = await Program.findOne({
-      _id: programId
-    });
-
-    if (!program) {
-      return res.status(400).json({
-        message: 'Program Doesnot Exist'
+    if (mongoose.Types.ObjectId.isValid(programId)) {
+      const program = await Program.findOne({
+        _id: programId
       });
+      if (!program) {
+        programId = 'NA';
+      }
+    } else {
+      programId = 'NA';
     }
+
     // Create user
     user = new User({
       fName,

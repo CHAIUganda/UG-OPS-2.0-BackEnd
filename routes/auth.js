@@ -52,7 +52,6 @@ router.post(
     check('team', 'Please Specify the  Staff team')
       .not()
       .isEmpty(),
-
     check('programId', 'Please Specify the staff Program Id')
       .not()
       .isEmpty(),
