@@ -97,10 +97,10 @@ const registerUser = async (req, res) => {
         _id: programId
       });
       if (!program) {
-        programId = undefined;
+        programId = null;
       }
     } else {
-      programId = undefined;
+      programId = null;
     }
 
     // Create user
