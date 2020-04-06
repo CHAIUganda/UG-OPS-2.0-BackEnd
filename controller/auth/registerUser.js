@@ -146,6 +146,7 @@ const registerUser = async (req, res) => {
   } catch (err) {
     debug(err.message);
     logger.error(`Error saving ${err.message}`);
+    console.log(`Error saving ${err.message}`);
     res.status(500).json({ message: 'Error in Saving' });
   }
 };
