@@ -48,9 +48,9 @@ const LeaveSchema = mongoose.Schema({
     type: String,
     required: false
   },
-  program: {
-    // program
-    type: String,
+  programId: {
+    // operations  Vaccines etc
+    type: mongoose.Schema.Types.ObjectId,
     required: true
   },
 

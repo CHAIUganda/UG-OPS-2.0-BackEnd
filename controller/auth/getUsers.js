@@ -101,6 +101,7 @@ const getUsers = async (req, res) => {
           roles,
           title,
           birthDate,
+          programId,
           program,
           programShortForm,
           oNames,

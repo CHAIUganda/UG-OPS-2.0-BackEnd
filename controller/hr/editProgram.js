@@ -63,7 +63,7 @@ const editProgram = async (req, res) => {
     };
 
     res.status(200).json({
-      message: 'program modified successfully',
+      message: 'Program modified successfully',
       _id: program._id,
       name,
       shortForm,

@@ -1,4 +1,5 @@
 const debug = require('debug')('server');
+const Program = require('../../model/Program');
 const User = require('../../model/User');
 // Get LoggedIn User
 const getLoggedInUser = async (req, res) => {
@@ -13,6 +14,22 @@ const getLoggedInUser = async (req, res) => {
       return res.status(400).json({
         message: 'Supervisor does not Exist'
       });
+    }
+    let program;
+    let programShortForm;
+    const { programId } = user;
+
+    const userProgram = await Program.findOne({
+      _id: programId
+    });
+
+    if (!userProgram) {
+      program = 'NA';
+      programShortForm = 'NA';
+      // eslint-disable-next-line no-else-return
+    } else {
+      program = userProgram.program;
+      programShortForm = userProgram.shortForm;
     }
     const supervisorDetails = {
       _id: supervisor._id,
@@ -33,7 +50,6 @@ const getLoggedInUser = async (req, res) => {
       gender,
       roles,
       title,
-      program,
       oNames,
       email,
       type,
@@ -53,7 +69,9 @@ const getLoggedInUser = async (req, res) => {
       roles,
       gender,
       title,
+      programId,
       program,
+      programShortForm,
       oNames,
       email,
       type,

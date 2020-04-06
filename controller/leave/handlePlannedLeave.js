@@ -7,6 +7,7 @@ const User = require('../../model/User');
 const Mailer = require('../../helpers/Mailer');
 const getLeaveDaysNo = require('./getLeaveDaysNo');
 const PublicHoliday = require('../../model/PublicHoliday');
+const Program = require('../../model/Program');
 const getLeavesTaken = require('./getLeavesTaken');
 
 const handlePlannedLeave = async (req, res) => {
@@ -96,10 +97,25 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
       });
     }
     // eslint-disable-next-line object-curly-newline
-    const { program } = leaveToTake;
+    const { programId } = leaveToTake;
     const publicHolidays = await PublicHoliday.find({});
     const daysDetails = getLeaveDaysNo(startDate, endDate, publicHolidays);
     const { supervisorEmail } = user;
+    let Leaveprogram;
+    let LeaveprogramShortForm;
+
+    const userProgram = await Program.findOne({
+      _id: programId
+    });
+
+    if (!userProgram) {
+      Leaveprogram = 'NA';
+      LeaveprogramShortForm = 'NA';
+      // eslint-disable-next-line no-else-return
+    } else {
+      Leaveprogram = userProgram.program;
+      LeaveprogramShortForm = userProgram.shortForm;
+    }
 
     if (leaveToTake.status === 'Planned') {
       if (action === 'applyForLeave') {
@@ -162,7 +178,9 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
           supervisorEmail,
           comment,
           status: 'Pending Supervisor',
-          program,
+          programId,
+          program: Leaveprogram,
+          programShortForm: LeaveprogramShortForm,
           leaveDays: daysDetails.leaveDays,
           daysTaken: daysDetails.totalDays,
           weekendDays: daysDetails.weekendDays,
@@ -193,7 +211,8 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
           supervisorEmail,
           comment,
           status: 'Cancelled',
-          program,
+          program: Leaveprogram,
+          programShortForm: LeaveprogramShortForm,
           leaveDays: daysDetails.leaveDays,
           daysTaken: daysDetails.totalDays,
           weekendDays: daysDetails.weekendDays,

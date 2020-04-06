@@ -1,6 +1,7 @@
 const debug = require('debug')('leave-controller');
 const moment = require('moment-timezone');
 const User = require('../../model/User');
+const Program = require('../../model/Program');
 const getLeavesTaken = require('./getLeavesTaken');
 
 const getAllStaffLeavesTaken = async (req, res) => {
@@ -22,13 +23,27 @@ const getAllStaffLeavesTaken = async (req, res) => {
           supervisorEmail,
           gender,
           title,
-          program,
+          programId,
           oNames,
           email,
           type,
           level
         } = arr[controller];
+        let Leaveprogram;
+        let LeaveprogramShortForm;
 
+        const userProgram = await Program.findOne({
+          _id: programId
+        });
+
+        if (!userProgram) {
+          Leaveprogram = 'NA';
+          LeaveprogramShortForm = 'NA';
+          // eslint-disable-next-line no-else-return
+        } else {
+          Leaveprogram = userProgram.program;
+          LeaveprogramShortForm = userProgram.shortForm;
+        }
         const { annualLeaveBF } = arr[controller];
         const leaveDetailss = await getLeavesTaken(arr[controller]);
 
@@ -109,7 +124,9 @@ const getAllStaffLeavesTaken = async (req, res) => {
           shortForm,
           gender,
           title,
-          program,
+          programId,
+          program: Leaveprogram,
+          programShortForm: LeaveprogramShortForm,
           oNames,
           email,
           type,

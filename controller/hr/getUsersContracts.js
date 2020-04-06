@@ -1,5 +1,6 @@
 const debug = require('debug')('server');
 const moment = require('moment-timezone');
+const Program = require('../../model/Program');
 const Contract = require('../../model/Contract');
 const User = require('../../model/User');
 
@@ -23,8 +24,8 @@ const getUsersContracts = async (req, res) => {
           roles,
           title,
           birthDate,
-          program,
           oNames,
+          programId,
           email,
           type,
           level,
@@ -73,6 +74,21 @@ const getUsersContracts = async (req, res) => {
             email: supervisor.email
           };
         }
+        let program;
+        let programShortForm;
+
+        const userProgram = await Program.findOne({
+          _id: programId
+        });
+
+        if (!userProgram) {
+          program = 'NA';
+          programShortForm = 'NA';
+          // eslint-disable-next-line no-else-return
+        } else {
+          program = userProgram.program;
+          programShortForm = userProgram.shortForm;
+        }
         let endDate = contract.contractEndDate;
         // set timezone to kampala
         const CurrentDate = moment()
@@ -93,7 +109,9 @@ const getUsersContracts = async (req, res) => {
             roles,
             title,
             birthDate,
+            programId,
             program,
+            programShortForm,
             oNames,
             email,
             type,

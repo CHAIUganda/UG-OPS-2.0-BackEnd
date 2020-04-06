@@ -1,6 +1,7 @@
 const debug = require('debug')('server');
 const User = require('../../model/User');
 const Leave = require('../../model/Leave');
+const Program = require('../../model/Program');
 const getLeaveDaysNo = require('./getLeaveDaysNo');
 const PublicHoliday = require('../../model/PublicHoliday');
 
@@ -54,50 +55,68 @@ const getStaffLeaves = async (req, res) => {
 
     const leaves = await Leave.find(query);
     const combinedArray = [];
-    leaves.forEach((leave) => {
-      const daysDetails = getLeaveDaysNo(
-        leave.startDate,
-        leave.endDate,
-        publicHolidays
-      );
+    const recurseProcessLeave = async (controller, arr) => {
+      if (controller < arr.length) {
+        // eslint-disable-next-line object-curly-newline
+        const {
+          staff,
+          modificationDetails,
+          _id,
+          startDate,
+          endDate,
+          type,
+          programId,
+          supervisorEmail,
+          comment,
+          rejectionReason
+        } = arr[controller];
 
-      const {
-        staff,
-        modificationDetails,
-        _id,
-        startDate,
-        endDate,
-        type,
-        supervisorEmail,
-        rejectionReason,
-        comment,
-        program
-      } = leave;
+        const daysDetails = getLeaveDaysNo(startDate, endDate, publicHolidays);
 
-      const Leavestatus = leave.status;
+        let Leaveprogram;
+        let LeaveprogramShortForm;
 
-      const leaveRemade = {
-        staff,
-        modificationDetails,
-        _id,
-        startDate,
-        endDate,
-        type,
-        supervisorEmail,
-        rejectionReason,
-        comment,
-        status: Leavestatus,
-        program,
-        leaveDays: daysDetails.leaveDays,
-        daysTaken: daysDetails.totalDays,
-        weekendDays: daysDetails.weekendDays,
-        publicHolidays: daysDetails.holidayDays
-      };
+        const userProgram = await Program.findOne({
+          _id: programId
+        });
 
-      combinedArray.push(leaveRemade);
-    });
+        if (!userProgram) {
+          Leaveprogram = 'NA';
+          LeaveprogramShortForm = 'NA';
+          // eslint-disable-next-line no-else-return
+        } else {
+          Leaveprogram = userProgram.program;
+          LeaveprogramShortForm = userProgram.shortForm;
+        }
+        const Leavestatus = arr[controller].status;
 
-    res.status(200).json(combinedArray);
+        const leaveRemade = {
+          staff,
+          modificationDetails,
+          _id,
+          startDate,
+          endDate,
+          type,
+          supervisorEmail,
+          comment,
+          rejectionReason,
+          status: Leavestatus,
+          programId,
+          program: Leaveprogram,
+          programShortForm: LeaveprogramShortForm,
+          leaveDays: daysDetails.leaveDays,
+          daysTaken: daysDetails.totalDays,
+          weekendDays: daysDetails.weekendDays,
+          publicHolidays: daysDetails.holidayDays
+        };
+
+        combinedArray.push(leaveRemade);
+        recurseProcessLeave(controller + 1, arr);
+      } else {
+        res.json(combinedArray);
+      }
+    };
+    await recurseProcessLeave(0, leaves);
   } catch (e) {
     console.log(e.message);
     debug(e.message);

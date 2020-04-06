@@ -34,51 +34,68 @@ const getAllStaffLeaves = async (req, res) => {
 
     const leaves = await Leave.find(query);
     const combinedArray = [];
-    leaves.forEach((leave) => {
-      const daysDetails = getLeaveDaysNo(
-        leave.startDate,
-        leave.endDate,
-        publicHolidays
-      );
+    const recurseProcessLeave = async (controller, arr) => {
+      if (controller < arr.length) {
+        // eslint-disable-next-line object-curly-newline
+        const {
+          staff,
+          modificationDetails,
+          _id,
+          startDate,
+          endDate,
+          type,
+          programId,
+          supervisorEmail,
+          comment,
+          rejectionReason
+        } = arr[controller];
 
-      const {
-        staff,
-        modificationDetails,
-        _id,
-        startDate,
-        endDate,
-        type,
-        supervisorEmail,
-        lName,
-        comment,
-        rejectionReason
-      } = leave;
-      const Leaveprogram = leave.program;
-      const Leavestatus = leave.status;
+        const daysDetails = getLeaveDaysNo(startDate, endDate, publicHolidays);
 
-      const leaveRemade = {
-        staff,
-        modificationDetails,
-        _id,
-        startDate,
-        endDate,
-        type,
-        supervisorEmail,
-        lName,
-        comment,
-        rejectionReason,
-        status: Leavestatus,
-        program: Leaveprogram,
-        leaveDays: daysDetails.leaveDays,
-        daysTaken: daysDetails.totalDays,
-        weekendDays: daysDetails.weekendDays,
-        publicHolidays: daysDetails.holidayDays
-      };
+        let Leaveprogram;
+        let LeaveprogramShortForm;
 
-      combinedArray.push(leaveRemade);
-    });
+        const userProgram = await Program.findOne({
+          _id: programId
+        });
 
-    res.status(200).json(combinedArray);
+        if (!userProgram) {
+          Leaveprogram = 'NA';
+          LeaveprogramShortForm = 'NA';
+          // eslint-disable-next-line no-else-return
+        } else {
+          Leaveprogram = userProgram.program;
+          LeaveprogramShortForm = userProgram.shortForm;
+        }
+        const Leavestatus = arr[controller].status;
+
+        const leaveRemade = {
+          staff,
+          modificationDetails,
+          _id,
+          startDate,
+          endDate,
+          type,
+          supervisorEmail,
+          comment,
+          rejectionReason,
+          status: Leavestatus,
+          programId,
+          program: Leaveprogram,
+          programShortForm: LeaveprogramShortForm,
+          leaveDays: daysDetails.leaveDays,
+          daysTaken: daysDetails.totalDays,
+          weekendDays: daysDetails.weekendDays,
+          publicHolidays: daysDetails.holidayDays
+        };
+
+        combinedArray.push(leaveRemade);
+        recurseProcessLeave(controller + 1, arr);
+      } else {
+        res.json(combinedArray);
+      }
+    };
+    await recurseProcessLeave(0, leaves);
   } catch (e) {
     console.log(e.message);
     debug(e.message);

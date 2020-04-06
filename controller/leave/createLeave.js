@@ -2,6 +2,7 @@ const { validationResult } = require('express-validator/check');
 // const moment = require('moment-timezone');
 const debug = require('debug')('leave-controller');
 const moment = require('moment-timezone');
+const Program = require('../../model/Program');
 const errorToString = require('../../helpers/errorToString');
 const Leave = require('../../model/Leave');
 const User = require('../../model/User');
@@ -60,9 +61,23 @@ const createLeave = async (req, res) => {
         message: 'Supervisor is not Registered in system'
       });
     }
+    const { programId } = user;
+    let program;
+    let programShortForm;
 
+    const userProgram = await Program.findOne({
+      _id: programId
+    });
+
+    if (!userProgram) {
+      program = 'NA';
+      programShortForm = 'NA';
+      // eslint-disable-next-line no-else-return
+    } else {
+      program = userProgram.program;
+      programShortForm = userProgram.shortForm;
+    }
     if (status === 'Pending Supervisor' || status === 'Planned') {
-      const { program } = user;
       const publicHolidays = await PublicHoliday.find({});
       const daysDetails = getLeaveDaysNo(startDate, endDate, publicHolidays);
       // set timezone to kampala
@@ -238,7 +253,7 @@ const createLeave = async (req, res) => {
         supervisorEmail,
         comment,
         status,
-        program
+        programId
       });
       // leave id saved on staff collection after it has been planned, it the status that is updated
       await User.updateOne(
@@ -269,7 +284,9 @@ ${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateStri
         supervisorEmail,
         comment,
         status,
+        programId,
         program,
+        programShortForm,
         leaveDays: daysDetails.leaveDays,
         daysTaken: daysDetails.totalDays,
         weekendDays: daysDetails.weekendDays,
