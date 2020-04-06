@@ -51,7 +51,7 @@ const LeaveSchema = mongoose.Schema({
   programId: {
     // operations  Vaccines etc
     type: mongoose.Schema.Types.ObjectId,
-    required: true
+    required: false
   },
 
   rejectionReason: {
