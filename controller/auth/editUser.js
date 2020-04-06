@@ -1,5 +1,6 @@
 const { validationResult } = require('express-validator/check');
 const debug = require('debug')('server');
+const mongoose = require('mongoose');
 const User = require('../../model/User');
 const Contract = require('../../model/Contract');
 const Program = require('../../model/Program');
@@ -108,14 +109,15 @@ const editUser = async (req, res) => {
     if (programId == null) {
       programId = user.programId;
     }
-    const program = await Program.findOne({
-      _id: programId
-    });
-
-    if (!program) {
-      return res.status(400).json({
-        message: 'Program Doesnot Exist'
+    if (mongoose.Types.ObjectId.isValid(programId)) {
+      const program = await Program.findOne({
+        _id: programId
       });
+      if (!program) {
+        programId = null;
+      }
+    } else {
+      programId = null;
     }
     if (type == null) {
       type = user.type;
