@@ -16,6 +16,7 @@ const editUser = async (req, res) => {
   let {
     fName,
     lName,
+    newEmail,
     bankName,
     accountNumber,
     contractStartDate,
@@ -59,6 +60,9 @@ const editUser = async (req, res) => {
     // check for what has not been modified
     if (admin == null) {
       admin = user.roles.admin;
+    }
+    if (newEmail == null) {
+      newEmail = user.email;
     }
     if (admin == null) {
       admin = user.roles.admin;
@@ -168,7 +172,7 @@ const editUser = async (req, res) => {
           birthDate,
           programId,
           oNames,
-          email,
+          email: newEmail,
           type,
           level,
           team
