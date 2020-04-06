@@ -9,25 +9,6 @@ const getLoggedInUser = async (req, res) => {
     // dont return pwd and id
     user.password = undefined;
     user._id = undefined;
-    const userSupervisor = await User.findOne({
-      email: supervisorEmail
-    });
-    let supervisorDetails;
-    if (!userSupervisor) {
-      supervisorDetails = {
-        Supervisor_id: null,
-        fName: null,
-        lName: null,
-        email: null
-      };
-    } else {
-      supervisorDetails = {
-        _id: userSupervisor._id,
-        fName: userSupervisor.fName,
-        lName: userSupervisor.lName,
-        email: userSupervisor.email
-      };
-    }
     let program;
     let programShortForm;
     const { programId } = user;
@@ -63,6 +44,26 @@ const getLoggedInUser = async (req, res) => {
       level,
       team
     } = user;
+
+    const userSupervisor = await User.findOne({
+      email: supervisorEmail
+    });
+    let supervisorDetails;
+    if (!userSupervisor) {
+      supervisorDetails = {
+        Supervisor_id: null,
+        fName: null,
+        lName: null,
+        email: null
+      };
+    } else {
+      supervisorDetails = {
+        _id: userSupervisor._id,
+        fName: userSupervisor.fName,
+        lName: userSupervisor.lName,
+        email: userSupervisor.email
+      };
+    }
 
     const person = {
       admin,
