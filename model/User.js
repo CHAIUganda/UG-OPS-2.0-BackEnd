@@ -77,11 +77,11 @@ const UserSchema = mongoose.Schema({
     }
   ],
   nssfNumber: {
-    type: Number,
+    type: String,
     required: true
   },
   tinNumber: {
-    type: Number,
+    type: String,
     required: true
   },
   roles: {
