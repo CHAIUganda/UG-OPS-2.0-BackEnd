@@ -35,9 +35,9 @@ const UserSchema = mongoose.Schema({
     type: Date,
     required: true
   },
-  program: {
+  programId: {
     // operations  Vaccines etc
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
     required: true
   },
   supervisorEmail: {

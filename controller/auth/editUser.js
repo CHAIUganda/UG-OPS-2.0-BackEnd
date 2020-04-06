@@ -2,6 +2,7 @@ const { validationResult } = require('express-validator/check');
 const debug = require('debug')('server');
 const User = require('../../model/User');
 const Contract = require('../../model/Contract');
+const Program = require('../../model/Program');
 const errorToString = require('../../helpers/errorToString');
 
 const editUser = async (req, res) => {
@@ -24,7 +25,7 @@ const editUser = async (req, res) => {
     birthDate,
     gender,
     title,
-    program,
+    programId,
     type,
     level,
     team,
@@ -55,7 +56,6 @@ const editUser = async (req, res) => {
         message: 'Contract Doesnot Exist'
       });
     }
-
     // check for what has not been modified
     if (admin == null) {
       admin = user.roles.admin;
@@ -101,8 +101,17 @@ const editUser = async (req, res) => {
     if (title == null) {
       title = user.title;
     }
-    if (program == null) {
-      program = user.program;
+    if (programId == null) {
+      programId = user.programId;
+    }
+    const program = await Program.findOne({
+      _id: programId
+    });
+
+    if (!program) {
+      return res.status(400).json({
+        message: 'Program Doesnot Exist'
+      });
     }
     if (type == null) {
       type = user.type;
@@ -157,7 +166,7 @@ const editUser = async (req, res) => {
           },
           title,
           birthDate,
-          program,
+          programId,
           oNames,
           email,
           type,

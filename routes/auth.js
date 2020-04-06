@@ -53,7 +53,7 @@ router.post(
       .not()
       .isEmpty(),
 
-    check('program', 'Please Specify the staff Program')
+    check('programId', 'Please Specify the staff Program Id')
       .not()
       .isEmpty(),
     check(

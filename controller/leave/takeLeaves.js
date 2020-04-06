@@ -1,6 +1,5 @@
 const debug = require('debug')('server');
 const moment = require('moment-timezone');
-
 const log4js = require('log4js');
 const Leave = require('../../model/Leave');
 const User = require('../../model/User');

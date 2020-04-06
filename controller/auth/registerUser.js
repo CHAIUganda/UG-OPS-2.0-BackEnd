@@ -1,12 +1,15 @@
 const { validationResult } = require('express-validator/check');
 const bcrypt = require('bcryptjs');
 const debug = require('debug')('server');
+const log4js = require('log4js');
 const User = require('../../model/User');
 const Contract = require('../../model/Contract');
+const Program = require('../../model/Program');
 const errorToString = require('../../helpers/errorToString');
 
 const registerUser = async (req, res) => {
   const errors = validationResult(req);
+  const logger = log4js.getLogger('Timed');
   if (!errors.isEmpty()) {
     return res.status(400).json({
       message: errorToString(errors.array())
@@ -22,7 +25,7 @@ const registerUser = async (req, res) => {
     contractType,
     gender,
     title,
-    program,
+    programId,
     type,
     level,
     bankName,
@@ -88,6 +91,16 @@ const registerUser = async (req, res) => {
         message: 'User Already Exists'
       });
     }
+
+    const program = await Program.findOne({
+      _id: programId
+    });
+
+    if (!program) {
+      return res.status(400).json({
+        message: 'Program Doesnot Exist'
+      });
+    }
     // Create user
     user = new User({
       fName,
@@ -102,7 +115,7 @@ const registerUser = async (req, res) => {
       },
       title,
       birthDate,
-      program,
+      programId,
       oNames,
       email,
       type,
@@ -132,6 +145,7 @@ const registerUser = async (req, res) => {
     res.status(201).json({ message: 'User Created successfully' });
   } catch (err) {
     debug(err.message);
+    logger.error(`Error saving ${err.message}`);
     res.status(500).json({ message: 'Error in Saving' });
   }
 };

@@ -1,6 +1,7 @@
 const debug = require('debug')('server');
 const Contract = require('../../model/Contract');
 const User = require('../../model/User');
+const Program = require('../../model/Program');
 
 const getUsers = async (req, res) => {
   try {
@@ -21,7 +22,7 @@ const getUsers = async (req, res) => {
           roles,
           title,
           birthDate,
-          program,
+          programId,
           oNames,
           email,
           type,
@@ -33,7 +34,19 @@ const getUsers = async (req, res) => {
           nssfNumber,
           tinNumber
         } = arr[controller];
+        let program;
+        let programShortForm;
+        const staffProgram = await Program.findOne({
+          _id: programId
+        });
 
+        if (!staffProgram) {
+          program = 'NA';
+          programShortForm = 'NA';
+        } else {
+          program = staffProgram.name;
+          programShortForm = staffProgram.shortForm;
+        }
         const contract = await Contract.findOne({
           _userId: _id,
           contractStatus: 'ACTIVE'
@@ -89,6 +102,7 @@ const getUsers = async (req, res) => {
           title,
           birthDate,
           program,
+          programShortForm,
           oNames,
           email,
           type,
