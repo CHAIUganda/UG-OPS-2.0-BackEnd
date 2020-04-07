@@ -29,14 +29,14 @@ const getUsersContracts = async (req, res) => {
           email,
           type,
           level,
-          bankDetails,
+          bankAccounts,
           team,
-          annualLeaveBF
+          annualLeaveBF,
         } = arr[controller];
 
         const contract = await Contract.findOne({
           _userId: _id,
-          contractStatus: 'ACTIVE'
+          contractStatus: 'ACTIVE',
         });
 
         let contractStartDate;
@@ -55,7 +55,7 @@ const getUsersContracts = async (req, res) => {
         }
 
         const supervisor = await User.findOne({
-          email: arr[controller].supervisorEmail
+          email: arr[controller].supervisorEmail,
         });
 
         let supervisorDetails;
@@ -64,21 +64,21 @@ const getUsersContracts = async (req, res) => {
             Supervisor_id: null,
             fName: null,
             lName: null,
-            email: null
+            email: null,
           };
         } else {
           supervisorDetails = {
             _id: supervisor._id,
             fName: supervisor.fName,
             lName: supervisor.lName,
-            email: supervisor.email
+            email: supervisor.email,
           };
         }
         let program;
         let programShortForm;
 
         const userProgram = await Program.findOne({
-          _id: programId
+          _id: programId,
         });
 
         if (!userProgram) {
@@ -91,9 +91,7 @@ const getUsersContracts = async (req, res) => {
         }
         let endDate = contract.contractEndDate;
         // set timezone to kampala
-        const CurrentDate = moment()
-          .tz('Africa/Kampala')
-          .format();
+        const CurrentDate = moment().tz('Africa/Kampala').format();
 
         endDate = moment(endDate);
         const diff = endDate.diff(CurrentDate, 'days') + 1;
@@ -116,7 +114,7 @@ const getUsersContracts = async (req, res) => {
             email,
             type,
             level,
-            bankDetails,
+            bankAccounts,
             team,
             annualLeaveBF,
             contractId,
@@ -124,7 +122,7 @@ const getUsersContracts = async (req, res) => {
             contractEndDate,
             contractType,
             contractStatus,
-            daysLeftonContract
+            daysLeftonContract,
           };
 
           combinedArray.push(userRemade);

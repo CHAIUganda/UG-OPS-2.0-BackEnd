@@ -27,17 +27,16 @@ const getUsers = async (req, res) => {
           email,
           type,
           level,
-          bankDetails,
           team,
           annualLeaveBF,
           bankAccounts,
           nssfNumber,
-          tinNumber
+          tinNumber,
         } = arr[controller];
         let program;
         let programShortForm;
         const staffProgram = await Program.findOne({
-          _id: programId
+          _id: programId,
         });
 
         if (!staffProgram) {
@@ -49,7 +48,7 @@ const getUsers = async (req, res) => {
         }
         const contract = await Contract.findOne({
           _userId: _id,
-          contractStatus: 'ACTIVE'
+          contractStatus: 'ACTIVE',
         });
 
         let contractStartDate;
@@ -72,7 +71,7 @@ const getUsers = async (req, res) => {
         }
 
         const supervisor = await User.findOne({
-          email: arr[controller].supervisorEmail
+          email: arr[controller].supervisorEmail,
         });
 
         let supervisorDetails;
@@ -81,14 +80,14 @@ const getUsers = async (req, res) => {
             Supervisor_id: null,
             fName: null,
             lName: null,
-            email: null
+            email: null,
           };
         } else {
           supervisorDetails = {
             _id: supervisor._id,
             fName: supervisor.fName,
             lName: supervisor.lName,
-            email: supervisor.email
+            email: supervisor.email,
           };
         }
 
@@ -108,7 +107,6 @@ const getUsers = async (req, res) => {
           email,
           type,
           level,
-          bankDetails,
           team,
           annualLeaveBF,
           bankAccounts,
@@ -118,7 +116,7 @@ const getUsers = async (req, res) => {
           contractStartDate,
           contractEndDate,
           contractType,
-          contractStatus
+          contractStatus,
         };
 
         combinedArray.push(userRemade);

@@ -13,7 +13,7 @@ const registerUser = async (req, res) => {
   const logger = log4js.getLogger('Timed');
   if (!errors.isEmpty()) {
     return res.status(400).json({
-      message: errorToString(errors.array())
+      message: errorToString(errors.array()),
     });
   }
 
@@ -28,13 +28,11 @@ const registerUser = async (req, res) => {
     title,
     type,
     level,
-    bankName,
-    accountNumber,
     team,
     supervisorEmail,
     oNames,
     email,
-    password
+    password,
   } = req.body;
 
   let {
@@ -47,7 +45,7 @@ const registerUser = async (req, res) => {
     nssfNumber,
     tinNumber,
     workPermitStartDate,
-    workPermitEndDate
+    workPermitEndDate,
   } = req.body;
 
   if (bankAccounts == null) {
@@ -84,17 +82,17 @@ const registerUser = async (req, res) => {
 
     const contractStatus = 'ACTIVE';
     let user = await User.findOne({
-      email
+      email,
     });
 
     if (user) {
       return res.status(400).json({
-        message: 'User Already Exists'
+        message: 'User Already Exists',
       });
     }
     if (mongoose.Types.ObjectId.isValid(programId)) {
       const program = await Program.findOne({
-        _id: programId
+        _id: programId,
       });
       if (!program) {
         programId = null;
@@ -113,7 +111,7 @@ const registerUser = async (req, res) => {
         admin,
         hr,
         supervisor,
-        countryDirector
+        countryDirector,
       },
       title,
       birthDate,
@@ -122,14 +120,12 @@ const registerUser = async (req, res) => {
       email,
       type,
       level,
-      bankName,
-      accountNumber,
       team,
       password,
       annualLeaveBF,
       bankAccounts,
       nssfNumber,
-      tinNumber
+      tinNumber,
     });
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(password, salt);
@@ -140,7 +136,7 @@ const registerUser = async (req, res) => {
       contractStartDate,
       contractEndDate,
       contractType,
-      contractStatus
+      contractStatus,
     });
     await contract.save();
     await user.save();

@@ -10,7 +10,7 @@ const editUser = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
-      message: errorToString(errors.array())
+      message: errorToString(errors.array()),
     });
   }
   const { contractId, email } = req.body;
@@ -18,8 +18,7 @@ const editUser = async (req, res) => {
     fName,
     lName,
     newEmail,
-    bankName,
-    accountNumber,
+    bankAccounts,
     contractStartDate,
     contractEndDate,
     contractType,
@@ -36,26 +35,26 @@ const editUser = async (req, res) => {
     hr,
     supervisor,
     admin,
-    countryDirector
+    countryDirector,
   } = req.body;
 
   try {
     const user = await User.findOne({
-      email
+      email,
     });
 
     if (!user) {
       return res.status(400).json({
-        message: 'User Doesnot Exist'
+        message: 'User Doesnot Exist',
       });
     }
     const contract = await Contract.findOne({
-      _id: contractId
+      _id: contractId,
     });
 
     if (!contract) {
       return res.status(400).json({
-        message: 'Contract Doesnot Exist'
+        message: 'Contract Doesnot Exist',
       });
     }
     // check for what has not been modified
@@ -91,11 +90,8 @@ const editUser = async (req, res) => {
     if (lName == null) {
       lName = user.lName;
     }
-    if (bankName == null) {
-      bankName = user.bankName;
-    }
-    if (accountNumber == null) {
-      accountNumber = user.accountNumber;
+    if (bankAccounts == null) {
+      bankAccounts = user.bankAccounts;
     }
     if (birthDate == null) {
       birthDate = user.birthDate;
@@ -111,7 +107,7 @@ const editUser = async (req, res) => {
     }
     if (mongoose.Types.ObjectId.isValid(programId)) {
       const program = await Program.findOne({
-        _id: programId
+        _id: programId,
       });
       if (!program) {
         programId = null;
@@ -151,7 +147,7 @@ const editUser = async (req, res) => {
     // modify user
     await User.updateOne(
       {
-        email
+        email,
       },
       {
         // eslint-disable-next-line max-len
@@ -164,12 +160,9 @@ const editUser = async (req, res) => {
             admin,
             hr,
             supervisor,
-            countryDirector
+            countryDirector,
           },
-          bankDetails: {
-            bankName,
-            accountNumber
-          },
+          bankAccounts,
           title,
           birthDate,
           programId,
@@ -177,14 +170,14 @@ const editUser = async (req, res) => {
           email: newEmail,
           type,
           level,
-          team
-        }
+          team,
+        },
       }
     );
     // update contract
     await Contract.updateOne(
       {
-        _id: contractId
+        _id: contractId,
       },
       {
         // eslint-disable-next-line max-len
@@ -192,8 +185,8 @@ const editUser = async (req, res) => {
           contractStartDate,
           contractEndDate,
           contractType,
-          contractStatus
-        }
+          contractStatus,
+        },
       }
     );
 

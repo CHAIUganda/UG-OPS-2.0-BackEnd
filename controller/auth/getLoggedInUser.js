@@ -14,7 +14,7 @@ const getLoggedInUser = async (req, res) => {
     const { programId } = user;
 
     const userProgram = await Program.findOne({
-      _id: programId
+      _id: programId,
     });
 
     if (!userProgram) {
@@ -28,7 +28,7 @@ const getLoggedInUser = async (req, res) => {
 
     const {
       admin,
-      bankDetails,
+      bankAccounts,
       leaves,
       createdAt,
       _id,
@@ -42,11 +42,11 @@ const getLoggedInUser = async (req, res) => {
       email,
       type,
       level,
-      team
+      team,
     } = user;
 
     const userSupervisor = await User.findOne({
-      email: supervisorEmail
+      email: supervisorEmail,
     });
     let supervisorDetails;
     if (!userSupervisor) {
@@ -54,14 +54,14 @@ const getLoggedInUser = async (req, res) => {
         Supervisor_id: null,
         fName: null,
         lName: null,
-        email: null
+        email: null,
       };
     } else {
       supervisorDetails = {
         _id: userSupervisor._id,
         fName: userSupervisor.fName,
         lName: userSupervisor.lName,
-        email: userSupervisor.email
+        email: userSupervisor.email,
       };
     }
 
@@ -69,7 +69,7 @@ const getLoggedInUser = async (req, res) => {
       admin,
       leaves,
       createdAt,
-      bankDetails,
+      bankAccounts,
       _id,
       fName,
       lName,
@@ -85,7 +85,7 @@ const getLoggedInUser = async (req, res) => {
       type,
       level,
       team,
-      supervisorDetails
+      supervisorDetails,
     };
 
     res.json(person);
