@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
 const debug = require('debug')('server');
 
-const Mailer = (from, to, subject, text, cc, content) => {
+const Mailer = (from, to, subject, text, cc, content, htmlAttach) => {
   // Send the email
   const transporter = nodemailer.createTransport({
     host: 'smtp.office365.com', // hostname
@@ -9,12 +9,12 @@ const Mailer = (from, to, subject, text, cc, content) => {
     port: 587, // port for secure SMTP
     requireTLS: true,
     tls: {
-      ciphers: 'SSLv3'
+      ciphers: 'SSLv3',
     },
     auth: {
       user: process.env.MAIL_USERNAME,
-      pass: process.env.MAIL_PASSWORD
-    }
+      pass: process.env.MAIL_PASSWORD,
+    },
   });
   let mailOptions;
 
@@ -28,8 +28,18 @@ const Mailer = (from, to, subject, text, cc, content) => {
       icalEvent: {
         filename: 'contractRenewalInvitation.ics',
         method: 'request',
-        content
-      }
+        content,
+      },
+    };
+  } else if (htmlAttach) {
+    mailOptions = {
+      from,
+      to,
+      subject,
+      text,
+      cc,
+      html: htmlAttach.html,
+      attachments: htmlAttach.attachments,
     };
   } else {
     mailOptions = {
@@ -37,7 +47,7 @@ const Mailer = (from, to, subject, text, cc, content) => {
       to,
       subject,
       text,
-      cc
+      cc,
     };
   }
 

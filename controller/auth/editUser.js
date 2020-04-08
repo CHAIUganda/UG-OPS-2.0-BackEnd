@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const User = require('../../model/User');
 const Contract = require('../../model/Contract');
 const Program = require('../../model/Program');
+const WorkPermit = require('../../model/WorkPermit');
 const errorToString = require('../../helpers/errorToString');
 
 const editUser = async (req, res) => {
@@ -13,7 +14,7 @@ const editUser = async (req, res) => {
       message: errorToString(errors.array()),
     });
   }
-  const { contractId, email } = req.body;
+  const { contractId, email, workPermitId } = req.body;
   let {
     fName,
     lName,
@@ -36,6 +37,9 @@ const editUser = async (req, res) => {
     supervisor,
     admin,
     countryDirector,
+    workPermitStartDate,
+    workPermitEndDate,
+    workPermitStatus,
   } = req.body;
 
   try {
@@ -190,6 +194,45 @@ const editUser = async (req, res) => {
       }
     );
 
+    if (
+      // eslint-disable-next-line operator-linebreak
+      workPermitId != null &&
+      (user.type === 'expat' || user.type === 'tcn')
+    ) {
+      const workPermit = await WorkPermit.findOne({
+        _id: contractId,
+      });
+
+      if (!workPermit) {
+        return res.status(400).json({
+          message: 'Work Permit Doesnot Exist',
+        });
+      }
+
+      if (workPermitStartDate == null) {
+        workPermitStartDate = workPermit.workPermitStartDate;
+      }
+      if (workPermitEndDate == null) {
+        workPermitEndDate = workPermit.workPermitEndDate;
+      }
+      if (workPermitStatus == null) {
+        workPermitStatus = workPermit.workPermitStatus;
+      }
+
+      await WorkPermit.updateOne(
+        {
+          _id: workPermitId,
+        },
+        {
+          // eslint-disable-next-line max-len
+          $set: {
+            workPermitStartDate,
+            workPermitEndDate,
+            workPermitStatus,
+          },
+        }
+      );
+    }
     res
       .status(201)
       .json({ message: 'User details have been Modified successfully' });

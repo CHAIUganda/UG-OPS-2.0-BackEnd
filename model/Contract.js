@@ -6,24 +6,32 @@ const ContractSchema = mongoose.Schema({
   _userId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'User'
+    ref: 'User',
   },
   contractStartDate: {
     type: Date,
-    required: true
+    required: true,
   },
   contractEndDate: {
     type: Date,
-    required: true
+    required: true,
   },
   contractType: {
     type: String,
-    required: true
+    required: true,
   },
   contractStatus: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
+  dismiss: {
+    type: Boolean,
+    default: false,
+  },
+  snooze: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 // export model contract with ContractSchema

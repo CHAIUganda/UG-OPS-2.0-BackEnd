@@ -5,6 +5,7 @@ const log4js = require('log4js');
 const mongoose = require('mongoose');
 const User = require('../../model/User');
 const Contract = require('../../model/Contract');
+const WorkPermit = require('../../model/WorkPermit');
 const Program = require('../../model/Program');
 const errorToString = require('../../helpers/errorToString');
 
@@ -58,10 +59,10 @@ const registerUser = async (req, res) => {
     tinNumber = '';
   }
   if (workPermitStartDate == null) {
-    workPermitStartDate = '';
+    workPermitStartDate = undefined;
   }
   if (workPermitEndDate == null) {
-    workPermitEndDate = '';
+    workPermitEndDate = undefined;
   }
   if (!admin === true) {
     admin = false;
@@ -81,6 +82,7 @@ const registerUser = async (req, res) => {
     const annualLeaveBF = 0;
 
     const contractStatus = 'ACTIVE';
+    const workPermitStatus = 'ACTIVE';
     let user = await User.findOne({
       email,
     });
@@ -138,8 +140,20 @@ const registerUser = async (req, res) => {
       contractType,
       contractStatus,
     });
+
     await contract.save();
     await user.save();
+    if (user.type === 'expat' || user.type === 'tcn') {
+      // create user contract
+      const workpermit = new WorkPermit({
+        _userId: user._id,
+        workPermitStartDate,
+        workPermitEndDate,
+        workPermitStatus,
+      });
+
+      await workpermit.save();
+    }
     res.status(201).json({ message: 'User Created successfully' });
   } catch (err) {
     debug(err.message);

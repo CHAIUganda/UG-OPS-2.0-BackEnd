@@ -6,24 +6,20 @@ const WorkPermitSchema = mongoose.Schema({
   _userId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'User'
+    ref: 'User',
   },
   workPermitStartDate: {
     type: Date,
-    required: true
+    required: false,
   },
   workPermitEndDate: {
     type: Date,
-    required: true
-  },
-  workPermitType: {
-    type: String,
-    required: true
+    required: false,
   },
   workPermitStatus: {
     type: String,
-    required: true
-  }
+    required: false,
+  },
 });
 
 // export model workPermit with WorkPermitSchema
