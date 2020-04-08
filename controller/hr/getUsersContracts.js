@@ -44,6 +44,8 @@ const getUsersContracts = async (req, res) => {
         let contractType;
         let contractStatus;
         let contractId;
+        let contractDismiss;
+        let contractSnooze;
         if (!contract) {
           recurseProcessLeave(controller + 1, arr);
         } else {
@@ -52,6 +54,8 @@ const getUsersContracts = async (req, res) => {
           contractType = contract.contractType;
           contractStatus = contract.contractStatus;
           contractId = contract._id;
+          contractDismiss = contract.contractDismiss;
+          contractSnooze = contract.contractSnooze;
         }
 
         const supervisor = await User.findOne({
@@ -122,6 +126,8 @@ const getUsersContracts = async (req, res) => {
             contractEndDate,
             contractType,
             contractStatus,
+            contractDismiss,
+            contractSnooze,
             daysLeftonContract,
           };
 

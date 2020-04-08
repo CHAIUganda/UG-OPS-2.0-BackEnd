@@ -8,6 +8,7 @@ const createProgram = require('./createProgram');
 const editProgram = require('./editProgram');
 const getPrograms = require('./getPrograms');
 const getUsersContracts = require('./getUsersContracts');
+const getUsersWorkPermits = require('./getUsersWorkPermits');
 const deleteProgram = require('./deleteProgram');
 
 // Handle new public holiday
@@ -30,6 +31,8 @@ exports.getPrograms = getPrograms;
 
 // Handle get staff contracts
 exports.getUsersContracts = getUsersContracts;
+// Handle get staff contracts
+exports.getUsersWorkPermits = getUsersWorkPermits;
 
 // Handle remove Program
 exports.deleteProgram = deleteProgram;

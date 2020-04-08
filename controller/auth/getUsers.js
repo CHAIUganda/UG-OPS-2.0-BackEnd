@@ -2,6 +2,7 @@ const debug = require('debug')('server');
 const Contract = require('../../model/Contract');
 const User = require('../../model/User');
 const Program = require('../../model/Program');
+const WorkPermit = require('../../model/WorkPermit');
 
 const getUsers = async (req, res) => {
   try {
@@ -35,6 +36,29 @@ const getUsers = async (req, res) => {
         } = arr[controller];
         let program;
         let programShortForm;
+        let workPermitStartDate;
+        let workPermitId;
+        let workPermitEndDate;
+        let workPermitStatus;
+
+        if (user.type === 'expat' || user.type === 'tcn') {
+          const workPermit = await WorkPermit.findOne({
+            _userId: _id,
+            workPermitStatus: 'ACTIVE',
+          });
+
+          if (!workPermit) {
+            workPermitId = 'NA';
+            workPermitStartDate = 'NA';
+            workPermitEndDate = 'NA';
+            workPermitStatus = 'NA';
+          } else {
+            workPermitId = workPermit._id;
+            workPermitStartDate = workPermit.workPermitStartDate;
+            workPermitEndDate = workPermit.workPermitEndDate;
+            workPermitStatus = workPermit.workPermitStatus;
+          }
+        }
         const staffProgram = await Program.findOne({
           _id: programId,
         });
@@ -117,6 +141,10 @@ const getUsers = async (req, res) => {
           contractEndDate,
           contractType,
           contractStatus,
+          workPermitId,
+          workPermitStartDate,
+          workPermitEndDate,
+          workPermitStatus,
         };
 
         combinedArray.push(userRemade);

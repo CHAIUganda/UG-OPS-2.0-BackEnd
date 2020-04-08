@@ -22,7 +22,7 @@ router.post(
       .isEmpty(),
     check('date', 'Please Enter a Valid date for the public holiday')
       .not()
-      .isEmpty()
+      .isEmpty(),
   ],
   hrController.createPublicHoliday
 );
@@ -40,7 +40,7 @@ router.post(
     // input validations date validation pending
     check('id', 'Please Enter a Valid id for the public holiday')
       .not()
-      .isEmpty()
+      .isEmpty(),
   ],
   hrController.removePublicHoliday
 );
@@ -61,15 +61,13 @@ router.post(
   '/createProgram',
   [
     // input validations date validation pending
-    check('name', 'Please Enter a Valid name for the Program')
-      .not()
-      .isEmpty(),
+    check('name', 'Please Enter a Valid name for the Program').not().isEmpty(),
     check('shortForm', 'Please Enter a Short Form for the program')
       .not()
       .isEmpty(),
     check('programManagerId', 'Please Enter a Valid Program manager Id')
       .not()
-      .isEmpty()
+      .isEmpty(),
   ],
   hrController.createProgram
 );
@@ -83,15 +81,11 @@ router.post(
   '/editProgram',
   [
     // input validations
-    check('id', 'Please Enter an id for the program')
-      .not()
-      .isEmpty(),
+    check('id', 'Please Enter an id for the program').not().isEmpty(),
     check('shortForm', 'Please Enter a Short Form for the program')
       .not()
       .isEmpty(),
-    check('name', 'Please name for the program')
-      .not()
-      .isEmpty()
+    check('name', 'Please name for the program').not().isEmpty(),
   ],
   hrController.editProgram
 );
@@ -107,9 +101,17 @@ router.get('/getPrograms', hrController.getPrograms);
  * @method - GET
  * @description - Get all staff contracts about toexpiry basing on days supplied.
  * verify the token
- * @param - /getAllStaffLeaves
+ * @param - /getUsersContracts
  */
 router.get('/getUsersContracts/:expiryIn', hrController.getUsersContracts);
+
+/**
+ * @method - GET
+ * @description - Get all staff worpermits about toexpiry basing on days supplied.
+ * verify the token
+ * @param - /getUsersWorkPermits
+ */
+router.get('/getUsersWorkPermits/:expiryIn', hrController.getUsersWorkPermits);
 
 /**
  * @method - POST
@@ -120,9 +122,7 @@ router.post(
   '/deleteProgram',
   [
     // input validations
-    check('id', 'Please Enter an id for the program')
-      .not()
-      .isEmpty()
+    check('id', 'Please Enter an id for the program').not().isEmpty(),
   ],
   hrController.deleteProgram
 );

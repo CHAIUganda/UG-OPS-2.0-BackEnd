@@ -24,11 +24,11 @@ const ContractSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  dismiss: {
+  contractDismiss: {
     type: Boolean,
     default: false,
   },
-  snooze: {
+  contractSnooze: {
     type: Boolean,
     default: false,
   },

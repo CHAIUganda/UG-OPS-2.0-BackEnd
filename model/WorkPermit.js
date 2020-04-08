@@ -20,6 +20,14 @@ const WorkPermitSchema = mongoose.Schema({
     type: String,
     required: false,
   },
+  wpDismiss: {
+    type: Boolean,
+    default: false,
+  },
+  wpSnooze: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 // export model workPermit with WorkPermitSchema
