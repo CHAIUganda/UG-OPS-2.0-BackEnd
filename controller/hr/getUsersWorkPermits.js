@@ -55,85 +55,85 @@ const getUsersWorkPermits = async (req, res) => {
             workPermitStatus = workPermit.workPermitStatus;
             wpDismiss = workPermit.wpDismiss;
             wpSnooze = workPermit.wpSnooze;
-          }
 
-          const supervisor = await User.findOne({
-            email: arr[controller].supervisorEmail,
-          });
+            const supervisor = await User.findOne({
+              email: arr[controller].supervisorEmail,
+            });
 
-          let supervisorDetails;
-          if (!supervisor) {
-            supervisorDetails = {
-              Supervisor_id: null,
-              fName: null,
-              lName: null,
-              email: null,
-            };
-          } else {
-            supervisorDetails = {
-              _id: supervisor._id,
-              fName: supervisor.fName,
-              lName: supervisor.lName,
-              email: supervisor.email,
-            };
-          }
-          let program;
-          let programShortForm;
+            let supervisorDetails;
+            if (!supervisor) {
+              supervisorDetails = {
+                Supervisor_id: null,
+                fName: null,
+                lName: null,
+                email: null,
+              };
+            } else {
+              supervisorDetails = {
+                _id: supervisor._id,
+                fName: supervisor.fName,
+                lName: supervisor.lName,
+                email: supervisor.email,
+              };
+            }
+            let program;
+            let programShortForm;
 
-          const userProgram = await Program.findOne({
-            _id: programId,
-          });
+            const userProgram = await Program.findOne({
+              _id: programId,
+            });
 
-          if (!userProgram) {
-            program = 'NA';
-            programShortForm = 'NA';
-            // eslint-disable-next-line no-else-return
-          } else {
-            program = userProgram.program;
-            programShortForm = userProgram.shortForm;
-          }
-          let endDate = workPermit.workPermitEndDate;
-          // set timezone to kampala
-          const CurrentDate = moment().tz('Africa/Kampala').format();
+            if (!userProgram) {
+              program = 'NA';
+              programShortForm = 'NA';
+              // eslint-disable-next-line no-else-return
+            } else {
+              program = userProgram.program;
+              programShortForm = userProgram.shortForm;
+            }
+            let endDate = workPermitEndDate;
+            // set timezone to kampala
+            const CurrentDate = moment().tz('Africa/Kampala').format();
 
-          endDate = moment(endDate);
-          const diff = endDate.diff(CurrentDate, 'days') + 1;
-          const daysLeftonWorkPermit = diff;
-          // eslint-disable-next-line eqeqeq
-          if (diff < expiryIn || diff == expiryIn) {
-            const userRemade = {
-              _id,
-              fName,
-              lName,
-              supervisorDetails,
-              gender,
-              roles,
-              title,
-              birthDate,
-              programId,
-              program,
-              programShortForm,
-              oNames,
-              email,
-              type,
-              level,
-              bankAccounts,
-              team,
-              annualLeaveBF,
-              workPermitId,
-              workPermitStartDate,
-              workPermitEndDate,
-              workPermitStatus,
-              wpDismiss,
-              wpSnooze,
-              daysLeftonWorkPermit,
-            };
+            endDate = moment(endDate);
+            const diff = endDate.diff(CurrentDate, 'days') + 1;
+            const daysLeftonWorkPermit = diff;
+            // eslint-disable-next-line eqeqeq
+            if (diff < expiryIn || diff == expiryIn) {
+              const userRemade = {
+                _id,
+                fName,
+                lName,
+                supervisorDetails,
+                gender,
+                roles,
+                title,
+                birthDate,
+                programId,
+                program,
+                programShortForm,
+                oNames,
+                email,
+                type,
+                level,
+                bankAccounts,
+                team,
+                annualLeaveBF,
+                workPermitId,
+                workPermitStartDate,
+                workPermitEndDate,
+                workPermitStatus,
+                wpDismiss,
+                wpSnooze,
+                daysLeftonWorkPermit,
+              };
 
-            combinedArray.push(userRemade);
+              combinedArray.push(userRemade);
 
-            recurseProcessLeave(controller + 1, arr);
-          } else {
-            recurseProcessLeave(controller + 1, arr);
+              recurseProcessLeave(controller + 1, arr);
+            } else {
+              recurseProcessLeave(controller + 1, arr);
+            }
           }
         } else {
           recurseProcessLeave(controller + 1, arr);
