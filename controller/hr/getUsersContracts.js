@@ -97,15 +97,15 @@ const getUsersContracts = async (req, res) => {
             };
             // eslint-disable-next-line no-else-return
           } else {
-            programManagerId = userProgram.program;
-            staffprogram = userProgram.program;
+            programManagerId = userProgram.programManagerId;
+            staffprogram = userProgram.name;
             programShortForm = userProgram.shortForm;
             const userPM = await User.findOne({
               _id: programManagerId,
             });
             if (!userPM) {
               programManagerDetails = {
-                Supervisor_id: null,
+                _id: null,
                 fName: null,
                 lName: null,
                 email: null,
