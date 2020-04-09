@@ -77,7 +77,7 @@ const getUsersContracts = async (req, res) => {
               email: supervisor.email,
             };
           }
-          let program;
+          let staffprogram;
           let programShortForm;
           let programManagerId;
           let programManagerDetails;
@@ -87,7 +87,7 @@ const getUsersContracts = async (req, res) => {
           });
 
           if (!userProgram) {
-            program = 'NA';
+            staffprogram = 'NA';
             programShortForm = 'NA';
             programManagerDetails = {
               Supervisor_id: null,
@@ -98,7 +98,7 @@ const getUsersContracts = async (req, res) => {
             // eslint-disable-next-line no-else-return
           } else {
             programManagerId = userProgram.program;
-            program = userProgram.program;
+            staffprogram = userProgram.program;
             programShortForm = userProgram.shortForm;
             const userPM = await User.findOne({
               _id: programManagerId,
@@ -139,7 +139,7 @@ const getUsersContracts = async (req, res) => {
               title,
               birthDate,
               programId,
-              program,
+              program: staffprogram,
               programShortForm,
               programManagerDetails,
               oNames,
