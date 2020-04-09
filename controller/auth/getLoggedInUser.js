@@ -22,7 +22,7 @@ const getLoggedInUser = async (req, res) => {
       programShortForm = 'NA';
       // eslint-disable-next-line no-else-return
     } else {
-      program = userProgram.program;
+      program = userProgram.name;
       programShortForm = userProgram.shortForm;
     }
 
