@@ -41,7 +41,7 @@ const getUsers = async (req, res) => {
         let workPermitEndDate;
         let workPermitStatus;
 
-        if (user.type === 'expat' || user.type === 'tcn') {
+        if (type === 'expat' || type === 'tcn') {
           const workPermit = await WorkPermit.findOne({
             _userId: _id,
             workPermitStatus: 'ACTIVE',
