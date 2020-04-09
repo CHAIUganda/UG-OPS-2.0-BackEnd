@@ -15,7 +15,7 @@ const getStaffLeaves = async (req, res) => {
     const publicHolidays = await PublicHoliday.find({});
     if (!user) {
       return res.status(400).json({
-        message: 'User does not exist'
+        message: 'User does not exist',
       });
     }
     let query; // more queries to be added for leaves
@@ -48,7 +48,7 @@ const getStaffLeaves = async (req, res) => {
         query = { _id: { $in: user.leaves }, $text: { $search: status } };
       } else {
         return res.status(400).json({
-          message: 'Invalid Status'
+          message: 'Invalid Status',
         });
       }
     }
@@ -68,7 +68,7 @@ const getStaffLeaves = async (req, res) => {
           programId,
           supervisorEmail,
           comment,
-          rejectionReason
+          rejectionReason,
         } = arr[controller];
 
         const daysDetails = getLeaveDaysNo(startDate, endDate, publicHolidays);
@@ -77,7 +77,7 @@ const getStaffLeaves = async (req, res) => {
         let LeaveprogramShortForm;
 
         const userProgram = await Program.findOne({
-          _id: programId
+          _id: programId,
         });
 
         if (!userProgram) {
@@ -85,7 +85,7 @@ const getStaffLeaves = async (req, res) => {
           LeaveprogramShortForm = 'NA';
           // eslint-disable-next-line no-else-return
         } else {
-          Leaveprogram = userProgram.program;
+          Leaveprogram = userProgram.name;
           LeaveprogramShortForm = userProgram.shortForm;
         }
         const Leavestatus = arr[controller].status;
@@ -107,7 +107,7 @@ const getStaffLeaves = async (req, res) => {
           leaveDays: daysDetails.leaveDays,
           daysTaken: daysDetails.totalDays,
           weekendDays: daysDetails.weekendDays,
-          publicHolidays: daysDetails.holidayDays
+          publicHolidays: daysDetails.holidayDays,
         };
 
         combinedArray.push(leaveRemade);

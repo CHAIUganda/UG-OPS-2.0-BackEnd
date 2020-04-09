@@ -27,13 +27,13 @@ const getAllStaffLeavesTaken = async (req, res) => {
           oNames,
           email,
           type,
-          level
+          level,
         } = arr[controller];
         let Leaveprogram;
         let LeaveprogramShortForm;
 
         const userProgram = await Program.findOne({
-          _id: programId
+          _id: programId,
         });
 
         if (!userProgram) {
@@ -41,15 +41,13 @@ const getAllStaffLeavesTaken = async (req, res) => {
           LeaveprogramShortForm = 'NA';
           // eslint-disable-next-line no-else-return
         } else {
-          Leaveprogram = userProgram.program;
+          Leaveprogram = userProgram.name;
           LeaveprogramShortForm = userProgram.shortForm;
         }
         const { annualLeaveBF } = arr[controller];
         const leaveDetailss = await getLeavesTaken(arr[controller]);
 
-        let CurrentDate = moment()
-          .tz('Africa/Kampala')
-          .format();
+        let CurrentDate = moment().tz('Africa/Kampala').format();
         CurrentDate = new Date(CurrentDate);
         const currentMonth = CurrentDate.getMonth();
         // Computing Annual Leave
@@ -74,7 +72,7 @@ const getAllStaffLeavesTaken = async (req, res) => {
           maternityLeaveTaken,
           paternityLeaveTaken,
           sickLeaveTaken,
-          studyLeaveTaken
+          studyLeaveTaken,
         } = leaveDetailss;
 
         const leaveDetails = {
@@ -94,11 +92,11 @@ const getAllStaffLeavesTaken = async (req, res) => {
           sickLeaveTaken,
           sickLeaveBal: sick - sickLeaveTaken,
           studyLeaveTaken,
-          studyLeaveBal: study - studyLeaveTaken
+          studyLeaveBal: study - studyLeaveTaken,
         };
 
         const userSupervisor = await User.findOne({
-          email: supervisorEmail
+          email: supervisorEmail,
         });
         let supervisorDetails;
         if (!userSupervisor) {
@@ -106,14 +104,14 @@ const getAllStaffLeavesTaken = async (req, res) => {
             Supervisor_id: null,
             fName: null,
             lName: null,
-            email: null
+            email: null,
           };
         } else {
           supervisorDetails = {
             _id: userSupervisor._id,
             fName: userSupervisor.fName,
             lName: userSupervisor.lName,
-            email: userSupervisor.email
+            email: userSupervisor.email,
           };
         }
 
@@ -133,7 +131,7 @@ const getAllStaffLeavesTaken = async (req, res) => {
           level,
           annualLeaveBF,
           supervisorDetails,
-          leaveDetails
+          leaveDetails,
         };
 
         combinedArray.push(userRemade);
@@ -148,7 +146,7 @@ const getAllStaffLeavesTaken = async (req, res) => {
     debug(err.message);
     console.log(err.message);
     res.status(500).json({
-      message: 'Error geting  Leaves taken'
+      message: 'Error geting  Leaves taken',
     });
   }
 };

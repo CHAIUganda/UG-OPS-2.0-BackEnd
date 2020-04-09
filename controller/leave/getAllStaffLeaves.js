@@ -14,7 +14,7 @@ const getAllStaffLeaves = async (req, res) => {
       const programs = await Program.findOne({ name: program });
       if (!programs) {
         return res.status(400).json({
-          message: 'User Program does not exist'
+          message: 'User Program does not exist',
         });
       }
     }
@@ -47,7 +47,7 @@ const getAllStaffLeaves = async (req, res) => {
           programId,
           supervisorEmail,
           comment,
-          rejectionReason
+          rejectionReason,
         } = arr[controller];
 
         const daysDetails = getLeaveDaysNo(startDate, endDate, publicHolidays);
@@ -56,7 +56,7 @@ const getAllStaffLeaves = async (req, res) => {
         let LeaveprogramShortForm;
 
         const userProgram = await Program.findOne({
-          _id: programId
+          _id: programId,
         });
 
         if (!userProgram) {
@@ -64,7 +64,7 @@ const getAllStaffLeaves = async (req, res) => {
           LeaveprogramShortForm = 'NA';
           // eslint-disable-next-line no-else-return
         } else {
-          Leaveprogram = userProgram.program;
+          Leaveprogram = userProgram.name;
           LeaveprogramShortForm = userProgram.shortForm;
         }
         const Leavestatus = arr[controller].status;
@@ -86,7 +86,7 @@ const getAllStaffLeaves = async (req, res) => {
           leaveDays: daysDetails.leaveDays,
           daysTaken: daysDetails.totalDays,
           weekendDays: daysDetails.weekendDays,
-          publicHolidays: daysDetails.holidayDays
+          publicHolidays: daysDetails.holidayDays,
         };
 
         combinedArray.push(leaveRemade);

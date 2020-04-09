@@ -14,7 +14,7 @@ const getSupervisorLeaves = async (req, res) => {
     const user = await User.findOne({ email: staffEmail });
     if (!user) {
       return res.status(400).json({
-        message: 'Supervisor does not exist'
+        message: 'Supervisor does not exist',
       });
     }
     let query; // more queries to be added for leaves
@@ -26,7 +26,7 @@ const getSupervisorLeaves = async (req, res) => {
 
       query = {
         supervisorEmail: staffEmail,
-        $text: { $search: status }
+        $text: { $search: status },
       };
     } else {
       query = { supervisorEmail: staffEmail, status };
@@ -46,7 +46,7 @@ const getSupervisorLeaves = async (req, res) => {
           programId,
           supervisorEmail,
           comment,
-          rejectionReason
+          rejectionReason,
         } = arr[controller];
 
         const daysDetails = getLeaveDaysNo(startDate, endDate, publicHolidays);
@@ -55,7 +55,7 @@ const getSupervisorLeaves = async (req, res) => {
         let LeaveprogramShortForm;
 
         const userProgram = await Program.findOne({
-          _id: programId
+          _id: programId,
         });
 
         if (!userProgram) {
@@ -63,7 +63,7 @@ const getSupervisorLeaves = async (req, res) => {
           LeaveprogramShortForm = 'NA';
           // eslint-disable-next-line no-else-return
         } else {
-          Leaveprogram = userProgram.program;
+          Leaveprogram = userProgram.name;
           LeaveprogramShortForm = userProgram.shortForm;
         }
         const Leavestatus = arr[controller].status;
@@ -85,7 +85,7 @@ const getSupervisorLeaves = async (req, res) => {
           leaveDays: daysDetails.leaveDays,
           daysTaken: daysDetails.totalDays,
           weekendDays: daysDetails.weekendDays,
-          publicHolidays: daysDetails.holidayDays
+          publicHolidays: daysDetails.holidayDays,
         };
 
         combinedArraySupervisor.push(leaveRemade);
@@ -111,7 +111,7 @@ const getSupervisorLeaves = async (req, res) => {
                 programId,
                 supervisorEmail,
                 comment,
-                rejectionReason
+                rejectionReason,
               } = arrcd[controllercd];
 
               const daysDetails = getLeaveDaysNo(
@@ -124,7 +124,7 @@ const getSupervisorLeaves = async (req, res) => {
               let LeaveprogramShortForm;
 
               const userProgram = await Program.findOne({
-                _id: programId
+                _id: programId,
               });
 
               if (!userProgram) {
@@ -132,7 +132,7 @@ const getSupervisorLeaves = async (req, res) => {
                 LeaveprogramShortForm = 'NA';
                 // eslint-disable-next-line no-else-return
               } else {
-                Leaveprogram = userProgram.program;
+                Leaveprogram = userProgram.name;
                 LeaveprogramShortForm = userProgram.shortForm;
               }
               const Leavestatus = arrcd[controllercd].status;
@@ -154,7 +154,7 @@ const getSupervisorLeaves = async (req, res) => {
                 leaveDays: daysDetails.leaveDays,
                 daysTaken: daysDetails.totalDays,
                 weekendDays: daysDetails.weekendDays,
-                publicHolidays: daysDetails.holidayDays
+                publicHolidays: daysDetails.holidayDays,
               };
 
               combinedArrayCD.push(leaveRemade);
