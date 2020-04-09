@@ -80,6 +80,8 @@ const getUsersContracts = async (req, res) => {
         }
         let program;
         let programShortForm;
+        let programManagerId;
+        let programManagerDetails;
 
         const userProgram = await Program.findOne({
           _id: programId,
@@ -88,11 +90,37 @@ const getUsersContracts = async (req, res) => {
         if (!userProgram) {
           program = 'NA';
           programShortForm = 'NA';
+          programManagerDetails = {
+            Supervisor_id: null,
+            fName: null,
+            lName: null,
+            email: null,
+          };
           // eslint-disable-next-line no-else-return
         } else {
+          programManagerId = userProgram.program;
           program = userProgram.program;
           programShortForm = userProgram.shortForm;
+          const userPM = await User.findOne({
+            _id: programManagerId,
+          });
+          if (!userPM) {
+            programManagerDetails = {
+              Supervisor_id: null,
+              fName: null,
+              lName: null,
+              email: null,
+            };
+          } else {
+            programManagerDetails = {
+              _id: user._id,
+              fName: user.fName,
+              lName: user.lName,
+              email: user.email,
+            };
+          }
         }
+
         let endDate = contract.contractEndDate;
         // set timezone to kampala
         const CurrentDate = moment().tz('Africa/Kampala').format();
@@ -114,6 +142,7 @@ const getUsersContracts = async (req, res) => {
             programId,
             program,
             programShortForm,
+            programManagerDetails,
             oNames,
             email,
             type,
