@@ -15,7 +15,7 @@ const createLeave = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
-      message: errorToString(errors.array())
+      message: errorToString(errors.array()),
     });
   }
 
@@ -34,23 +34,23 @@ const createLeave = async (req, res) => {
 
   try {
     const user = await User.findOne({
-      email: staffEmail
+      email: staffEmail,
     });
     if (!user) {
       return res.status(400).json({
-        message: 'User does not Exist'
+        message: 'User does not Exist',
       });
     }
     if (status === 'Pending Supervisor') {
       const chkleaves = await Leave.find({
         _id: { $in: user.leaves },
         status,
-        type
+        type,
       });
       if (chkleaves.length > 0) {
         return res.status(400).json({
           message: `A pending Leave of type ${type} Already exists `,
-          chkleaves
+          chkleaves,
         });
       }
     }
@@ -58,7 +58,7 @@ const createLeave = async (req, res) => {
     const supervisor = await User.findOne({ email: user.supervisorEmail });
     if (!supervisor) {
       return res.status(400).json({
-        message: 'Supervisor is not Registered in system'
+        message: 'Supervisor is not Registered in system',
       });
     }
     const { programId } = user;
@@ -66,7 +66,7 @@ const createLeave = async (req, res) => {
     let programShortForm;
 
     const userProgram = await Program.findOne({
-      _id: programId
+      _id: programId,
     });
 
     if (!userProgram) {
@@ -89,7 +89,7 @@ const createLeave = async (req, res) => {
         return res.status(400).json({
           message: 'Start Date cannot be after End date',
           endDate,
-          startDate
+          startDate,
         });
       }
 
@@ -111,7 +111,7 @@ const createLeave = async (req, res) => {
         maternityLeaveTaken,
         paternityLeaveTaken,
         sickLeaveTaken,
-        studyLeaveTaken
+        studyLeaveTaken,
       } = leaveDetails;
 
       // prettier-ignore
@@ -125,7 +125,7 @@ const createLeave = async (req, res) => {
       if (type === 'Paternity') {
         if (user.gender === 'Female') {
           return res.status(400).json({
-            message: 'Paternity leave only given to Gentlemen'
+            message: 'Paternity leave only given to Gentlemen',
           });
         }
         const totalPaternity = paternityLeaveTaken + daysDetails.totalDays;
@@ -135,13 +135,13 @@ const createLeave = async (req, res) => {
             paternityLeaveTaken,
             daysRequested: daysDetails.totalDays,
             totalPaternity,
-            paternity
+            paternity,
           });
         }
       } else if (type === 'Home') {
         if (user.type === 'national') {
           return res.status(400).json({
-            message: 'Home leave only given to Expatriates and TCNs'
+            message: 'Home leave only given to Expatriates and TCNs',
           });
         }
         // eslint-disable-next-line operator-linebreak
@@ -155,13 +155,13 @@ const createLeave = async (req, res) => {
             homeLeaveTaken,
             daysRequested: daysDetails.totalDays,
             totalHome,
-            totalAcruedAnualLeavePlusAnualLeaveBF
+            totalAcruedAnualLeavePlusAnualLeaveBF,
           });
         }
       } else if (type === 'Maternity') {
         if (user.gender === 'Male') {
           return res.status(400).json({
-            message: 'Maternity leave only given to Ladies'
+            message: 'Maternity leave only given to Ladies',
           });
         }
         const totalMaternity = maternityLeaveTaken + daysDetails.totalDays;
@@ -171,7 +171,7 @@ const createLeave = async (req, res) => {
             maternityLeaveTaken,
             daysRequested: daysDetails.totalDays,
             totalMaternity,
-            maternity
+            maternity,
           });
         }
       } else if (type === 'Sick') {
@@ -182,7 +182,7 @@ const createLeave = async (req, res) => {
             sickLeaveTaken,
             daysRequested: daysDetails.totalDays,
             totalSick,
-            sick
+            sick,
           });
         }
       } else if (type === 'Unpaid') {
@@ -193,7 +193,7 @@ const createLeave = async (req, res) => {
             unPaidLeaveTaken,
             daysRequested: daysDetails.totalDays,
             totalUnpaid,
-            unpaid
+            unpaid,
           });
         }
       } else if (type === 'Study') {
@@ -204,7 +204,7 @@ const createLeave = async (req, res) => {
             studyLeaveTaken,
             daysRequested: daysDetails.totalDays,
             totalStudy,
-            study
+            study,
           });
         }
       } else if (type === 'Annual') {
@@ -219,12 +219,12 @@ const createLeave = async (req, res) => {
             homeLeaveTaken,
             daysRequested: daysDetails.totalDays,
             totalAnnual,
-            totalAcruedAnualLeavePlusAnualLeaveBF
+            totalAcruedAnualLeavePlusAnualLeaveBF,
           });
         }
       } else {
         return res.status(400).json({
-          message: 'Invalid Leave type selected'
+          message: 'Invalid Leave type selected',
         });
       }
 
@@ -232,12 +232,12 @@ const createLeave = async (req, res) => {
       const from = 'UGOperations@clintonhealthaccess.org';
       const footer = `
   
-  Regards,
+Regards,
   
-  Uganda Operations
-  Clinton Health Access Initiative
+Uganda Operations
+Clinton Health Access Initiative
   
-  Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
+Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
 
       // checks if user has enough leaves days happen here basing on what has been computed
       const { supervisorEmail } = user;
@@ -248,17 +248,17 @@ const createLeave = async (req, res) => {
         staff: {
           email: user.email,
           fName: user.fName,
-          lName: user.lName
+          lName: user.lName,
         },
         supervisorEmail,
         comment,
         status,
-        programId
+        programId,
       });
       // leave id saved on staff collection after it has been planned, it the status that is updated
       await User.updateOne(
         {
-          email: staffEmail
+          email: staffEmail,
         },
         { $push: { leaves: leaveRemade._id } }
       );
@@ -279,7 +279,7 @@ ${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateStri
         staff: {
           email: user.email,
           fName: user.fName,
-          lName: user.lName
+          lName: user.lName,
         },
         supervisorEmail,
         comment,
@@ -290,17 +290,17 @@ ${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateStri
         leaveDays: daysDetails.leaveDays,
         daysTaken: daysDetails.totalDays,
         weekendDays: daysDetails.weekendDays,
-        publicHolidays: daysDetails.holidayDays
+        publicHolidays: daysDetails.holidayDays,
       };
 
       // send email notification to supervisor if leave is is pending
       res.status(201).json({
         message: 'Leave Created successfully',
-        leave
+        leave,
       });
     } else {
       res.status(400).json({
-        message: 'Invalid Leave Status'
+        message: 'Invalid Leave Status',
       });
     }
   } catch (err) {
@@ -308,7 +308,7 @@ ${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateStri
     // eslint-disable-next-line no-console
     console.log(err.message);
     res.status(500).json({
-      message: 'Error Creating Leave'
+      message: 'Error Creating Leave',
     });
   }
 };
