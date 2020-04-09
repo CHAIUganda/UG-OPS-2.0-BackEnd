@@ -5,109 +5,109 @@ const mongoose = require('mongoose');
 const UserSchema = mongoose.Schema({
   fName: {
     type: String,
-    required: true
+    required: true,
   },
   lName: {
     type: String,
-    required: true
+    required: true,
   },
   oNames: {
     type: String,
-    required: false
+    required: false,
   },
   gender: {
     type: String,
-    required: true
+    required: true,
   },
   email: {
     type: String,
-    required: true
+    required: true,
   },
   password: {
     type: String,
-    required: true
+    required: true,
   },
   title: {
     type: String,
-    required: true
+    required: true,
   },
   birthDate: {
     type: Date,
-    required: true
+    required: true,
   },
   programId: {
     // operations  Vaccines etc
     type: mongoose.Schema.Types.ObjectId,
-    required: false
+    required: false,
   },
   supervisorEmail: {
     type: String,
-    required: true
+    required: true,
   },
   type: {
     // national TCN expat
     type: String,
-    required: true
+    required: true,
   },
   level: {
     // 1-6
     type: String,
-    required: false
+    required: false,
   },
   team: {
     // countryOffice global
     type: String,
-    required: true
+    required: true,
   },
   annualLeaveBF: {
     type: Number,
-    required: true
+    required: true,
   },
   leaves: [mongoose.Schema.Types.ObjectId],
   createdAt: {
     type: Date,
-    default: Date.now()
+    default: Date.now(),
   },
   bankAccounts: [
     {
       bankName: String,
       accountNumber: String,
       Currency: String,
-      status: String
-    }
+      status: String,
+    },
   ],
   nssfNumber: {
     type: String,
-    required: true
+    required: true,
   },
   tinNumber: {
     type: String,
-    required: true
+    required: true,
   },
   roles: {
     admin: {
       // To track is user is admin
       type: Boolean,
-      default: false
+      default: false,
     },
     ordinary: {
       type: Boolean,
-      default: true
+      default: true,
     },
     hr: {
       type: Boolean,
-      default: false
+      default: false,
     },
     supervisor: {
       type: Boolean,
-      default: false
+      default: false,
     },
     countryDirector: {
       // To track is user is CD
       type: Boolean,
-      default: false
-    }
-  }
+      default: false,
+    },
+  },
 });
 
 // export model user with UserSchema
