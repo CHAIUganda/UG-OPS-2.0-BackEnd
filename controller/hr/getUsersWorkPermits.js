@@ -76,20 +76,41 @@ const getUsersWorkPermits = async (req, res) => {
                 email: supervisor.email,
               };
             }
-            let program;
+            let staffprogram;
             let programShortForm;
+            let programManagerId;
+            let programManagerDetails;
 
             const userProgram = await Program.findOne({
               _id: programId,
             });
 
             if (!userProgram) {
-              program = 'NA';
+              staffprogram = 'NA';
               programShortForm = 'NA';
               // eslint-disable-next-line no-else-return
             } else {
-              program = userProgram.program;
+              programManagerId = userProgram.programManagerId;
+              staffprogram = userProgram.name;
               programShortForm = userProgram.shortForm;
+              const userPM = await User.findOne({
+                _id: programManagerId,
+              });
+              if (!userPM) {
+                programManagerDetails = {
+                  _id: null,
+                  fName: null,
+                  lName: null,
+                  email: null,
+                };
+              } else {
+                programManagerDetails = {
+                  _id: userPM._id,
+                  fName: userPM.fName,
+                  lName: userPM.lName,
+                  email: userPM.email,
+                };
+              }
             }
             let endDate = workPermitEndDate;
             // set timezone to kampala
@@ -110,8 +131,9 @@ const getUsersWorkPermits = async (req, res) => {
                 title,
                 birthDate,
                 programId,
-                program,
+                program: staffprogram,
                 programShortForm,
+                programManagerDetails,
                 oNames,
                 email,
                 type,
