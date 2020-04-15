@@ -1,25 +1,33 @@
+const moment = require('moment-timezone');
 const Leave = require('../../model/Leave');
 const getLeaveDaysNo = require('./getLeaveDaysNo');
 const PublicHoliday = require('../../model/PublicHoliday');
 
 const getLeavesTaken = async (user) => {
+  let CurrentDate = moment().tz('Africa/Kampala').format();
+  CurrentDate = new Date(CurrentDate);
+  const currentYear = CurrentDate.getFullYear();
   // const status = 'Taken';
   const query = {
     _id: { $in: user.leaves },
     $or: [
       {
-        status: 'Taken'
+        status: 'Taken',
+        $expr: { $eq: [{ $year: '$startDate' }, currentYear] },
       },
       {
-        status: 'Approved'
+        status: 'Approved',
+        $expr: { $eq: [{ $year: '$startDate' }, currentYear] },
       },
       {
-        status: 'Pending Change'
+        status: 'Pending Change',
+        $expr: { $eq: [{ $year: '$startDate' }, currentYear] },
       },
       {
-        status: 'Pending Not Taken'
-      }
-    ]
+        status: 'Pending Not Taken',
+        $expr: { $eq: [{ $year: '$startDate' }, currentYear] },
+      },
+    ],
   };
   const leaves = await Leave.find(query);
   const publicHolidays = await PublicHoliday.find({});
@@ -31,7 +39,7 @@ const getLeavesTaken = async (user) => {
     maternityLeaveTaken: 0,
     paternityLeaveTaken: 0,
     sickLeaveTaken: 0,
-    studyLeaveTaken: 0
+    studyLeaveTaken: 0,
   };
 
   let sum = 0;

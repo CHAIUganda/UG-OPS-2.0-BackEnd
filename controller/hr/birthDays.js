@@ -44,19 +44,17 @@ From the entire team.`;
           const imgDay = `bd${today.getDay() + 1}.jpg`;
           const htmlAttach = {
             // prettier-ignore
-            html: `Embedded image: <img src="${today.getDay() + 1}@kreata.ee"/>`,
+            html: `Hello  ${fName}, <img src="${today.getDay() + 1}@kreata.ee"/>${footer}
+            `,
             attachments: [
               {
                 filename: imgDay,
-                path: `./hr/bd images/${imgDay}`,
+                path: `${__dirname}\\bd images\\${imgDay}`,
                 cid: `${today.getDay() + 1}@kreata.ee`,
               },
             ],
           };
-          const textUser = `Hello  ${fName}, 
-  
-Happy BirthDay${footer}.
-                                              `;
+          const textUser = '';
           Mailer(
             from,
             email,

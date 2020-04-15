@@ -3,6 +3,7 @@ const { validationResult } = require('express-validator/check');
 const debug = require('debug')('leave-controller');
 const moment = require('moment-timezone');
 const Program = require('../../model/Program');
+const Contract = require('../../model/Contract');
 const errorToString = require('../../helpers/errorToString');
 const Leave = require('../../model/Leave');
 const User = require('../../model/User');
@@ -41,6 +42,18 @@ const createLeave = async (req, res) => {
         message: 'User does not Exist',
       });
     }
+
+    const contract = await Contract.findOne({
+      _userId: user._id,
+      contractStatus: 'ACTIVE',
+    });
+
+    if (!contract) {
+      return res.status(400).json({
+        message: 'User does not Have an active Contract',
+      });
+    }
+
     if (status === 'Pending Supervisor') {
       const chkleaves = await Leave.find({
         _id: { $in: user.leaves },
@@ -84,7 +97,6 @@ const createLeave = async (req, res) => {
       // const CurrentDate = moment().tz('Africa/Kampala').format();
       endDate = new Date(endDate);
       startDate = new Date(startDate);
-      const endDateMonth = endDate.getMonth();
       if (moment(startDate).isAfter(endDate)) {
         return res.status(400).json({
           message: 'Start Date cannot be after End date',
@@ -92,14 +104,18 @@ const createLeave = async (req, res) => {
           startDate,
         });
       }
-
+      // compute accrued days fromstart of contract
+      const leaveEndDate = moment(endDate);
+      const contractStartDate = moment(contract.contractStartDate);
+      let monthOnContract = leaveEndDate.diff(contractStartDate, 'months');
+      monthOnContract = Math.trunc(monthOnContract);
       // Computing Annual Leave
       let accruedAnnualLeave;
-      if (endDateMonth === 0) {
+      if (monthOnContract === 0) {
         accruedAnnualLeave = 0;
       } else {
         // accruedAnnualLeave = currentMonth * 1.75;
-        accruedAnnualLeave = Math.trunc(endDateMonth * 1.75);
+        accruedAnnualLeave = Math.trunc(monthOnContract * 1.75);
       }
       const { annualLeaveBF } = user;
       const leaveDetails = await getLeavesTaken(user);

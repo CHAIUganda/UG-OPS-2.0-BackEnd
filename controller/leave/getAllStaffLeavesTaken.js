@@ -2,6 +2,7 @@ const debug = require('debug')('leave-controller');
 const moment = require('moment-timezone');
 const User = require('../../model/User');
 const Program = require('../../model/Program');
+const Contract = require('../../model/Contract');
 const getLeavesTaken = require('./getLeavesTaken');
 
 const getAllStaffLeavesTaken = async (req, res) => {
@@ -46,17 +47,31 @@ const getAllStaffLeavesTaken = async (req, res) => {
         }
         const { annualLeaveBF } = arr[controller];
         const leaveDetailss = await getLeavesTaken(arr[controller]);
+        const contract = await Contract.findOne({
+          _userId: arr[controller]._id,
+          contractStatus: 'ACTIVE',
+        });
 
-        let CurrentDate = moment().tz('Africa/Kampala').format();
-        CurrentDate = new Date(CurrentDate);
-        const currentMonth = CurrentDate.getMonth();
-        // Computing Annual Leave
         let accruedAnnualLeave;
-        if (currentMonth === 0) {
+        if (!contract) {
           accruedAnnualLeave = 0;
         } else {
-          accruedAnnualLeave = Math.trunc(currentMonth * 1.75);
+          let CurrentDate = moment().tz('Africa/Kampala').format();
+          CurrentDate = new Date(CurrentDate);
+          // compute accrued days fromstart of contract
+          const leaveEndDate = moment(CurrentDate);
+          const contractStartDate = moment(contract.contractStartDate);
+          let monthOnContract = leaveEndDate.diff(contractStartDate, 'months');
+          monthOnContract = Math.trunc(monthOnContract);
+          // Computing Annual Leave
+          if (monthOnContract === 0) {
+            accruedAnnualLeave = 0;
+          } else {
+            // accruedAnnualLeave = currentMonth * 1.75;
+            accruedAnnualLeave = Math.trunc(monthOnContract * 1.75);
+          }
         }
+
         // prettier-ignore
         const totalAcruedAnualLeavePlusAnualLeaveBF = accruedAnnualLeave + annualLeaveBF;
         const maternity = 60;

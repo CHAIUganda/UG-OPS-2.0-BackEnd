@@ -79,7 +79,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
                 // prettier-ignore
                 const textUser = `Hello  ${programMngr.fName}, 
         
-      ${fName} ${lName}'s Contract will expiry in ${diff} days as of ${today.toDateString()}. This is an invitation to discuss their contract renewal. Please find attached the calender Invite "Add to your Calender"${footer}.
+${fName} ${lName}'s Contract will expiry in ${diff} days as of ${today.toDateString()}. This is an invitation to discuss their contract renewal. Please find attached the calender Invite "Add to your Calender"${footer}.
                                                     `;
                 // Create new Calendar and set optional fields
 

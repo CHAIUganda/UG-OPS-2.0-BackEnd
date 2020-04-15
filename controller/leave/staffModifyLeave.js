@@ -8,12 +8,13 @@ const Mailer = require('../../helpers/Mailer');
 const getLeavesTaken = require('./getLeavesTaken');
 const getLeaveDaysNo = require('./getLeaveDaysNo');
 const PublicHoliday = require('../../model/PublicHoliday');
+const Contract = require('../../model/Contract');
 
 const staffModifyLeave = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
-      message: errorToString(errors.array())
+      message: errorToString(errors.array()),
     });
   }
 
@@ -32,26 +33,47 @@ const staffModifyLeave = async (req, res) => {
 
   try {
     // set timezone to kampala
-    let CurrentDate = moment()
-      .tz('Africa/Kampala')
-      .format();
+    let CurrentDate = moment().tz('Africa/Kampala').format();
     CurrentDate = new Date(CurrentDate);
     endDate = new Date(endDate);
     startDate = new Date(startDate);
     // check if user exists
     const user = await User.findOne({
-      email: staffEmail
+      email: staffEmail,
     });
     if (!user) {
       return res.status(400).json({
-        message: 'User does not Exist'
+        message: 'User does not Exist',
       });
+    }
+
+    const contract = await Contract.findOne({
+      _userId: user._id,
+      contractStatus: 'ACTIVE',
+    });
+
+    let accruedAnnualLeave;
+    if (!contract) {
+      accruedAnnualLeave = 0;
+    } else {
+      // compute accrued days fromstart of contract
+      const leaveEndDate = moment(CurrentDate);
+      const contractStartDate = moment(contract.contractStartDate);
+      let monthOnContract = leaveEndDate.diff(contractStartDate, 'months');
+      monthOnContract = Math.trunc(monthOnContract);
+      // Computing Annual Leave
+      if (monthOnContract === 0) {
+        accruedAnnualLeave = 0;
+      } else {
+        // accruedAnnualLeave = currentMonth * 1.75;
+        accruedAnnualLeave = Math.trunc(monthOnContract * 1.75);
+      }
     }
     // check if HR exists in System
     const hr = await User.findOne({ 'roles.hr': true });
     if (!hr) {
       return res.status(400).json({
-        message: 'HR is not Registered in system'
+        message: 'HR is not Registered in system',
       });
     }
 
@@ -59,16 +81,16 @@ const staffModifyLeave = async (req, res) => {
     const supervisor = await User.findOne({ email: user.supervisorEmail });
     if (!supervisor) {
       return res.status(400).json({
-        message: 'Supervisor is not Registered in system'
+        message: 'Supervisor is not Registered in system',
       });
     }
 
     const leave = await Leave.findOne({
-      _id: leaveId
+      _id: leaveId,
     });
     if (!leave) {
       return res.status(400).json({
-        message: 'The leave doesnot exist'
+        message: 'The leave doesnot exist',
       });
     }
     if (type == null) {
@@ -97,7 +119,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
       return res.status(400).json({
         message: 'Start Date cannot be after End date',
         endDate,
-        startDate
+        startDate,
       });
     }
     if (leave.status === 'Approved') {
@@ -116,7 +138,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
             message:
               'Start Date cannot be changed to a date that already started',
             CurrentDate,
-            startDate
+            startDate,
           });
         }
 
@@ -124,7 +146,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
           return res.status(400).json({
             message: 'End Date cannot be changed beacause it already passed',
             CurrentDate,
-            endDate
+            endDate,
           });
         }
 
@@ -133,7 +155,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
             message:
               'End Date cannot be changed to a date that already started',
             CurrentDate,
-            endDate
+            endDate,
           });
         }
 
@@ -156,18 +178,6 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
           );
           const leaveDetails = await getLeavesTaken(user);
 
-          // set timezone to kampala
-          // const CurrentDate = moment().tz('Africa/Kampala').format();
-          const endDateMonth = endDate.getMonth();
-
-          // Computing Annual Leave
-          let accruedAnnualLeave;
-          if (endDateMonth === 0) {
-            accruedAnnualLeave = 0;
-          } else {
-            // accruedAnnualLeave = currentMonth * 1.75;
-            accruedAnnualLeave = Math.trunc(endDateMonth * 1.75);
-          }
           const { annualLeaveBF } = user;
 
           const {
@@ -177,7 +187,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
             maternityLeaveTaken,
             paternityLeaveTaken,
             sickLeaveTaken,
-            studyLeaveTaken
+            studyLeaveTaken,
           } = leaveDetails;
 
           // prettier-ignore
@@ -191,7 +201,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
           if (type === 'Paternity') {
             if (user.gender === 'Female') {
               return res.status(400).json({
-                message: 'Paternity leave only given to Gentlemen'
+                message: 'Paternity leave only given to Gentlemen',
               });
             }
             const totalPaternity = paternityLeaveTaken + daysDetails.totalDays;
@@ -201,13 +211,13 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
                 paternityLeaveTaken,
                 daysRequested: daysDetails.totalDays,
                 totalPaternity,
-                paternity
+                paternity,
               });
             }
           } else if (type === 'Home') {
             if (user.type === 'national') {
               return res.status(400).json({
-                message: 'Home leave only given to Expatriates and TCNs'
+                message: 'Home leave only given to Expatriates and TCNs',
               });
             }
             // eslint-disable-next-line operator-linebreak
@@ -221,13 +231,13 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
                 homeLeaveTaken,
                 daysRequested: daysDetails.totalDays,
                 totalHome,
-                totalAcruedAnualLeavePlusAnualLeaveBF
+                totalAcruedAnualLeavePlusAnualLeaveBF,
               });
             }
           } else if (type === 'Maternity') {
             if (user.gender === 'Male') {
               return res.status(400).json({
-                message: 'Maternity leave only given to Ladies'
+                message: 'Maternity leave only given to Ladies',
               });
             }
             const totalMaternity = maternityLeaveTaken + daysDetails.totalDays;
@@ -237,7 +247,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
                 maternityLeaveTaken,
                 daysRequested: daysDetails.totalDays,
                 totalMaternity,
-                maternity
+                maternity,
               });
             }
           } else if (type === 'Sick') {
@@ -248,7 +258,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
                 sickLeaveTaken,
                 daysRequested: daysDetails.totalDays,
                 totalSick,
-                sick
+                sick,
               });
             }
           } else if (type === 'Unpaid') {
@@ -259,7 +269,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
                 unPaidLeaveTaken,
                 daysRequested: daysDetails.totalDays,
                 totalUnpaid,
-                unpaid
+                unpaid,
               });
             }
           } else if (type === 'Study') {
@@ -270,7 +280,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
                 studyLeaveTaken,
                 daysRequested: daysDetails.totalDays,
                 totalStudy,
-                study
+                study,
               });
             }
           } else if (type === 'Annual') {
@@ -285,12 +295,12 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
                 homeLeaveTaken,
                 daysRequested: daysDetails.totalDays,
                 totalAnnual,
-                totalAcruedAnualLeavePlusAnualLeaveBF
+                totalAcruedAnualLeavePlusAnualLeaveBF,
               });
             }
           } else {
             return res.status(400).json({
-              message: 'Invalid Leave type'
+              message: 'Invalid Leave type',
             });
           }
           const message = `Staff Comment:${comment}  System Comment: Leave is being modified outside of approved time`;
@@ -299,7 +309,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
           // change leave details
           await Leave.updateOne(
             {
-              _id: leaveId
+              _id: leaveId,
             },
             {
               // eslint-disable-next-line max-len
@@ -309,8 +319,8 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
                 status,
                 type,
                 comment: message,
-                isModfied: true
-              }
+                isModfied: true,
+              },
             }
           );
           const modLeaves = {
@@ -318,7 +328,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
             startDate: oldStartDate,
             endDate: oldEndDate,
             comment: oldComment,
-            typ: oldType
+            typ: oldType,
           };
           leave.modificationDetails.modLeaves.push(modLeaves);
           await leave.save();
@@ -329,7 +339,7 @@ ${user.fName}  ${user.lName} is requesting to modify their leave. To be off from
                                       `;
           Mailer(from, supervisor.email, subject, textSupervisor, '');
           res.status(200).json({
-            message: 'Leave Modification Request has been sent successfully.'
+            message: 'Leave Modification Request has been sent successfully.',
           });
         } else {
           // leave is still in approved time
@@ -532,7 +542,7 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
         }
       } else {
         return res.status(400).json({
-          message: 'Invalid action for staff leave modification'
+          message: 'Invalid action for staff leave modification',
         });
       }
     } else if (leave.status === 'Taken') {
@@ -569,18 +579,6 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
         const daysDetails = getLeaveDaysNo(startDate, endDate, publicHolidays);
         const leaveDetails = await getLeavesTaken(user);
 
-        // set timezone to kampala
-        // const CurrentDate = moment().tz('Africa/Kampala').format();
-        const endDateMonth = endDate.getMonth();
-
-        // Computing Annual Leave
-        let accruedAnnualLeave;
-        if (endDateMonth === 0) {
-          accruedAnnualLeave = 0;
-        } else {
-          // accruedAnnualLeave = currentMonth * 1.75;
-          accruedAnnualLeave = Math.trunc(endDateMonth * 1.75);
-        }
         const { annualLeaveBF } = user;
 
         const {
@@ -590,7 +588,7 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
           maternityLeaveTaken,
           paternityLeaveTaken,
           sickLeaveTaken,
-          studyLeaveTaken
+          studyLeaveTaken,
         } = leaveDetails;
 
         // prettier-ignore
@@ -604,7 +602,7 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
         if (type === 'Paternity') {
           if (user.gender === 'Female') {
             return res.status(400).json({
-              message: 'Paternity leave only given to Gentlemen'
+              message: 'Paternity leave only given to Gentlemen',
             });
           }
           const totalPaternity = paternityLeaveTaken + daysDetails.totalDays;
@@ -614,13 +612,13 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
               paternityLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalPaternity,
-              paternity
+              paternity,
             });
           }
         } else if (type === 'Home') {
           if (user.type === 'national') {
             return res.status(400).json({
-              message: 'Home leave only given to Expatriates and TCNs'
+              message: 'Home leave only given to Expatriates and TCNs',
             });
           }
           // eslint-disable-next-line operator-linebreak
@@ -634,13 +632,13 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
               homeLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalHome,
-              totalAcruedAnualLeavePlusAnualLeaveBF
+              totalAcruedAnualLeavePlusAnualLeaveBF,
             });
           }
         } else if (type === 'Maternity') {
           if (user.gender === 'Male') {
             return res.status(400).json({
-              message: 'Maternity leave only given to Ladies'
+              message: 'Maternity leave only given to Ladies',
             });
           }
           const totalMaternity = maternityLeaveTaken + daysDetails.totalDays;
@@ -650,7 +648,7 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
               maternityLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalMaternity,
-              maternity
+              maternity,
             });
           }
         } else if (type === 'Sick') {
@@ -661,7 +659,7 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
               sickLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalSick,
-              sick
+              sick,
             });
           }
         } else if (type === 'Unpaid') {
@@ -672,7 +670,7 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
               unPaidLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalUnpaid,
-              unpaid
+              unpaid,
             });
           }
         } else if (type === 'Study') {
@@ -683,7 +681,7 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
               studyLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalStudy,
-              study
+              study,
             });
           }
         } else if (type === 'Annual') {
@@ -698,12 +696,12 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
               homeLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalAnnual,
-              totalAcruedAnualLeavePlusAnualLeaveBF
+              totalAcruedAnualLeavePlusAnualLeaveBF,
             });
           }
         } else {
           return res.status(400).json({
-            message: 'Invalid Leave type'
+            message: 'Invalid Leave type',
           });
         }
         const message = `Staff Comment:${comment}  System Comment(s): ${msg}`;
@@ -717,7 +715,7 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
           const cd = await User.findOne({ 'roles.countryDirector': true });
           if (!cd) {
             return res.status(400).json({
-              message: 'Country Director is not Registered in the system'
+              message: 'Country Director is not Registered in the system',
             });
           }
 
@@ -725,7 +723,7 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
           const status = 'Pending Change';
           await Leave.updateOne(
             {
-              _id: leaveId
+              _id: leaveId,
             },
             {
               // eslint-disable-next-line max-len
@@ -737,9 +735,9 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
                   endDate,
                   type,
                   comment: message,
-                  status: 'Pending'
-                }
-              }
+                  status: 'Pending',
+                },
+              },
             }
           );
           // prettier-ignore
@@ -751,7 +749,7 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken leave. New Date
           Mailer(from, supervisor.email, subject, textSupervisor, cc);
 
           res.status(200).json({
-            message: 'Leave Modification request sent successfully.'
+            message: 'Leave Modification request sent successfully.',
           });
         } else {
           // Leave not home
@@ -763,7 +761,7 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken leave. New Date
           // change leave details
           await Leave.updateOne(
             {
-              _id: leaveId
+              _id: leaveId,
             },
             {
               // eslint-disable-next-line max-len
@@ -775,9 +773,9 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken leave. New Date
                   endDate,
                   type,
                   comment: message,
-                  status: 'Pending'
-                }
-              }
+                  status: 'Pending',
+                },
+              },
             }
           );
           // prettier-ignore
@@ -789,7 +787,7 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken leave. New Date
           Mailer(from, supervisor.email, subject, textSupervisor, cc);
 
           res.status(200).json({
-            message: 'Leave Modification request sent successfully.'
+            message: 'Leave Modification request sent successfully.',
           });
         }
       } else if (action === 'cancelLeave') {
@@ -813,11 +811,11 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken leave Which was
         Mailer(from, supervisor.email, subject, textSupervisor, '');
 
         res.status(200).json({
-          message: 'Cancellation Pending Supervisor Approval'
+          message: 'Cancellation Pending Supervisor Approval',
         });
       } else {
         return res.status(400).json({
-          message: 'Invalid action for staff leave modification'
+          message: 'Invalid action for staff leave modification',
         });
       }
     } else if (leave.status === 'Pending Supervisor') {
@@ -836,7 +834,7 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken leave Which was
             message:
               'Start Date cannot be changed to a date that already started',
             CurrentDate,
-            startDate
+            startDate,
           });
         }
 
@@ -844,7 +842,7 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken leave Which was
           return res.status(400).json({
             message: 'End Date cannot be changed beacause it already passed',
             CurrentDate,
-            endDate
+            endDate,
           });
         }
 
@@ -853,7 +851,7 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken leave Which was
             message:
               'End Date cannot be changed to a date that already started',
             CurrentDate,
-            endDate
+            endDate,
           });
         }
         // chk if staff is an expat or tcn to allow cd notication
@@ -862,18 +860,6 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken leave Which was
         const daysDetails = getLeaveDaysNo(startDate, endDate, publicHolidays);
         const leaveDetails = await getLeavesTaken(user);
 
-        // set timezone to kampala
-        // const CurrentDate = moment().tz('Africa/Kampala').format();
-        const endDateMonth = endDate.getMonth();
-
-        // Computing Annual Leave
-        let accruedAnnualLeave;
-        if (endDateMonth === 0) {
-          accruedAnnualLeave = 0;
-        } else {
-          // accruedAnnualLeave = currentMonth * 1.75;
-          accruedAnnualLeave = Math.trunc(endDateMonth * 1.75);
-        }
         const { annualLeaveBF } = user;
 
         const {
@@ -883,7 +869,7 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken leave Which was
           maternityLeaveTaken,
           paternityLeaveTaken,
           sickLeaveTaken,
-          studyLeaveTaken
+          studyLeaveTaken,
         } = leaveDetails;
 
         // prettier-ignore
@@ -897,7 +883,7 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken leave Which was
         if (type === 'Paternity') {
           if (user.gender === 'Female') {
             return res.status(400).json({
-              message: 'Paternity leave only given to Gentlemen'
+              message: 'Paternity leave only given to Gentlemen',
             });
           }
           const totalPaternity = paternityLeaveTaken + daysDetails.totalDays;
@@ -907,13 +893,13 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken leave Which was
               paternityLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalPaternity,
-              paternity
+              paternity,
             });
           }
         } else if (type === 'Home') {
           if (user.type === 'national') {
             return res.status(400).json({
-              message: 'Home leave only given to Expatriates and TCNs'
+              message: 'Home leave only given to Expatriates and TCNs',
             });
           }
           // eslint-disable-next-line operator-linebreak
@@ -927,13 +913,13 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken leave Which was
               homeLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalHome,
-              totalAcruedAnualLeavePlusAnualLeaveBF
+              totalAcruedAnualLeavePlusAnualLeaveBF,
             });
           }
         } else if (type === 'Maternity') {
           if (user.gender === 'Male') {
             return res.status(400).json({
-              message: 'Maternity leave only given to Ladies'
+              message: 'Maternity leave only given to Ladies',
             });
           }
           const totalMaternity = maternityLeaveTaken + daysDetails.totalDays;
@@ -943,7 +929,7 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken leave Which was
               maternityLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalMaternity,
-              maternity
+              maternity,
             });
           }
         } else if (type === 'Sick') {
@@ -954,7 +940,7 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken leave Which was
               sickLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalSick,
-              sick
+              sick,
             });
           }
         } else if (type === 'Unpaid') {
@@ -965,7 +951,7 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken leave Which was
               unPaidLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalUnpaid,
-              unpaid
+              unpaid,
             });
           }
         } else if (type === 'Study') {
@@ -976,7 +962,7 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken leave Which was
               studyLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalStudy,
-              study
+              study,
             });
           }
         } else if (type === 'Annual') {
@@ -991,18 +977,18 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken leave Which was
               homeLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalAnnual,
-              totalAcruedAnualLeavePlusAnualLeaveBF
+              totalAcruedAnualLeavePlusAnualLeaveBF,
             });
           }
         } else {
           return res.status(400).json({
-            message: 'Invalid Leave type'
+            message: 'Invalid Leave type',
           });
         }
 
         await Leave.updateOne(
           {
-            _id: leaveId
+            _id: leaveId,
           },
           {
             // eslint-disable-next-line max-len
@@ -1011,15 +997,15 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken leave Which was
               endDate,
               type,
               comment,
-              isModfied: true
-            }
+              isModfied: true,
+            },
           }
         );
         const modLeaves = {
           startDate: oldStartDate,
           endDate: oldEndDate,
           comment: oldComment,
-          typ: oldType
+          typ: oldType,
         };
         leave.modificationDetails.modLeaves.push(modLeaves);
         await leave.save();
@@ -1035,7 +1021,7 @@ ${user.fName}  ${user.lName} has modified their Leave request, now asking to be 
         Mailer(from, supervisor.email, subject, textSupervisor, '');
 
         res.status(200).json({
-          message: 'Leave has been Modified successfully.'
+          message: 'Leave has been Modified successfully.',
         });
       } else if (action === 'cancelLeave') {
         // prettier-ignore
@@ -1056,18 +1042,18 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
         Mailer(from, supervisor.email, subject, textSupervisor, '');
 
         res.status(200).json({
-          message: 'Leave has been Cancelled'
+          message: 'Leave has been Cancelled',
         });
       } else {
         return res.status(400).json({
-          message: 'Invalid action for staff leave modification'
+          message: 'Invalid action for staff leave modification',
         });
       }
     } else if (leave.status === 'Pending Country Director') {
       const cd = await User.findOne({ 'roles.countryDirector': true });
       if (!cd) {
         return res.status(400).json({
-          message: 'Country Director is not Registered in the system'
+          message: 'Country Director is not Registered in the system',
         });
       }
       if (action === 'changeLeave') {
@@ -1085,7 +1071,7 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
             message:
               'Start Date cannot be changed to a date that already started',
             CurrentDate,
-            startDate
+            startDate,
           });
         }
 
@@ -1093,7 +1079,7 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
           return res.status(400).json({
             message: 'End Date cannot be changed beacause it already passed',
             CurrentDate,
-            endDate
+            endDate,
           });
         }
 
@@ -1102,7 +1088,7 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
             message:
               'End Date cannot be changed to a date that already started',
             CurrentDate,
-            endDate
+            endDate,
           });
         }
         // chk if staff is an expat or tcn to allow cd notication
@@ -1111,18 +1097,6 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
         const daysDetails = getLeaveDaysNo(startDate, endDate, publicHolidays);
         const leaveDetails = await getLeavesTaken(user);
 
-        // set timezone to kampala
-        // const CurrentDate = moment().tz('Africa/Kampala').format();
-        const endDateMonth = endDate.getMonth();
-
-        // Computing Annual Leave
-        let accruedAnnualLeave;
-        if (endDateMonth === 0) {
-          accruedAnnualLeave = 0;
-        } else {
-          // accruedAnnualLeave = currentMonth * 1.75;
-          accruedAnnualLeave = Math.trunc(endDateMonth * 1.75);
-        }
         const { annualLeaveBF } = user;
 
         const {
@@ -1132,7 +1106,7 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
           maternityLeaveTaken,
           paternityLeaveTaken,
           sickLeaveTaken,
-          studyLeaveTaken
+          studyLeaveTaken,
         } = leaveDetails;
 
         // prettier-ignore
@@ -1146,7 +1120,7 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
         if (type === 'Paternity') {
           if (user.gender === 'Female') {
             return res.status(400).json({
-              message: 'Paternity leave only given to Gentlemen'
+              message: 'Paternity leave only given to Gentlemen',
             });
           }
           const totalPaternity = paternityLeaveTaken + daysDetails.totalDays;
@@ -1156,13 +1130,13 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
               paternityLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalPaternity,
-              paternity
+              paternity,
             });
           }
         } else if (type === 'Home') {
           if (user.type === 'national') {
             return res.status(400).json({
-              message: 'Home leave only given to Expatriates and TCNs'
+              message: 'Home leave only given to Expatriates and TCNs',
             });
           }
           // eslint-disable-next-line operator-linebreak
@@ -1176,13 +1150,13 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
               homeLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalHome,
-              totalAcruedAnualLeavePlusAnualLeaveBF
+              totalAcruedAnualLeavePlusAnualLeaveBF,
             });
           }
         } else if (type === 'Maternity') {
           if (user.gender === 'Male') {
             return res.status(400).json({
-              message: 'Maternity leave only given to Ladies'
+              message: 'Maternity leave only given to Ladies',
             });
           }
           const totalMaternity = maternityLeaveTaken + daysDetails.totalDays;
@@ -1192,7 +1166,7 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
               maternityLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalMaternity,
-              maternity
+              maternity,
             });
           }
         } else if (type === 'Sick') {
@@ -1203,7 +1177,7 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
               sickLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalSick,
-              sick
+              sick,
             });
           }
         } else if (type === 'Unpaid') {
@@ -1214,7 +1188,7 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
               unPaidLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalUnpaid,
-              unpaid
+              unpaid,
             });
           }
         } else if (type === 'Study') {
@@ -1225,7 +1199,7 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
               studyLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalStudy,
-              study
+              study,
             });
           }
         } else if (type === 'Annual') {
@@ -1240,18 +1214,18 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
               homeLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalAnnual,
-              totalAcruedAnualLeavePlusAnualLeaveBF
+              totalAcruedAnualLeavePlusAnualLeaveBF,
             });
           }
         } else {
           return res.status(400).json({
-            message: 'Invalid Leave type'
+            message: 'Invalid Leave type',
           });
         }
 
         await Leave.updateOne(
           {
-            _id: leaveId
+            _id: leaveId,
           },
           {
             // eslint-disable-next-line max-len
@@ -1261,15 +1235,15 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
               status: 'Pending Supervisor',
               type,
               comment,
-              isModfied: true
-            }
+              isModfied: true,
+            },
           }
         );
         const modLeaves = {
           startDate: oldStartDate,
           endDate: oldEndDate,
           comment: oldComment,
-          typ: oldType
+          typ: oldType,
         };
         leave.modificationDetails.modLeaves.push(modLeaves);
         await leave.save();
@@ -1283,7 +1257,7 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
         Mailer(from, supervisor.email, subject, textSupervisor, cc);
 
         res.status(200).json({
-          message: 'Leave has modified successfully.'
+          message: 'Leave has modified successfully.',
         });
       } else if (action === 'cancelLeave') {
         // prettier-ignore
@@ -1303,16 +1277,16 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
         const cc = `${cd.email},${hr.email}`;
         Mailer(from, supervisor.email, subject, textSupervisor, cc);
         res.status(200).json({
-          message: 'Leave has been Cancelled'
+          message: 'Leave has been Cancelled',
         });
       } else {
         return res.status(400).json({
-          message: 'Invalid action for staff leave modification'
+          message: 'Invalid action for staff leave modification',
         });
       }
     } else {
       return res.status(400).json({
-        message: 'Invalid Leave status for leave modification'
+        message: 'Invalid Leave status for leave modification',
       });
     }
   } catch (err) {
@@ -1320,7 +1294,7 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
     res.status(500).json({
       message: 'Error Handling Leave',
       msg: err.message,
-      err
+      err,
     });
   }
 };
