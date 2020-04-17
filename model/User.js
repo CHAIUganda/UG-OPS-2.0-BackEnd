@@ -45,7 +45,7 @@ const UserSchema = mongoose.Schema({
     required: true,
   },
   type: {
-    // national TCN expat
+    // national tcn expat
     type: String,
     required: true,
   },

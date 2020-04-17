@@ -3,6 +3,7 @@ const log4js = require('log4js');
 const takeLeaves = require('../controller/leave/takeLeaves');
 const birthDays = require('../controller/hr/birthDays');
 const contractRenewalInvite = require('../controller/hr/contractRenewalInvite');
+const workPermitRenewalReminder = require('../controller/hr/workPermitRenewalReminder');
 
 log4js.configure({
   appenders: { Timed: { type: 'file', filename: './log/logs.log' } },
@@ -16,6 +17,7 @@ const schedule = new CronJob(
     console.log('Checking for birthdays and Ripe leaves');
     takeLeaves();
     contractRenewalInvite();
+    workPermitRenewalReminder();
     birthDays();
 
     // logger.error('Cheese is too ripe!');

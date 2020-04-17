@@ -1,19 +1,27 @@
 const debug = require('debug')('server');
 const moment = require('moment-timezone');
-const ics = require('ics');
 const log4js = require('log4js');
-const Contract = require('../../model/Contract');
+const WorkPermit = require('../../model/WorkPermit');
 const Program = require('../../model/Program');
 const User = require('../../model/User');
 const Mailer = require('../../helpers/Mailer');
 
-const contractRenewalInvite = async () => {
+const workPermitRenewalReminder = async () => {
   try {
     const logger = log4js.getLogger('Timed');
     const expiryIn = 90;
     const expiryIn2 = 60;
     const expiryIn3 = 30;
-    const user = await User.find({});
+    const user = await User.find({
+      $or: [
+        {
+          type: 'tcn',
+        },
+        {
+          type: 'expat',
+        },
+      ],
+    });
     user.password = undefined;
     // check if HR exists in System
     const hr = await User.findOne({ 'roles.hr': true });
@@ -27,7 +35,7 @@ const contractRenewalInvite = async () => {
       throw errorMessage;
     }
     // initialize emailing necessities
-    const subject = 'Uganda Operations Contracts';
+    const subject = 'Uganda Operations WorkPermits';
     const from = 'UGOperations@clintonhealthaccess.org';
     const footer = `
 
@@ -60,13 +68,13 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
             );
             recurseProcessLeave(controller + 1, arr);
           } else {
-            const contract = await Contract.findOne({
+            const workPermit = await WorkPermit.findOne({
               _userId: _id,
-              contractStatus: 'ACTIVE',
+              workPermitStatus: 'ACTIVE',
             });
 
-            if (!contract) {
-              logger.error(`${lName} ${fName} Has no Active Contract`);
+            if (!workPermit) {
+              logger.error(`${lName} ${fName} Has no Active Work Permit`);
               recurseProcessLeave(controller + 1, arr);
             } else {
               // check if Supervisor exists in System
@@ -79,7 +87,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
                 );
                 recurseProcessLeave(controller + 1, arr);
               } else {
-                let endDate = contract.contractEndDate;
+                let endDate = workPermit.workPermitEndDate;
                 // set timezone to kampala
                 const CurrentDate = moment().tz('Africa/Kampala').format();
                 const today = new Date(CurrentDate);
@@ -90,71 +98,19 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
                 if (
                   // prettier-ignore
                   // eslint-disable-next-line
-                  (contract.contractDismiss == false && contract.contractSnooze == false) &&
+                  (workPermit.wpDismiss == false && workPermit.wpSnooze == false) &&
                 // prettier-ignore
                 // eslint-disable-next-line
                 (diff == expiryIn || diff == expiryIn2 || diff == expiryIn3)
                 ) {
                   // email to staff
                   // prettier-ignore
-                  const textUser = `Hello  ${supervisor.fName}, 
+                  const textUser = `Hello  ${hr.fName}, 
         
-${fName} ${lName}'s Contract will expiry in ${diff} days as of ${today.toDateString()}. This is an invitation to discuss their contract renewal. Please find attached the calender Invite "Add to your Calender"${footer}.
+${fName} ${lName}'s Work Permit will expiry in ${diff} days as of ${today.toDateString()}. This is a remainder to start its renewal process."${footer}.
                                                     `;
-                  const cc = `${programMngr.email},${hr.email}`;
-                  // Create new Calendar and set optional fields
-
-                  // // create a new event
-                  const meetstartDate = moment()
-                    .tz('Africa/Kampala')
-                    .format('YYYY-M-D-H-m')
-                    .split('-');
-                  const event = {
-                    start: meetstartDate,
-                    duration: { hours: 1, minutes: 30 },
-                    title: 'Staff Contract Renewal Invite',
-                    description: `${fName} ${lName}'s Contract will expiry in ${diff} days, this is an invite to initiate their contract renewal process`,
-                    location: 'Lawns',
-                    url: 'https://ugops.clintonhealthaccess.org',
-                    geo: { lat: 0.34002, lon: 32.591718 },
-                    categories: ['Chai', '8 Moyo Close', 'Kampala'],
-                    status: 'CONFIRMED',
-                    busyStatus: 'BUSY',
-                    organizer: {
-                      name: 'CHAI Uganda Operations',
-                      email: 'UGOperations@clintonhealthaccess.org',
-                    },
-                    attendees: [
-                      {
-                        name: `${programMngr.fName} ${programMngr.lName}`,
-                        email: programMngr.email,
-                        rsvp: true,
-                        partstat: 'ACCEPTED',
-                        role: 'REQ-PARTICIPANT',
-                      },
-                      {
-                        name: `${hr.fName} ${hr.lName}`,
-                        email: hr.email,
-                        role: 'REQ-PARTICIPANT',
-                      },
-                    ],
-                  };
-                  let content;
-                  await ics.createEvent(event, (error, value) => {
-                    if (error) {
-                      console.log(error);
-                      return;
-                    }
-                    content = value;
-                  });
-                  Mailer(
-                    from,
-                    programMngr.email,
-                    subject,
-                    textUser,
-                    cc,
-                    content
-                  );
+                  const cc = `${programMngr.email},${programMngr.email}`;
+                  Mailer(from, hr.email, subject, textUser, cc);
                   recurseProcessLeave(controller + 1, arr);
                 } else {
                   recurseProcessLeave(controller + 1, arr);
@@ -176,4 +132,4 @@ ${fName} ${lName}'s Contract will expiry in ${diff} days as of ${today.toDateStr
   }
 };
 
-module.exports = contractRenewalInvite;
+module.exports = workPermitRenewalReminder;

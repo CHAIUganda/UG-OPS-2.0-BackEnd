@@ -127,4 +127,32 @@ router.post(
   hrController.deleteProgram
 );
 
+/**
+ * @method - POST
+ * @description - dismiss or snooze contract expiry notifications
+ * @param - /handleContractNotifications
+ */
+router.post(
+  '/handleContractNotifications',
+  [
+    // input validations
+    check('contractId', 'Please Enter a contractId').not().isEmpty(),
+  ],
+  hrController.handleContractNotifications
+);
+
+/**
+ * @method - POST
+ * @description - dismiss or snooze work permit expiry notifications
+ * @param - /handleWPNotifications
+ */
+router.post(
+  '/handleWPNotifications',
+  [
+    // input validations
+    check('workPermitId', 'Please Enter a workPermitId').not().isEmpty(),
+  ],
+  hrController.handleWPNotifications
+);
+
 module.exports = router;
