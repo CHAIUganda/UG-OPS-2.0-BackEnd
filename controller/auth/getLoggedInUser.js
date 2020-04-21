@@ -1,6 +1,8 @@
 const debug = require('debug')('server');
 const Program = require('../../model/Program');
 const User = require('../../model/User');
+const Contract = require('../../model/Contract');
+const WorkPermit = require('../../model/WorkPermit');
 // Get LoggedIn User
 const getLoggedInUser = async (req, res) => {
   try {
@@ -27,22 +29,26 @@ const getLoggedInUser = async (req, res) => {
     }
 
     const {
-      admin,
-      bankAccounts,
-      leaves,
-      createdAt,
       _id,
       fName,
       lName,
-      supervisorEmail,
       gender,
       roles,
       title,
+      birthDate,
       oNames,
       email,
       type,
       level,
       team,
+      annualLeaveBF,
+      bankAccounts,
+      nssfNumber,
+      tinNumber,
+      admin,
+      leaves,
+      createdAt,
+      supervisorEmail,
     } = user;
 
     const userSupervisor = await User.findOne({
@@ -64,6 +70,53 @@ const getLoggedInUser = async (req, res) => {
         email: userSupervisor.email,
       };
     }
+    let workPermitStartDate;
+    let workPermitId;
+    let workPermitEndDate;
+    let workPermitStatus;
+
+    if (type === 'expat' || type === 'tcn') {
+      const workPermit = await WorkPermit.findOne({
+        _userId: _id,
+        workPermitStatus: 'ACTIVE',
+      });
+
+      if (!workPermit) {
+        workPermitId = 'NA';
+        workPermitStartDate = 'NA';
+        workPermitEndDate = 'NA';
+        workPermitStatus = 'NA';
+      } else {
+        workPermitId = workPermit._id;
+        workPermitStartDate = workPermit.workPermitStartDate;
+        workPermitEndDate = workPermit.workPermitEndDate;
+        workPermitStatus = workPermit.workPermitStatus;
+      }
+    }
+
+    const contract = await Contract.findOne({
+      _userId: _id,
+      contractStatus: 'ACTIVE',
+    });
+
+    let contractStartDate;
+    let contractEndDate;
+    let contractType;
+    let contractStatus;
+    let contractId;
+    if (!contract) {
+      contractStartDate = null;
+      contractEndDate = null;
+      contractType = null;
+      contractStatus = null;
+      contractId = null;
+    } else {
+      contractStartDate = contract.contractStartDate;
+      contractEndDate = contract.contractEndDate;
+      contractType = contract.contractType;
+      contractStatus = contract.contractStatus;
+      contractId = contract._id;
+    }
 
     const person = {
       admin,
@@ -72,8 +125,12 @@ const getLoggedInUser = async (req, res) => {
       bankAccounts,
       _id,
       fName,
+      birthDate,
       lName,
       supervisorEmail,
+      annualLeaveBF,
+      nssfNumber,
+      tinNumber,
       roles,
       gender,
       title,
@@ -86,6 +143,15 @@ const getLoggedInUser = async (req, res) => {
       level,
       team,
       supervisorDetails,
+      contractId,
+      contractStartDate,
+      contractEndDate,
+      contractType,
+      contractStatus,
+      workPermitId,
+      workPermitStartDate,
+      workPermitEndDate,
+      workPermitStatus,
     };
 
     res.json(person);
