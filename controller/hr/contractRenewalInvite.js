@@ -42,7 +42,6 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
     const recurseProcessLeave = async (controller, arr) => {
       if (controller < arr.length) {
         // eslint-disable-next-line object-curly-newline
-        // eslint-disable-next-line object-curly-newline
         const { _id, fName, lName, programId, supervisorEmail } = arr[
           controller
         ];
@@ -104,7 +103,7 @@ ${fName} ${lName}'s Contract will expiry in ${diff} days as of ${today.toDateStr
                   const cc = `${programMngr.email},${hr.email}`;
                   // Create new Calendar and set optional fields
 
-                  // // create a new event
+                  // create a new event
                   const meetstartDate = moment()
                     .tz('Africa/Kampala')
                     .format('YYYY-M-D-H-m')
@@ -149,7 +148,7 @@ ${fName} ${lName}'s Contract will expiry in ${diff} days as of ${today.toDateStr
                   });
                   Mailer(
                     from,
-                    programMngr.email,
+                    supervisor.email,
                     subject,
                     textUser,
                     cc,

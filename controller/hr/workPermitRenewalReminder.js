@@ -109,7 +109,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
         
 ${fName} ${lName}'s Work Permit will expiry in ${diff} days as of ${today.toDateString()}. This is a remainder to start its renewal process."${footer}.
                                                     `;
-                  const cc = `${programMngr.email},${programMngr.email}`;
+                  const cc = `${programMngr.email},${supervisor.email}`;
                   Mailer(from, hr.email, subject, textUser, cc);
                   recurseProcessLeave(controller + 1, arr);
                 } else {
