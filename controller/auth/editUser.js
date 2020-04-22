@@ -200,7 +200,7 @@ const editUser = async (req, res) => {
       (user.type === 'expat' || user.type === 'tcn')
     ) {
       const workPermit = await WorkPermit.findOne({
-        _id: contractId,
+        _id: workPermitId,
       });
 
       if (!workPermit) {
