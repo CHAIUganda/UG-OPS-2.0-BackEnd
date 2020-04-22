@@ -10,7 +10,6 @@ const getLoggedInUser = async (req, res) => {
     const user = await User.findById(req.user.id);
     // dont return pwd and id
     user.password = undefined;
-    user._id = undefined;
     let program;
     let programShortForm;
     const { programId } = user;
