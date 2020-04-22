@@ -14,22 +14,22 @@ const getPrograms = async (req, res) => {
         const { _id, name, programManagerId, shortForm } = arr[controller];
 
         const user = await User.findOne({
-          _id: programManagerId
+          _id: programManagerId,
         });
         let programManagerDetails;
         if (!user) {
           programManagerDetails = {
-            Supervisor_id: null,
-            fName: null,
-            lName: null,
-            email: null
+            Supervisor_id: 'NA',
+            fName: 'NA',
+            lName: 'NA',
+            email: 'NA',
           };
         } else {
           programManagerDetails = {
             _id: user._id,
             fName: user.fName,
             lName: user.lName,
-            email: user.email
+            email: user.email,
           };
         }
 
@@ -38,7 +38,7 @@ const getPrograms = async (req, res) => {
           name,
           shortForm,
           programManagerId,
-          programManagerDetails
+          programManagerDetails,
         };
 
         combinedArray.push(programRemade);

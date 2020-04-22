@@ -64,10 +64,10 @@ const getUsersContracts = async (req, res) => {
           let supervisorDetails;
           if (!supervisor) {
             supervisorDetails = {
-              Supervisor_id: null,
-              fName: null,
-              lName: null,
-              email: null,
+              Supervisor_id: 'NA',
+              fName: 'NA',
+              lName: 'NA',
+              email: 'NA',
             };
           } else {
             supervisorDetails = {
@@ -99,10 +99,10 @@ const getUsersContracts = async (req, res) => {
             });
             if (!userPM) {
               programManagerDetails = {
-                _id: null,
-                fName: null,
-                lName: null,
-                email: null,
+                _id: 'NA',
+                fName: 'NA',
+                lName: 'NA',
+                email: 'NA',
               };
             } else {
               programManagerDetails = {

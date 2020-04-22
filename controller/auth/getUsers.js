@@ -81,11 +81,11 @@ const getUsers = async (req, res) => {
         let contractStatus;
         let contractId;
         if (!contract) {
-          contractStartDate = null;
-          contractEndDate = null;
-          contractType = null;
-          contractStatus = null;
-          contractId = null;
+          contractStartDate = 'NA';
+          contractEndDate = 'NA';
+          contractType = 'NA';
+          contractStatus = 'NA';
+          contractId = 'NA';
         } else {
           contractStartDate = contract.contractStartDate;
           contractEndDate = contract.contractEndDate;
@@ -101,10 +101,10 @@ const getUsers = async (req, res) => {
         let supervisorDetails;
         if (!supervisor) {
           supervisorDetails = {
-            Supervisor_id: null,
-            fName: null,
-            lName: null,
-            email: null,
+            Supervisor_id: 'NA',
+            fName: 'NA',
+            lName: 'NA',
+            email: 'NA',
           };
         } else {
           supervisorDetails = {

@@ -116,10 +116,10 @@ const getAllStaffLeavesTaken = async (req, res) => {
         let supervisorDetails;
         if (!userSupervisor) {
           supervisorDetails = {
-            Supervisor_id: null,
-            fName: null,
-            lName: null,
-            email: null,
+            Supervisor_id: 'NA',
+            fName: 'NA',
+            lName: 'NA',
+            email: 'NA',
           };
         } else {
           supervisorDetails = {

@@ -20,7 +20,7 @@ const handleWPNotifications = async (req, res) => {
     });
     if (!workPermit) {
       return res.status(400).json({
-        message: 'This contract  doesnot exist',
+        message: 'This Work Permit  doesnot exist',
       });
     }
     if (wpDismiss == null) {
