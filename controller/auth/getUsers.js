@@ -48,10 +48,10 @@ const getUsers = async (req, res) => {
           });
 
           if (!workPermit) {
-            workPermitId = 'NA';
-            workPermitStartDate = 'NA';
-            workPermitEndDate = 'NA';
-            workPermitStatus = 'NA';
+            workPermitId = null;
+            workPermitStartDate = null;
+            workPermitEndDate = null;
+            workPermitStatus = null;
           } else {
             workPermitId = workPermit._id;
             workPermitStartDate = workPermit.workPermitStartDate;
