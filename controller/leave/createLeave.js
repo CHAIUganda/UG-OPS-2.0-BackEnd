@@ -83,8 +83,8 @@ const createLeave = async (req, res) => {
     });
 
     if (!userProgram) {
-      program = 'NA';
-      programShortForm = 'NA';
+      program = null;
+      programShortForm = null;
       // eslint-disable-next-line no-else-return
     } else {
       program = userProgram.name;

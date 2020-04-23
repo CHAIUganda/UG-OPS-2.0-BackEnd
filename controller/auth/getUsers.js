@@ -64,8 +64,8 @@ const getUsers = async (req, res) => {
         });
 
         if (!staffProgram) {
-          program = 'NA';
-          programShortForm = 'NA';
+          program = null;
+          programShortForm = null;
         } else {
           program = staffProgram.name;
           programShortForm = staffProgram.shortForm;
@@ -81,11 +81,11 @@ const getUsers = async (req, res) => {
         let contractStatus;
         let contractId;
         if (!contract) {
-          contractStartDate = 'NA';
-          contractEndDate = 'NA';
-          contractType = 'NA';
-          contractStatus = 'NA';
-          contractId = 'NA';
+          contractStartDate = null;
+          contractEndDate = null;
+          contractType = null;
+          contractStatus = null;
+          contractId = null;
         } else {
           contractStartDate = contract.contractStartDate;
           contractEndDate = contract.contractEndDate;
@@ -101,10 +101,10 @@ const getUsers = async (req, res) => {
         let supervisorDetails;
         if (!supervisor) {
           supervisorDetails = {
-            Supervisor_id: 'NA',
-            fName: 'NA',
-            lName: 'NA',
-            email: 'NA',
+            Supervisor_id: null,
+            fName: null,
+            lName: null,
+            email: null,
           };
         } else {
           supervisorDetails = {

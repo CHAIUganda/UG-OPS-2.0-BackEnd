@@ -38,8 +38,8 @@ const getAllStaffLeavesTaken = async (req, res) => {
         });
 
         if (!userProgram) {
-          Leaveprogram = 'NA';
-          LeaveprogramShortForm = 'NA';
+          Leaveprogram = null;
+          LeaveprogramShortForm = null;
           // eslint-disable-next-line no-else-return
         } else {
           Leaveprogram = userProgram.name;
@@ -116,10 +116,10 @@ const getAllStaffLeavesTaken = async (req, res) => {
         let supervisorDetails;
         if (!userSupervisor) {
           supervisorDetails = {
-            Supervisor_id: 'NA',
-            fName: 'NA',
-            lName: 'NA',
-            email: 'NA',
+            Supervisor_id: null,
+            fName: null,
+            lName: null,
+            email: null,
           };
         } else {
           supervisorDetails = {

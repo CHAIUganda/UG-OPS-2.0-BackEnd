@@ -19,10 +19,10 @@ const getPrograms = async (req, res) => {
         let programManagerDetails;
         if (!user) {
           programManagerDetails = {
-            Supervisor_id: 'NA',
-            fName: 'NA',
-            lName: 'NA',
-            email: 'NA',
+            Supervisor_id: null,
+            fName: null,
+            lName: null,
+            email: null,
           };
         } else {
           programManagerDetails = {

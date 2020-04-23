@@ -233,6 +233,22 @@ const editUser = async (req, res) => {
         }
       );
     }
+    if (
+      // eslint-disable-next-line operator-linebreak
+      workPermitId == null &&
+      (user.type === 'expat' || user.type === 'tcn')
+    ) {
+      // create user WP
+      const workpermit = new WorkPermit({
+        _userId: user._id,
+        workPermitStartDate,
+        workPermitEndDate,
+        workPermitStatus,
+      });
+
+      await workpermit.save();
+    }
+
     res
       .status(201)
       .json({ message: 'User details have been Modified successfully' });

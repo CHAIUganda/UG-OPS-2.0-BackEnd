@@ -144,7 +144,7 @@ const registerUser = async (req, res) => {
     await contract.save();
     await user.save();
     if (user.type === 'expat' || user.type === 'tcn') {
-      // create user contract
+      // create user WP
       const workpermit = new WorkPermit({
         _userId: user._id,
         workPermitStartDate,

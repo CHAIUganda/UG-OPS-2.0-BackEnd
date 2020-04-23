@@ -108,8 +108,8 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
     });
 
     if (!userProgram) {
-      Leaveprogram = 'NA';
-      LeaveprogramShortForm = 'NA';
+      Leaveprogram = null;
+      LeaveprogramShortForm = null;
       // eslint-disable-next-line no-else-return
     } else {
       Leaveprogram = userProgram.program;

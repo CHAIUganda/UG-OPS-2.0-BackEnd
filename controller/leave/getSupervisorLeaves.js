@@ -59,8 +59,8 @@ const getSupervisorLeaves = async (req, res) => {
         });
 
         if (!userProgram) {
-          Leaveprogram = 'NA';
-          LeaveprogramShortForm = 'NA';
+          Leaveprogram = null;
+          LeaveprogramShortForm = null;
           // eslint-disable-next-line no-else-return
         } else {
           Leaveprogram = userProgram.name;
@@ -128,8 +128,8 @@ const getSupervisorLeaves = async (req, res) => {
               });
 
               if (!userProgram) {
-                Leaveprogram = 'NA';
-                LeaveprogramShortForm = 'NA';
+                Leaveprogram = null;
+                LeaveprogramShortForm = null;
                 // eslint-disable-next-line no-else-return
               } else {
                 Leaveprogram = userProgram.name;

@@ -19,8 +19,8 @@ const getLoggedInUser = async (req, res) => {
     });
 
     if (!userProgram) {
-      program = 'NA';
-      programShortForm = 'NA';
+      program = null;
+      programShortForm = null;
       // eslint-disable-next-line no-else-return
     } else {
       program = userProgram.name;
@@ -56,10 +56,10 @@ const getLoggedInUser = async (req, res) => {
     let supervisorDetails;
     if (!userSupervisor) {
       supervisorDetails = {
-        Supervisor_id: 'NA',
-        fName: 'NA',
-        lName: 'NA',
-        email: 'NA',
+        Supervisor_id: null,
+        fName: null,
+        lName: null,
+        email: null,
       };
     } else {
       supervisorDetails = {
@@ -81,10 +81,10 @@ const getLoggedInUser = async (req, res) => {
       });
 
       if (!workPermit) {
-        workPermitId = 'NA';
-        workPermitStartDate = 'NA';
-        workPermitEndDate = 'NA';
-        workPermitStatus = 'NA';
+        workPermitId = null;
+        workPermitStartDate = null;
+        workPermitEndDate = null;
+        workPermitStatus = null;
       } else {
         workPermitId = workPermit._id;
         workPermitStartDate = workPermit.workPermitStartDate;
@@ -104,11 +104,11 @@ const getLoggedInUser = async (req, res) => {
     let contractStatus;
     let contractId;
     if (!contract) {
-      contractStartDate = 'NA';
-      contractEndDate = 'NA';
-      contractType = 'NA';
-      contractStatus = 'NA';
-      contractId = 'NA';
+      contractStartDate = null;
+      contractEndDate = null;
+      contractType = null;
+      contractStatus = null;
+      contractId = null;
     } else {
       contractStartDate = contract.contractStartDate;
       contractEndDate = contract.contractEndDate;

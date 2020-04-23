@@ -64,10 +64,10 @@ const getUsersContracts = async (req, res) => {
           let supervisorDetails;
           if (!supervisor) {
             supervisorDetails = {
-              Supervisor_id: 'NA',
-              fName: 'NA',
-              lName: 'NA',
-              email: 'NA',
+              Supervisor_id: null,
+              fName: null,
+              lName: null,
+              email: null,
             };
           } else {
             supervisorDetails = {
@@ -87,8 +87,8 @@ const getUsersContracts = async (req, res) => {
           });
 
           if (!userProgram) {
-            staffprogram = 'NA';
-            programShortForm = 'NA';
+            staffprogram = null;
+            programShortForm = null;
             // eslint-disable-next-line no-else-return
           } else {
             programManagerId = userProgram.programManagerId;
@@ -99,10 +99,10 @@ const getUsersContracts = async (req, res) => {
             });
             if (!userPM) {
               programManagerDetails = {
-                _id: 'NA',
-                fName: 'NA',
-                lName: 'NA',
-                email: 'NA',
+                _id: null,
+                fName: null,
+                lName: null,
+                email: null,
               };
             } else {
               programManagerDetails = {
