@@ -235,7 +235,7 @@ const editUser = async (req, res) => {
     }
     if (
       // eslint-disable-next-line operator-linebreak
-      workPermitId == null &&
+      workPermitId === null &&
       (user.type === 'expat' || user.type === 'tcn')
     ) {
       // create user WP
@@ -243,7 +243,7 @@ const editUser = async (req, res) => {
         _userId: user._id,
         workPermitStartDate,
         workPermitEndDate,
-        workPermitStatus,
+        workPermitStatus: 'ACTIVE',
       });
 
       await workpermit.save();
