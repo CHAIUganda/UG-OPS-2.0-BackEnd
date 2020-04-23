@@ -1,5 +1,6 @@
 const { validationResult } = require('express-validator/check');
 const debug = require('debug')('leave-controller');
+const moment = require('moment-timezone');
 const errorToString = require('../../helpers/errorToString');
 const Contract = require('../../model/Contract');
 
@@ -29,6 +30,13 @@ const handleContractNotifications = async (req, res) => {
     if (contractSnooze == null) {
       contractSnooze = contract.contractSnooze;
     }
+    // date to track snooze
+    let today;
+    if (contractSnooze === true) {
+      const CurrentDate = moment().tz('Africa/Kampala').format();
+      today = new Date(CurrentDate);
+    }
+
     // modify program
     await Contract.updateOne(
       {
@@ -39,6 +47,7 @@ const handleContractNotifications = async (req, res) => {
         $set: {
           contractDismiss,
           contractSnooze,
+          snoozeDate: today,
         },
       }
     );

@@ -1,5 +1,6 @@
 const { validationResult } = require('express-validator/check');
 const debug = require('debug')('leave-controller');
+const moment = require('moment-timezone');
 const errorToString = require('../../helpers/errorToString');
 const WorkPermit = require('../../model/WorkPermit');
 
@@ -29,6 +30,12 @@ const handleWPNotifications = async (req, res) => {
     if (wpSnooze == null) {
       wpSnooze = workPermit.wpSnooze;
     }
+    // date to track snooze
+    let today;
+    if (wpSnooze === true) {
+      const CurrentDate = moment().tz('Africa/Kampala').format();
+      today = new Date(CurrentDate);
+    }
     // modify program
     await WorkPermit.updateOne(
       {
@@ -39,6 +46,7 @@ const handleWPNotifications = async (req, res) => {
         $set: {
           wpDismiss,
           wpSnooze,
+          snoozeDate: today,
         },
       }
     );

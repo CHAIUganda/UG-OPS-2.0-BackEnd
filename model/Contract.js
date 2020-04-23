@@ -32,6 +32,10 @@ const ContractSchema = mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  snoozeDate: {
+    type: Date,
+    required: false,
+  },
 });
 
 // export model contract with ContractSchema

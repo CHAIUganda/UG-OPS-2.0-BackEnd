@@ -119,8 +119,12 @@ const getUsersWorkPermits = async (req, res) => {
             endDate = moment(endDate);
             const diff = endDate.diff(CurrentDate, 'days') + 1;
             const daysLeftonWorkPermit = diff;
+            // prettier-ignore
             // eslint-disable-next-line eqeqeq
-            if (diff < expiryIn || diff == expiryIn) {
+            if ((workPermit.wpDismiss == false && workPermit.wpSnooze == false)
+            // prettier-ignore
+            // eslint-disable-next-line eqeqeq
+            && (diff < expiryIn || diff == expiryIn)) {
               const userRemade = {
                 _id,
                 fName,

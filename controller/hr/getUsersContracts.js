@@ -121,8 +121,13 @@ const getUsersContracts = async (req, res) => {
           endDate = moment(endDate);
           const diff = endDate.diff(CurrentDate, 'days') + 1;
           const daysLeftonContract = diff;
+
+          // prettier-ignore
           // eslint-disable-next-line eqeqeq
-          if (diff < expiryIn || diff == expiryIn) {
+          if ((contract.contractDismiss == false && contract.contractSnooze == false)
+          // prettier-ignore
+          // eslint-disable-next-line eqeqeq
+          && (diff < expiryIn || diff == expiryIn)) {
             const userRemade = {
               _id,
               fName,
