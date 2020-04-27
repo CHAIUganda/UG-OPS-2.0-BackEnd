@@ -806,7 +806,7 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken leave. New Date
         // prettier-ignore
         const textSupervisor = `Hello  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} is requesting to modify their Taken leave Which was from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}. This is pending your approval${footer}.
+${user.fName}  ${user.lName} is requesting to Cancel their Taken leave Which was from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}. This is pending your approval${footer}.
                          `;
         Mailer(from, supervisor.email, subject, textSupervisor, '');
 
