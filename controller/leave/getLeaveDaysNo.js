@@ -10,7 +10,7 @@ const getLeaveDaysNo = (startDate, endDate, publicHolidays) => {
 
   while (moment(start.toDateString()).isBefore(end.toDateString())) {
     arrayOfDays.push(start);
-    const newDate = moment(start.toDateString()).add(24, 'hour');
+    const newDate = moment(start).add(24, 'hour');
     start = new Date(newDate);
   }
   arrayOfDays.push(end);
