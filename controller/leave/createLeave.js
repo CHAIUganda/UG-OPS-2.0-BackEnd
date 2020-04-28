@@ -285,8 +285,9 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
 
 ${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
                                       `;
-      Mailer(from, supervisor.email, subject, textSupervisor, '');
-
+      if (status === 'Pending Supervisor') {
+        Mailer(from, supervisor.email, subject, textSupervisor, '');
+      }
       const leave = {
         _id: leaveRemade._id,
         startDate,
