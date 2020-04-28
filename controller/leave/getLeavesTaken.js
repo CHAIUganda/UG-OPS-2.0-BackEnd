@@ -16,6 +16,18 @@ const getLeavesTaken = async (user) => {
         $expr: { $eq: [{ $year: '$startDate' }, currentYear] },
       },
       {
+        status: 'Pending Supervisor',
+        $expr: { $eq: [{ $year: '$startDate' }, currentYear] },
+      },
+      {
+        status: 'Pending Country Director',
+        $expr: { $eq: [{ $year: '$startDate' }, currentYear] },
+      },
+      {
+        status: 'Planned',
+        $expr: { $eq: [{ $year: '$startDate' }, currentYear] },
+      },
+      {
         status: 'Approved',
         $expr: { $eq: [{ $year: '$startDate' }, currentYear] },
       },
@@ -34,12 +46,19 @@ const getLeavesTaken = async (user) => {
 
   const leaveDetails = {
     unPaidLeaveTaken: 0,
+    unPaidLeavePlanned: 0,
     homeLeaveTaken: 0,
+    homeLeavePlanned: 0,
     annualLeaveTaken: 0,
+    annualLeavePlanned: 0,
     maternityLeaveTaken: 0,
+    maternityLeavePlanned: 0,
     paternityLeaveTaken: 0,
+    paternityLeavePlanned: 0,
     sickLeaveTaken: 0,
+    sickLeavePlanned: 0,
     studyLeaveTaken: 0,
+    studyLeavePlanned: 0,
   };
 
   let sum = 0;
@@ -57,27 +76,77 @@ const getLeavesTaken = async (user) => {
       sum = 0;
     }
   };
+  // get taken and planned leave for eact type and intialise leaves details obj
+  const homeLeavesTaken = leaves.filter(
+    (leave) => leave.type === 'Home' && leave.status !== 'Planned'
+  );
+  await recurseProcessLeave(0, homeLeavesTaken, 'homeLeaveTaken');
 
-  const homeLeaves = leaves.filter((leave) => leave.type === 'Home');
-  await recurseProcessLeave(0, homeLeaves, 'homeLeaveTaken');
+  const homeLeavesPlanned = leaves.filter(
+    (leave) => leave.type === 'Home' && leave.status === 'Planned'
+  );
+  await recurseProcessLeave(0, homeLeavesPlanned, 'homeLeavePlanned');
 
-  const annualLeaves = leaves.filter((leave) => leave.type === 'Annual');
-  await recurseProcessLeave(0, annualLeaves, 'annualLeaveTaken');
+  const annualLeavesTaken = leaves.filter(
+    (leave) => leave.type === 'Annual' && leave.status !== 'Planned'
+  );
+  await recurseProcessLeave(0, annualLeavesTaken, 'annualLeaveTaken');
 
-  const studyLeaves = leaves.filter((leave) => leave.type === 'Study');
-  await recurseProcessLeave(0, studyLeaves, 'studyLeaveTaken');
+  const annualLeavesPlanned = leaves.filter(
+    (leave) => leave.type === 'Annual' && leave.status === 'Planned'
+  );
+  await recurseProcessLeave(0, annualLeavesPlanned, 'annualLeavePlanned');
 
-  const paternityLeaves = leaves.filter((leave) => leave.type === 'Paternity');
-  await recurseProcessLeave(0, paternityLeaves, 'paternityLeaveTaken');
+  const studyLeavesTaken = leaves.filter(
+    (leave) => leave.type === 'Study' && leave.status !== 'Planned'
+  );
+  await recurseProcessLeave(0, studyLeavesTaken, 'studyLeaveTaken');
 
-  const maternityLeaves = leaves.filter((leave) => leave.type === 'Maternity');
-  await recurseProcessLeave(0, maternityLeaves, 'maternityLeaveTaken');
+  const studyLeavesPlanned = leaves.filter(
+    (leave) => leave.type === 'Study' && leave.status === 'Planned'
+  );
+  await recurseProcessLeave(0, studyLeavesPlanned, 'studyLeavePlanned');
 
-  const sickLeaves = leaves.filter((leave) => leave.type === 'Sick');
-  await recurseProcessLeave(0, sickLeaves, 'sickLeaveTaken');
+  const paternityLeavesTaken = leaves.filter(
+    (leave) => leave.type === 'Paternity' && leave.status !== 'Planned'
+  );
+  await recurseProcessLeave(0, paternityLeavesTaken, 'paternityLeaveTaken');
 
-  const unPaidLeaves = leaves.filter((leave) => leave.type === 'Unpaid');
-  await recurseProcessLeave(0, unPaidLeaves, 'unPaidLeaveTaken');
+  const paternityLeavesPlanned = leaves.filter(
+    (leave) => leave.type === 'Paternity' && leave.status === 'Planned'
+  );
+  await recurseProcessLeave(0, paternityLeavesPlanned, 'paternityLeavePlanned');
+
+  const maternityLeavesTaken = leaves.filter(
+    (leave) => leave.type === 'Maternity' && leave.status !== 'Planned'
+  );
+  await recurseProcessLeave(0, maternityLeavesTaken, 'maternityLeaveTaken');
+
+  const maternityLeavesPlanned = leaves.filter(
+    (leave) => leave.type === 'Maternity' && leave.status === 'Planned'
+  );
+  await recurseProcessLeave(0, maternityLeavesPlanned, 'maternityLeavePlanned');
+
+  const sickLeavesTaken = leaves.filter(
+    (leave) => leave.type === 'Sick' && leave.status !== 'Planned'
+  );
+  await recurseProcessLeave(0, sickLeavesTaken, 'sickLeaveTaken');
+
+  const sickLeavesPlanned = leaves.filter(
+    (leave) => leave.type === 'Sick' && leave.status === 'Planned'
+  );
+  await recurseProcessLeave(0, sickLeavesPlanned, 'sickLeavePlanned');
+
+  const unPaidLeavesTaken = leaves.filter(
+    (leave) => leave.type === 'Unpaid' && leave.status !== 'Planned'
+  );
+  await recurseProcessLeave(0, unPaidLeavesTaken, 'unPaidLeaveTaken');
+
+  const unPaidLeavesPlanned = leaves.filter(
+    (leave) => leave.type === 'Unpaid' && leave.status === 'Planned'
+  );
+  await recurseProcessLeave(0, unPaidLeavesPlanned, 'unPaidLeavePlanned');
+
   return leaveDetails;
 };
 

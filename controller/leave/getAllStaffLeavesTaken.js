@@ -82,32 +82,50 @@ const getAllStaffLeavesTaken = async (req, res) => {
 
         const {
           unPaidLeaveTaken,
+          unPaidLeavePlanned,
           homeLeaveTaken,
+          homeLeavePlanned,
           annualLeaveTaken,
+          annualLeavePlanned,
           maternityLeaveTaken,
+          maternityLeavePlanned,
           paternityLeaveTaken,
+          paternityLeavePlanned,
           sickLeaveTaken,
+          sickLeavePlanned,
           studyLeaveTaken,
+          studyLeavePlanned,
         } = leaveDetailss;
 
         const leaveDetails = {
           annualLeaveBF,
           unPaidLeaveTaken,
-          unpaidLeaveBal: unpaid - unPaidLeaveTaken,
+          unpaidLeaveBal: unpaid - unPaidLeaveTaken - unPaidLeavePlanned,
+          unPaidLeavePlanned,
           homeLeaveTaken,
           // prettier-ignore
-          homeLeaveBal: totalAcruedAnualLeavePlusAnualLeaveBF - homeLeaveTaken - annualLeaveTaken,
+          // eslint-disable-next-line max-len
+          homeLeaveBal: totalAcruedAnualLeavePlusAnualLeaveBF - homeLeaveTaken - annualLeaveTaken - homeLeavePlanned - annualLeavePlanned,
+          homeLeavePlanned,
           annualLeaveTaken,
           // prettier-ignore
-          annualLeaveBal: totalAcruedAnualLeavePlusAnualLeaveBF - homeLeaveTaken - annualLeaveTaken,
+          // eslint-disable-next-line max-len
+          annualLeaveBal: totalAcruedAnualLeavePlusAnualLeaveBF - homeLeaveTaken - annualLeaveTaken - homeLeavePlanned - annualLeavePlanned,
+          annualLeavePlanned,
           maternityLeaveTaken,
-          maternityLeaveBal: maternity - maternityLeaveTaken,
+          maternityLeaveBal:
+            maternity - maternityLeaveTaken - maternityLeavePlanned,
+          maternityLeavePlanned,
           paternityLeaveTaken,
-          paternityLeaveBal: paternity - paternityLeaveTaken,
+          paternityLeaveBal:
+            paternity - paternityLeaveTaken - paternityLeavePlanned,
+          paternityLeavePlanned,
           sickLeaveTaken,
-          sickLeaveBal: sick - sickLeaveTaken,
+          sickLeaveBal: sick - sickLeaveTaken - sickLeavePlanned,
+          sickLeavePlanned,
           studyLeaveTaken,
-          studyLeaveBal: study - studyLeaveTaken,
+          studyLeaveBal: study - studyLeaveTaken - studyLeavePlanned,
+          studyLeavePlanned,
         };
 
         const userSupervisor = await User.findOne({
