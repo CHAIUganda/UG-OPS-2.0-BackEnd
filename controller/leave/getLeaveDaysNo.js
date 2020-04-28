@@ -10,7 +10,7 @@ const getLeaveDaysNo = (startDate, endDate, publicHolidays) => {
 
   while (moment(start.toDateString()).isBefore(end.toDateString())) {
     arrayOfDays.push(start);
-    const newDate = moment(start.toDateString()).add(24, 'hour');
+    const newDate = moment(start.toDateString());
     start = new Date(newDate);
   }
   arrayOfDays.push(end);
@@ -30,7 +30,7 @@ const getLeaveDaysNo = (startDate, endDate, publicHolidays) => {
       if (check && moment(hol.toDateString()).isSame(dDay.toDateString())) {
         holidayDays.push({
           day,
-          name: holiday.name
+          name: holiday.name,
         });
         check = false;
       }
@@ -49,7 +49,7 @@ const getLeaveDaysNo = (startDate, endDate, publicHolidays) => {
     totalDays,
     leaveDays,
     weekendDays,
-    holidayDays
+    holidayDays,
   };
 
   totalDays = 0;
