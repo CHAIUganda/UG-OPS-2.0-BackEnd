@@ -161,7 +161,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
         // prettier-ignore
         const textSupervisor = `Hello  ${supervisor.fName}, 
   
-  ${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
+${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
                                         `;
         Mailer(from, supervisor.email, subject, textSupervisor, '');
         // eslint-disable-next-line object-curly-newline
