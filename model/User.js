@@ -33,7 +33,7 @@ const UserSchema = mongoose.Schema({
   },
   birthDate: {
     type: Date,
-    required: true,
+    required: false,
   },
   programId: {
     // operations  Vaccines etc
@@ -78,11 +78,11 @@ const UserSchema = mongoose.Schema({
   ],
   nssfNumber: {
     type: String,
-    required: true,
+    required: false,
   },
   tinNumber: {
     type: String,
-    required: true,
+    required: false,
   },
   roles: {
     admin: {
@@ -108,6 +108,15 @@ const UserSchema = mongoose.Schema({
       default: false,
     },
   },
+  notifications: [
+    {
+      title: String,
+      message: String,
+      status: String,
+      createDate: Date,
+      linkTo: String,
+    },
+  ],
 });
 
 // export model user with UserSchema

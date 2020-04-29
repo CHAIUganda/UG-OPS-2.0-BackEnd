@@ -4,7 +4,7 @@ const debug = require('debug')('server');
 module.exports = (req, res, next) => {
   const token = req.header('token');
   if (!token) {
-    return res.status(403).json({ message: 'Auth Error' });
+    return res.status(401).json({ message: 'Auth Error' });
   }
 
   try {
@@ -13,6 +13,6 @@ module.exports = (req, res, next) => {
     next();
   } catch (e) {
     debug(e);
-    res.status(403).json({ message: 'Token Expired' });
+    res.status(401).json({ message: 'Token Expired' });
   }
 };

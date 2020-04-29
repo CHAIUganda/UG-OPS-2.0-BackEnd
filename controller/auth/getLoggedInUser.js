@@ -48,6 +48,7 @@ const getLoggedInUser = async (req, res) => {
       leaves,
       createdAt,
       supervisorEmail,
+      notifications,
     } = user;
 
     const userSupervisor = await User.findOne({
@@ -151,6 +152,7 @@ const getLoggedInUser = async (req, res) => {
       workPermitStartDate,
       workPermitEndDate,
       workPermitStatus,
+      notifications,
     };
 
     res.json(person);

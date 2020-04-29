@@ -4,12 +4,13 @@ const errorToString = require('../../helpers/errorToString');
 const Leave = require('../../model/Leave');
 const User = require('../../model/User');
 const Mailer = require('../../helpers/Mailer');
+const storeNotification = require('../../helpers/storeNotification');
 
 const supervisorHandleLeave = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
-      message: errorToString(errors.array())
+      message: errorToString(errors.array()),
     });
   }
 
@@ -26,22 +27,32 @@ const supervisorHandleLeave = async (req, res) => {
       reason = '';
     }
     const user = await User.findOne({
-      email: staffEmail
+      email: staffEmail,
     });
     if (!user) {
       return res.status(400).json({
-        message: 'User does not Exist'
+        message: 'User does not Exist',
+      });
+    }
+
+    const supervisor = await User.findOne({
+      email: user.supervisorEmail,
+    });
+    if (!supervisor) {
+      return res.status(400).json({
+        message: 'Supervisor does not Exist',
       });
     }
 
     const leave = await Leave.findOne({
-      _id: leaveId
+      _id: leaveId,
     });
     if (!leave) {
       return res.status(400).json({
-        message: 'The leave doesnot exist'
+        message: 'The leave doesnot exist',
       });
     }
+
     const subject = 'Uganda Operations Leaves';
     const from = 'UGOperations@clintonhealthaccess.org';
     const to = user.email;
@@ -83,7 +94,12 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
 Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved your supervisor. It is now pending Country director approval${footer}.
                          `;
           Mailer(from, to, subject, text, '');
-
+          // save notification on user obj
+          const notificationTitle = 'Leave has been approved by supervisor';
+          const notificationType = 'Leave';
+          // eslint-disable-next-line max-len
+          const notificationMessage = `Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved your supervisor. It is now pending Country director approval`;
+          await storeNotification(user, notificationTitle, notificationMessage, notificationType);
           // email to CD
           // prettier-ignore
           const textCd = `Hello  ${cd.fName}, 
@@ -91,6 +107,14 @@ Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateStrin
 ${user.fName}  ${user.lName} is requesting for a Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
                          `;
           Mailer(from, cd.email, subject, textCd, '');
+          // save notification on user obj
+          const cdnotificationTitle = `${user.fName}  ${user.lName} is requesting for Home Leave`;
+          const cdnotificationType = 'Leave';
+          // prettier-ignore
+          // eslint-disable-next-line max-len
+          const cdnotificationMessage = `${user.fName}  ${user.lName} is requesting for Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}`;
+          // eslint-disable-next-line max-len
+          await storeNotification(cd, cdnotificationTitle, cdnotificationMessage, cdnotificationType);
 
           res.status(200).json({
             message: 'Leave has been Approved, Pending CD approval'
@@ -112,6 +136,22 @@ Your Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDate
                                    `;
 
           Mailer(from, to, subject, text, user.supervisorEmail);
+          // save notification on user obj
+          const notificationTitle = 'Leave has been approved by the Country director';
+          const notificationType = 'Leave';
+          // eslint-disable-next-line max-len
+          const notificationMessage = `Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by the Country director`;
+          await storeNotification(user, notificationTitle, notificationMessage, notificationType);
+
+          const supervisornotificationTitle = `${user.fName}  ${user.lName}'s Home Leave has been approved by the Country director `;
+          const supervisornotificationType = 'Leave';
+          // prettier-ignore
+          // eslint-disable-next-line max-len
+          const supervisornotificationMessage = `${user.fName}  ${user.lName}'s Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by the Country director`;
+          // eslint-disable-next-line max-len
+          await storeNotification(supervisor, supervisornotificationTitle, supervisornotificationMessage, supervisornotificationType);
+
+
           res.status(200).json({
             message: 'Leave has been Approved'
           });
@@ -132,6 +172,22 @@ Your Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDate
 Cancellation of your Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by your supervisor.${footer}.
                          `;
           Mailer(from, user.email, subject, textStaff, cd.email);
+          // save notification on user obj
+          const notificationTitle = 'Cancellation of Home Leave has been approved by your Supervsor';
+          const notificationType = 'Leave';
+          // eslint-disable-next-line max-len
+          const notificationMessage = `Cancellation of your Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by your supervisor.`;
+          await storeNotification(user, notificationTitle, notificationMessage, notificationType);
+
+          const cdnotificationTitle = `${user.fName}  ${user.lName}'s Home Leave Cancellation has been approved by the Supervisor `;
+          const cdnotificationType = 'Leave';
+          // prettier-ignore
+          // eslint-disable-next-line max-len
+          const cdnotificationMessage = `${user.fName}  ${user.lName}'s Home Leave Cancellation from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by the Supervisor`;
+          // eslint-disable-next-line max-len
+          await storeNotification(cd, cdnotificationTitle, cdnotificationMessage, cdnotificationType);
+
+
           res.status(200).json({
             message: 'Leave Cancellation has been Approved'
           });
@@ -175,6 +231,22 @@ Cancellation of your Home Leave from ${leave.startDate.toDateString()} to ${leav
 Modification of your taken Home Leave from ${leave.takenPending.startDate.toDateString()} to ${leave.takenPending.endDate.toDateString()} has been approved by your supervisor.${footer}.
                          `;
           Mailer(from, user.email, subject, textStaff, cd.email);
+          // save notification on user obj
+          const notificationTitle = 'Modification of your taken Home Leave has been approved by your Supervisor';
+          const notificationType = 'Leave';
+          // eslint-disable-next-line max-len
+          const notificationMessage = `Modification of your taken Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by your supervisor.`;
+          await storeNotification(user, notificationTitle, notificationMessage, notificationType);
+
+          const cdnotificationTitle = `${user.fName}  ${user.lName}'s Home Leave Modification has been approved by the Supervisor `;
+          const cdnotificationType = 'Leave';
+          // prettier-ignore
+          // eslint-disable-next-line max-len
+          const cdnotificationMessage = `${user.fName}  ${user.lName}'s Home Leave Modification from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by the Supervisor`;
+          // eslint-disable-next-line max-len
+          await storeNotification(cd, cdnotificationTitle, cdnotificationMessage, cdnotificationType);
+
+
           res.status(200).json({
             message: 'Leave Modification has been Approved'
           });
@@ -211,6 +283,12 @@ Modification of your taken Home Leave from ${leave.takenPending.startDate.toDate
 Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by your supervisor.${footer}.
                        `;
           Mailer(from, user.email, subject, textStaff, '');
+          // save notification on user obj
+          const notificationTitle = 'Cancellation of Home Leave has been approved by your Supervsor';
+          const notificationType = 'Leave';
+          // eslint-disable-next-line max-len
+          const notificationMessage = `Cancellation of your Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by your supervisor.`;
+          await storeNotification(user, notificationTitle, notificationMessage, notificationType);
           res.status(200).json({
             message: 'Leave Cancellation has been Approved'
           });
@@ -253,6 +331,13 @@ Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.end
 Modification of your taken Leave from ${leave.takenPending.startDate.toDateString()} to ${leave.takenPending.endDate.toDateString()} has been approved by your supervisor.${footer}.
                          `;
           Mailer(from, user.email, subject, textStaff, '');
+          // save notification on user obj
+          const notificationTitle = 'Modification of your taken Home Leave has been approved by your Supervisor';
+          const notificationType = 'Leave';
+          // eslint-disable-next-line max-len
+          const notificationMessage = `Modification of your taken Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by your supervisor.`;
+          await storeNotification(user, notificationTitle, notificationMessage, notificationType);
+
           res.status(200).json({
             message: 'Leave modification has been Approved'
           });
@@ -271,6 +356,12 @@ Modification of your taken Leave from ${leave.takenPending.startDate.toDateStrin
 Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by your supervisor${footer}.
                  `;
           Mailer(from, to, subject, text, '');
+          const notificationTitle = 'Leave has been approved by supervisor';
+          const notificationType = 'Leave';
+          // eslint-disable-next-line max-len
+          const notificationMessage = `Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved your supervisor.`;
+          await storeNotification(user, notificationTitle, notificationMessage, notificationType);
+
           res.status(200).json({
             message: 'Leave has been Approved'
           });
@@ -462,13 +553,13 @@ Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateStrin
       }
     } else {
       return res.status(400).json({
-        message: 'Invalid Leave status'
+        message: 'Invalid Leave status',
       });
     }
   } catch (err) {
     debug(err.message);
     res.status(500).json({
-      message: 'Error Handling Leave'
+      message: 'Error Handling Leave',
     });
   }
 };

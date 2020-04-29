@@ -26,7 +26,7 @@ const handleWPStatus = async () => {
       logger.error('HR not found in the system, Please Register the HR');
       console.log('HR not found in the system, Please Register the HR');
       const errorMessage = {
-        code: 403,
+        code: 404,
         message: 'HR not found in the system, Please Register the HR',
       };
       throw errorMessage;

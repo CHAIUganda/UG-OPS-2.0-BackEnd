@@ -11,6 +11,7 @@ const getLeavesTaken = require('./getLeavesTaken');
 const getLeaveDaysNo = require('./getLeaveDaysNo');
 const PublicHoliday = require('../../model/PublicHoliday');
 const Mailer = require('../../helpers/Mailer');
+const storeNotification = require('../../helpers/storeNotification');
 
 const createLeave = async (req, res) => {
   const errors = validationResult(req);
@@ -287,6 +288,18 @@ ${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateStri
                                       `;
       if (status === 'Pending Supervisor') {
         Mailer(from, supervisor.email, subject, textSupervisor, '');
+        // save notification on user obj
+        const notificationTitle = `${user.fName}  ${user.lName} is requesting to be off`;
+        const notificationType = 'Leave';
+        // prettier-ignore
+        // eslint-disable-next-line max-len
+        const notificationMessage = `${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateString()} to ${endDate.toDateString()}`;
+        await storeNotification(
+          supervisor,
+          notificationTitle,
+          notificationMessage,
+          notificationType
+        );
       }
       const leave = {
         _id: leaveRemade._id,

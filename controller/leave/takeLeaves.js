@@ -9,9 +9,7 @@ const takeLeaves = async () => {
   try {
     const logger = log4js.getLogger('Timed');
     // set timezone to kampala
-    const CurrentDate = moment()
-      .tz('Africa/Kampala')
-      .format();
+    const CurrentDate = moment().tz('Africa/Kampala').format();
     const leaves = await Leave.find({ status: 'Approved' });
     // check if HR exists in System
     const hr = await User.findOne({ 'roles.hr': true });
@@ -19,8 +17,8 @@ const takeLeaves = async () => {
       logger.error('HR not found in the system, Please Register the HR');
       console.log('HR not found in the system, Please Register the HR');
       const errorMessage = {
-        code: 403,
-        message: 'HR not found in the system, Please Register the HR'
+        code: 404,
+        message: 'HR not found in the system, Please Register the HR',
       };
       throw errorMessage;
     }
@@ -43,7 +41,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
 
         // check if user exists
         const user = await User.findOne({
-          email: staffEmail
+          email: staffEmail,
         });
         if (!user) {
           logger.error(`Staff not found. Email: ${staffEmail} LeaveId: ${_id}`);
