@@ -1,15 +1,24 @@
 const debug = require('debug')('server');
 const moment = require('moment-timezone');
 const log4js = require('log4js');
-const Contract = require('../../model/Contract');
-const Program = require('../../model/Program');
-const User = require('../../model/User');
-const Mailer = require('../../helpers/Mailer');
+const WorkPermit = require('../../../model/WorkPermit');
+const Program = require('../../../model/Program');
+const User = require('../../../model/User');
+const Mailer = require('../../../helpers/Mailer');
 
-const handleContractStatus = async () => {
+const handleWPStatus = async () => {
   try {
     const logger = log4js.getLogger('Timed');
-    const user = await User.find({});
+    const user = await User.find({
+      $or: [
+        {
+          type: 'tcn',
+        },
+        {
+          type: 'expat',
+        },
+      ],
+    });
     user.password = undefined;
     // check if HR exists in System
     const hr = await User.findOne({ 'roles.hr': true });
@@ -44,8 +53,8 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
         const programName = await Program.findOne({
           _id: programId,
         });
-        let contractStartDate;
-        let contractEndDate;
+        let workPermitStartDate;
+        let workPermitEndDate;
 
         if (programName) {
           programManagerId = programName.programManagerId;
@@ -57,18 +66,18 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
             );
             recurseProcessLeave(controller + 1, arr);
           } else {
-            const contract = await Contract.findOne({
+            const workPermit = await WorkPermit.findOne({
               _userId: _id,
             });
 
-            if (!contract) {
-              logger.error(`${lName} ${fName} Has no Active Contract`);
+            if (!workPermit) {
+              logger.error(`${lName} ${fName} Has no Active WorkPermit`);
               recurseProcessLeave(controller + 1, arr);
             } else {
               // eslint-disable-next-line no-lonely-if
-              if (contract.contractStatus === 'ACTIVE') {
-                contractStartDate = contract.contractStartDate;
-                contractEndDate = contract.contractEndDate;
+              if (workPermit.workPermitStatus === 'ACTIVE') {
+                workPermitStartDate = workPermit.workPermitStartDate;
+                workPermitEndDate = workPermit.workPermitEndDate;
                 // check if Supervisor exists in System
                 const supervisor = await User.findOne({
                   email: supervisorEmail,
@@ -79,30 +88,30 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
                   );
                   recurseProcessLeave(controller + 1, arr);
                 } else {
-                  let endDate = contract.contractEndDate;
+                  let endDate = workPermit.workPermitEndDate;
                   // set timezone to kampala
                   const CurrentDate = moment().tz('Africa/Kampala').format();
                   const today = new Date(CurrentDate);
                   endDate = moment(endDate);
                   endDate = new Date(endDate);
-                  contractStartDate = new Date(contractStartDate);
-                  contractEndDate = new Date(contractEndDate);
+                  workPermitStartDate = new Date(workPermitStartDate);
+                  workPermitEndDate = new Date(workPermitEndDate);
                   if (
                     moment(today.toDateString()).isSame(endDate.toDateString())
                   ) {
                     // change Contract status
 
-                    await Contract.updateOne(
+                    await WorkPermit.updateOne(
                       {
-                        _id: contract._id,
+                        _id: workPermit._id,
                       },
-                      { $set: { contractStatus: 'Expired' } }
+                      { $set: { workPermitStatus: 'Expired' } }
                     );
                     // email to HR
                     // prettier-ignore
                     const textUser = `Hello  ${hr.fName}, 
         
-${fName} ${lName}'s Contract that ran from ${contractStartDate.toDateString()} to  ${contractEndDate.toDateString()} has expired today. ${footer}.
+${fName} ${lName}'s Work Permit that ran from ${workPermitStartDate.toDateString()} to  ${workPermitEndDate.toDateString()} has expired today. ${footer}.
                                                     `;
                     const cc = `${programMngr.email},${supervisor.email}`;
                     Mailer(from, supervisor.email, subject, textUser, cc);
@@ -113,9 +122,9 @@ ${fName} ${lName}'s Contract that ran from ${contractStartDate.toDateString()} t
 
                   recurseProcessLeave(controller + 1, arr);
                 }
-              } else if (contract.contractStatus === 'Pending') {
-                contractStartDate = contract.contractStartDate;
-                contractEndDate = contract.contractEndDate;
+              } else if (workPermit.workPermitStatus === 'Pending') {
+                workPermitStartDate = workPermit.workPermitStartDate;
+                workPermitEndDate = workPermit.workPermitEndDate;
                 // check if Supervisor exists in System
                 const supervisor = await User.findOne({
                   email: supervisorEmail,
@@ -126,14 +135,14 @@ ${fName} ${lName}'s Contract that ran from ${contractStartDate.toDateString()} t
                   );
                   recurseProcessLeave(controller + 1, arr);
                 } else {
-                  let startDate = contract.contractStartDate;
+                  let startDate = workPermit.workPermitStartDate;
                   // set timezone to kampala
                   const CurrentDate = moment().tz('Africa/Kampala').format();
                   const today = new Date(CurrentDate);
                   startDate = moment(startDate);
                   startDate = new Date(startDate);
-                  contractStartDate = new Date(contractStartDate);
-                  contractEndDate = new Date(contractEndDate);
+                  workPermitStartDate = new Date(workPermitStartDate);
+                  workPermitEndDate = new Date(workPermitEndDate);
                   if (
                     moment(today.toDateString()).isSame(
                       startDate.toDateString()
@@ -141,17 +150,17 @@ ${fName} ${lName}'s Contract that ran from ${contractStartDate.toDateString()} t
                   ) {
                     // change Contract status
 
-                    await Contract.updateOne(
+                    await WorkPermit.updateOne(
                       {
-                        _id: contract._id,
+                        _id: workPermit._id,
                       },
-                      { $set: { contractStatus: 'ACTIVE' } }
+                      { $set: { workPermitStatus: 'ACTIVE' } }
                     );
                     // email to HR
                     // prettier-ignore
                     const textUser = `Hello  ${hr.fName}, 
         
-${fName} ${lName}'s Contract that rans from ${contractStartDate.toDateString()} to  ${contractEndDate.toDateString()} has been activated today. ${footer}.
+${fName} ${lName}'s WorkPermit that rans from ${workPermitStartDate.toDateString()} to  ${workPermitEndDate.toDateString()} has been activated today. ${footer}.
                                                     `;
                     const cc = `${programMngr.email},${supervisor.email}`;
                     Mailer(from, supervisor.email, subject, textUser, cc);
@@ -179,4 +188,4 @@ ${fName} ${lName}'s Contract that rans from ${contractStartDate.toDateString()} 
   }
 };
 
-module.exports = handleContractStatus;
+module.exports = handleWPStatus;

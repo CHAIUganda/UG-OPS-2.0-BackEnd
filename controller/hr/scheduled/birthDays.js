@@ -1,7 +1,7 @@
 const debug = require('debug')('server');
 const moment = require('moment-timezone');
-const User = require('../../model/User');
-const Mailer = require('../../helpers/Mailer');
+const User = require('../../../model/User');
+const Mailer = require('../../../helpers/Mailer');
 
 const birthDays = async () => {
   try {

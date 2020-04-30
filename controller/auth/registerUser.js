@@ -92,6 +92,15 @@ const registerUser = async (req, res) => {
         message: 'User Already Exists',
       });
     }
+    const cd = await User.findOne({
+      'roles.countryDirector': true,
+    });
+
+    if (cd) {
+      return res.status(400).json({
+        message: 'A User with a Country Director Role Already Exists',
+      });
+    }
     if (mongoose.Types.ObjectId.isValid(programId)) {
       const program = await Program.findOne({
         _id: programId,

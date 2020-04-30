@@ -1,27 +1,19 @@
 const debug = require('debug')('server');
 const moment = require('moment-timezone');
+const ics = require('ics');
 const log4js = require('log4js');
-const WorkPermit = require('../../model/WorkPermit');
-const Program = require('../../model/Program');
-const User = require('../../model/User');
-const Mailer = require('../../helpers/Mailer');
+const Contract = require('../../../model/Contract');
+const Program = require('../../../model/Program');
+const User = require('../../../model/User');
+const Mailer = require('../../../helpers/Mailer');
 
-const workPermitRenewalReminder = async () => {
+const contractRenewalInvite = async () => {
   try {
     const logger = log4js.getLogger('Timed');
     const expiryIn = 90;
     const expiryIn2 = 60;
     const expiryIn3 = 30;
-    const user = await User.find({
-      $or: [
-        {
-          type: 'tcn',
-        },
-        {
-          type: 'expat',
-        },
-      ],
-    });
+    const user = await User.find({});
     user.password = undefined;
     // check if HR exists in System
     const hr = await User.findOne({ 'roles.hr': true });
@@ -35,7 +27,7 @@ const workPermitRenewalReminder = async () => {
       throw errorMessage;
     }
     // initialize emailing necessities
-    const subject = 'Uganda Operations WorkPermits';
+    const subject = 'Uganda Operations Contracts';
     const from = 'UGOperations@clintonhealthaccess.org';
     const footer = `
 
@@ -49,7 +41,6 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
 
     const recurseProcessLeave = async (controller, arr) => {
       if (controller < arr.length) {
-        // eslint-disable-next-line object-curly-newline
         // eslint-disable-next-line object-curly-newline
         const { _id, fName, lName, programId, supervisorEmail } = arr[
           controller
@@ -68,13 +59,13 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
             );
             recurseProcessLeave(controller + 1, arr);
           } else {
-            const workPermit = await WorkPermit.findOne({
+            const contract = await Contract.findOne({
               _userId: _id,
-              workPermitStatus: 'ACTIVE',
+              contractStatus: 'ACTIVE',
             });
 
-            if (!workPermit) {
-              logger.error(`${lName} ${fName} Has no Active Work Permit`);
+            if (!contract) {
+              logger.error(`${lName} ${fName} Has no Active Contract`);
               recurseProcessLeave(controller + 1, arr);
             } else {
               // check if Supervisor exists in System
@@ -87,7 +78,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
                 );
                 recurseProcessLeave(controller + 1, arr);
               } else {
-                let endDate = workPermit.workPermitEndDate;
+                let endDate = contract.contractEndDate;
                 // set timezone to kampala
                 const CurrentDate = moment().tz('Africa/Kampala').format();
                 const today = new Date(CurrentDate);
@@ -98,19 +89,71 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
                 if (
                   // prettier-ignore
                   // eslint-disable-next-line
-                  (workPermit.wpDismiss == false && workPermit.wpSnooze == false) &&
+                  (contract.contractDismiss == false && contract.contractSnooze == false) &&
                 // prettier-ignore
                 // eslint-disable-next-line
                 (diff == expiryIn || diff == expiryIn2 || diff == expiryIn3)
                 ) {
                   // email to staff
                   // prettier-ignore
-                  const textUser = `Hello  ${hr.fName}, 
+                  const textUser = `Hello  ${supervisor.fName}, 
         
-${fName} ${lName}'s Work Permit will expiry in ${diff} days as of ${today.toDateString()}. This is a remainder to start its renewal process."${footer}.
+${fName} ${lName}'s Contract will expiry in ${diff} days as of ${today.toDateString()}. This is an invitation to discuss their contract renewal. Please find attached the calender Invite "Add to your Calender"${footer}.
                                                     `;
-                  const cc = `${programMngr.email},${supervisor.email}`;
-                  Mailer(from, hr.email, subject, textUser, cc);
+                  const cc = `${programMngr.email},${hr.email}`;
+                  // Create new Calendar and set optional fields
+
+                  // create a new event
+                  const meetstartDate = moment()
+                    .tz('Africa/Kampala')
+                    .format('YYYY-M-D-H-m')
+                    .split('-');
+                  const event = {
+                    start: meetstartDate,
+                    duration: { hours: 1, minutes: 30 },
+                    title: 'Staff Contract Renewal Invite',
+                    description: `${fName} ${lName}'s Contract will expiry in ${diff} days, this is an invite to initiate their contract renewal process`,
+                    location: 'Lawns',
+                    url: 'https://ugops.clintonhealthaccess.org',
+                    geo: { lat: 0.34002, lon: 32.591718 },
+                    categories: ['Chai', '8 Moyo Close', 'Kampala'],
+                    status: 'CONFIRMED',
+                    busyStatus: 'BUSY',
+                    organizer: {
+                      name: 'CHAI Uganda Operations',
+                      email: 'UGOperations@clintonhealthaccess.org',
+                    },
+                    attendees: [
+                      {
+                        name: `${programMngr.fName} ${programMngr.lName}`,
+                        email: programMngr.email,
+                        rsvp: true,
+                        partstat: 'ACCEPTED',
+                        role: 'REQ-PARTICIPANT',
+                      },
+                      {
+                        name: `${hr.fName} ${hr.lName}`,
+                        email: hr.email,
+                        role: 'REQ-PARTICIPANT',
+                      },
+                    ],
+                  };
+                  let content;
+                  await ics.createEvent(event, (error, value) => {
+                    if (error) {
+                      console.log(error);
+                      return;
+                    }
+                    content = value;
+                  });
+                  Mailer(
+                    from,
+                    supervisor.email,
+                    subject,
+                    textUser,
+                    cc,
+                    content
+                  );
                   recurseProcessLeave(controller + 1, arr);
                 } else {
                   recurseProcessLeave(controller + 1, arr);
@@ -132,4 +175,4 @@ ${fName} ${lName}'s Work Permit will expiry in ${diff} days as of ${today.toDate
   }
 };
 
-module.exports = workPermitRenewalReminder;
+module.exports = contractRenewalInvite;

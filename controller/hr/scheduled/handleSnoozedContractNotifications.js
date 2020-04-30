@@ -1,43 +1,34 @@
 const debug = require('debug')('server');
 const moment = require('moment-timezone');
-const WorkPermit = require('../../model/WorkPermit');
-const User = require('../../model/User');
+const Contract = require('../../../model/Contract');
+const User = require('../../../model/User');
 
-const handleSnoozedWPNotifications = async () => {
+const handleSnoozedContractNotifications = async () => {
   try {
-    const expiryIn = 1;
-    const user = await User.find({
-      $or: [
-        {
-          type: 'tcn',
-        },
-        {
-          type: 'expat',
-        },
-      ],
-    });
+    const expiryIn = 32;
+    const user = await User.find({});
     user.password = undefined;
 
     const recurseProcessLeave = async (controller, arr) => {
       if (controller < arr.length) {
         // eslint-disable-next-line object-curly-newline
         const { _id } = arr[controller];
-        const workPermit = await WorkPermit.findOne({
+        const contract = await Contract.findOne({
           _userId: _id,
           $and: [
             {
-              workPermitStatus: 'ACTIVE',
+              contractStatus: 'ACTIVE',
             },
             {
-              wpSnooze: true,
+              contractSnooze: true,
             },
           ],
         });
 
-        if (!workPermit) {
+        if (!contract) {
           recurseProcessLeave(controller + 1, arr);
         } else {
-          let { snoozeDate } = workPermit;
+          let { snoozeDate } = contract;
           // set timezone to kampala
           const CurrentDate = moment().tz('Africa/Kampala').format();
           snoozeDate = moment(snoozeDate);
@@ -47,11 +38,11 @@ const handleSnoozedWPNotifications = async () => {
           if (diff == expiryIn) {
             // reset snooze to false
 
-            await WorkPermit.updateOne(
+            await Contract.updateOne(
               {
-                _id: workPermit._id,
+                _id: contract._id,
               },
-              { $set: { wpSnooze: false, snoozeDate: undefined } }
+              { $set: { contractSnooze: false, snoozeDate: undefined } }
             );
           } else {
             recurseProcessLeave(controller + 1, arr);
@@ -68,4 +59,4 @@ const handleSnoozedWPNotifications = async () => {
   }
 };
 
-module.exports = handleSnoozedWPNotifications;
+module.exports = handleSnoozedContractNotifications;

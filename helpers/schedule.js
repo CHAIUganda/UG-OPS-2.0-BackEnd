@@ -1,13 +1,13 @@
 const { CronJob } = require('cron');
 const log4js = require('log4js');
-const takeLeaves = require('../controller/leave/takeLeaves');
-const birthDays = require('../controller/hr/birthDays');
-const contractRenewalInvite = require('../controller/hr/contractRenewalInvite');
-const workPermitRenewalReminder = require('../controller/hr/workPermitRenewalReminder');
-const handleContractStatus = require('../controller/hr/handleContractStatus');
-const handleWPStatus = require('../controller/hr/handleWPStatus');
-const handleSnoozedContractNotifications = require('../controller/hr/handleSnoozedContractNotifications');
-const handleSnoozedWPNotifications = require('../controller/hr/handleSnoozedWPNotifications');
+const takeLeaves = require('../controller/leave/scheduled/takeLeaves');
+const birthDays = require('../controller/hr/scheduled/birthDays');
+const contractRenewalInvite = require('../controller/hr/scheduled/contractRenewalInvite');
+const workPermitRenewalReminder = require('../controller/hr/scheduled/workPermitRenewalReminder');
+const handleContractStatus = require('../controller/hr/scheduled/handleContractStatus');
+const handleWPStatus = require('../controller/hr/scheduled/handleWPStatus');
+const handleSnoozedContractNotifications = require('../controller/hr/scheduled/handleSnoozedContractNotifications');
+const handleSnoozedWPNotifications = require('../controller/hr/scheduled/handleSnoozedWPNotifications');
 
 log4js.configure({
   appenders: { Timed: { type: 'file', filename: './log/logs.log' } },
@@ -16,7 +16,7 @@ log4js.configure({
 // const logger = log4js.getLogger('Timed');
 
 const schedule = new CronJob(
-  '0 59 10 * * *',
+  '0 31 07 * * *',
   () => {
     console.log('Checking for birthdays and Ripe leaves');
     // contains auto scheduled jobs to be done by system
