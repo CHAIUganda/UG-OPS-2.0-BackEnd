@@ -207,7 +207,8 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
             const totalPaternity = paternityLeaveTaken + daysDetails.totalDays;
             if (paternity < totalPaternity) {
               return res.status(400).json({
-                message: 'You Dont have enough Paternity Leave days',
+                message:
+                  'You Dont have enough Paternity Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
                 paternityLeaveTaken,
                 daysRequested: daysDetails.totalDays,
                 totalPaternity,
@@ -226,7 +227,8 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
             const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalHome;
             if (chk1) {
               return res.status(400).json({
-                message: 'You Dont have enough Annual Leave days',
+                message:
+                  'You Dont have enough Annual Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
                 annualLeaveTaken,
                 homeLeaveTaken,
                 daysRequested: daysDetails.totalDays,
@@ -243,7 +245,8 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
             const totalMaternity = maternityLeaveTaken + daysDetails.totalDays;
             if (maternity < totalMaternity) {
               return res.status(400).json({
-                message: 'You Dont have enough Maternity Leave days',
+                message:
+                  'You Dont have enough Maternity Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
                 maternityLeaveTaken,
                 daysRequested: daysDetails.totalDays,
                 totalMaternity,
@@ -254,7 +257,8 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
             const totalSick = sickLeaveTaken + daysDetails.totalDays;
             if (sick < totalSick) {
               return res.status(400).json({
-                message: 'You Dont have enough Sick Leave days',
+                message:
+                  'You Dont have enough Sick Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
                 sickLeaveTaken,
                 daysRequested: daysDetails.totalDays,
                 totalSick,
@@ -265,7 +269,8 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
             const totalUnpaid = unPaidLeaveTaken + daysDetails.totalDays;
             if (unpaid < totalUnpaid) {
               return res.status(400).json({
-                message: 'You Dont have enough Unpaid Leave days',
+                message:
+                  'You Dont have enough Unpaid Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
                 unPaidLeaveTaken,
                 daysRequested: daysDetails.totalDays,
                 totalUnpaid,
@@ -276,7 +281,8 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
             const totalStudy = studyLeaveTaken + daysDetails.totalDays;
             if (study < totalStudy) {
               return res.status(400).json({
-                message: 'You Dont have enough Study Leave days',
+                message:
+                  'You Dont have enough Study Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
                 studyLeaveTaken,
                 daysRequested: daysDetails.totalDays,
                 totalStudy,
@@ -290,7 +296,8 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
             const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalAnnual;
             if (chk1) {
               return res.status(400).json({
-                message: 'You Dont have enough Annual Leave days',
+                message:
+                  'You Dont have enough Annual Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
                 annualLeaveTaken,
                 homeLeaveTaken,
                 daysRequested: daysDetails.totalDays,
@@ -608,7 +615,8 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
           const totalPaternity = paternityLeaveTaken + daysDetails.totalDays;
           if (paternity < totalPaternity) {
             return res.status(400).json({
-              message: 'You Dont have enough Paternity Leave days',
+              message:
+                'You Dont have enough Paternity Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               paternityLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalPaternity,
@@ -627,7 +635,8 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
           const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalHome;
           if (chk1) {
             return res.status(400).json({
-              message: 'You Dont have enough Annual Leave days',
+              message:
+                'You Dont have enough Annual Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               annualLeaveTaken,
               homeLeaveTaken,
               daysRequested: daysDetails.totalDays,
@@ -644,7 +653,8 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
           const totalMaternity = maternityLeaveTaken + daysDetails.totalDays;
           if (maternity < totalMaternity) {
             return res.status(400).json({
-              message: 'You Dont have enough Maternity Leave days',
+              message:
+                'You Dont have enough Maternity Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               maternityLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalMaternity,
@@ -655,7 +665,8 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
           const totalSick = sickLeaveTaken + daysDetails.totalDays;
           if (sick < totalSick) {
             return res.status(400).json({
-              message: 'You Dont have enough Sick Leave days',
+              message:
+                'You Dont have enough Sick Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               sickLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalSick,
@@ -666,7 +677,8 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
           const totalUnpaid = unPaidLeaveTaken + daysDetails.totalDays;
           if (unpaid < totalUnpaid) {
             return res.status(400).json({
-              message: 'You Dont have enough Unpaid Leave days',
+              message:
+                'You Dont have enough Unpaid Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               unPaidLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalUnpaid,
@@ -677,7 +689,8 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
           const totalStudy = studyLeaveTaken + daysDetails.totalDays;
           if (study < totalStudy) {
             return res.status(400).json({
-              message: 'You Dont have enough Study Leave days',
+              message:
+                'You Dont have enough Study Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               studyLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalStudy,
@@ -691,7 +704,8 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
           const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalAnnual;
           if (chk1) {
             return res.status(400).json({
-              message: 'You Dont have enough Annual Leave days',
+              message:
+                'You Dont have enough Annual Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               annualLeaveTaken,
               homeLeaveTaken,
               daysRequested: daysDetails.totalDays,
@@ -889,7 +903,8 @@ ${user.fName}  ${user.lName} is requesting to Cancel their Taken leave Which was
           const totalPaternity = paternityLeaveTaken + daysDetails.totalDays;
           if (paternity < totalPaternity) {
             return res.status(400).json({
-              message: 'You Dont have enough Paternity Leave days',
+              message:
+                'You Dont have enough Paternity Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               paternityLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalPaternity,
@@ -908,7 +923,8 @@ ${user.fName}  ${user.lName} is requesting to Cancel their Taken leave Which was
           const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalHome;
           if (chk1) {
             return res.status(400).json({
-              message: 'You Dont have enough Annual Leave days',
+              message:
+                'You Dont have enough Annual Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               annualLeaveTaken,
               homeLeaveTaken,
               daysRequested: daysDetails.totalDays,
@@ -925,7 +941,8 @@ ${user.fName}  ${user.lName} is requesting to Cancel their Taken leave Which was
           const totalMaternity = maternityLeaveTaken + daysDetails.totalDays;
           if (maternity < totalMaternity) {
             return res.status(400).json({
-              message: 'You Dont have enough Maternity Leave days',
+              message:
+                'You Dont have enough Maternity Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               maternityLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalMaternity,
@@ -936,7 +953,8 @@ ${user.fName}  ${user.lName} is requesting to Cancel their Taken leave Which was
           const totalSick = sickLeaveTaken + daysDetails.totalDays;
           if (sick < totalSick) {
             return res.status(400).json({
-              message: 'You Dont have enough Sick Leave days',
+              message:
+                'You Dont have enough Sick Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               sickLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalSick,
@@ -947,7 +965,8 @@ ${user.fName}  ${user.lName} is requesting to Cancel their Taken leave Which was
           const totalUnpaid = unPaidLeaveTaken + daysDetails.totalDays;
           if (unpaid < totalUnpaid) {
             return res.status(400).json({
-              message: 'You Dont have enough Unpaid Leave days',
+              message:
+                'You Dont have enough Unpaid Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               unPaidLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalUnpaid,
@@ -958,7 +977,8 @@ ${user.fName}  ${user.lName} is requesting to Cancel their Taken leave Which was
           const totalStudy = studyLeaveTaken + daysDetails.totalDays;
           if (study < totalStudy) {
             return res.status(400).json({
-              message: 'You Dont have enough Study Leave days',
+              message:
+                'You Dont have enough Study Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               studyLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalStudy,
@@ -972,7 +992,8 @@ ${user.fName}  ${user.lName} is requesting to Cancel their Taken leave Which was
           const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalAnnual;
           if (chk1) {
             return res.status(400).json({
-              message: 'You Dont have enough Annual Leave days',
+              message:
+                'You Dont have enough Annual Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               annualLeaveTaken,
               homeLeaveTaken,
               daysRequested: daysDetails.totalDays,
@@ -1126,7 +1147,8 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
           const totalPaternity = paternityLeaveTaken + daysDetails.totalDays;
           if (paternity < totalPaternity) {
             return res.status(400).json({
-              message: 'You Dont have enough Paternity Leave days',
+              message:
+                'You Dont have enough Paternity Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               paternityLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalPaternity,
@@ -1145,7 +1167,8 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
           const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalHome;
           if (chk1) {
             return res.status(400).json({
-              message: 'You Dont have enough Annual Leave days',
+              message:
+                'You Dont have enough Annual Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               annualLeaveTaken,
               homeLeaveTaken,
               daysRequested: daysDetails.totalDays,
@@ -1162,7 +1185,8 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
           const totalMaternity = maternityLeaveTaken + daysDetails.totalDays;
           if (maternity < totalMaternity) {
             return res.status(400).json({
-              message: 'You Dont have enough Maternity Leave days',
+              message:
+                'You Dont have enough Maternity Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               maternityLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalMaternity,
@@ -1173,7 +1197,8 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
           const totalSick = sickLeaveTaken + daysDetails.totalDays;
           if (sick < totalSick) {
             return res.status(400).json({
-              message: 'You Dont have enough Sick Leave days',
+              message:
+                'You Dont have enough Sick Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               sickLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalSick,
@@ -1184,7 +1209,8 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
           const totalUnpaid = unPaidLeaveTaken + daysDetails.totalDays;
           if (unpaid < totalUnpaid) {
             return res.status(400).json({
-              message: 'You Dont have enough Unpaid Leave days',
+              message:
+                'You Dont have enough Unpaid Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               unPaidLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalUnpaid,
@@ -1195,7 +1221,8 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
           const totalStudy = studyLeaveTaken + daysDetails.totalDays;
           if (study < totalStudy) {
             return res.status(400).json({
-              message: 'You Dont have enough Study Leave days',
+              message:
+                'You Dont have enough Study Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               studyLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalStudy,
@@ -1209,7 +1236,8 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
           const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalAnnual;
           if (chk1) {
             return res.status(400).json({
-              message: 'You Dont have enough Annual Leave days',
+              message:
+                'You Dont have enough Annual Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               annualLeaveTaken,
               homeLeaveTaken,
               daysRequested: daysDetails.totalDays,

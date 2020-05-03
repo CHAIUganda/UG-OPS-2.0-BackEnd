@@ -148,7 +148,8 @@ const createLeave = async (req, res) => {
         const totalPaternity = paternityLeaveTaken + daysDetails.totalDays;
         if (paternity < totalPaternity) {
           return res.status(400).json({
-            message: 'You Dont have enough Paternity Leave days',
+            message:
+              'You Dont have enough Paternity Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
             paternityLeaveTaken,
             daysRequested: daysDetails.totalDays,
             totalPaternity,
@@ -167,7 +168,8 @@ const createLeave = async (req, res) => {
         const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalHome;
         if (chk1) {
           return res.status(400).json({
-            message: 'You Dont have enough Annual Leave days',
+            message:
+              'You Dont have enough Annual Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
             annualLeaveTaken,
             homeLeaveTaken,
             daysRequested: daysDetails.totalDays,
@@ -184,7 +186,8 @@ const createLeave = async (req, res) => {
         const totalMaternity = maternityLeaveTaken + daysDetails.totalDays;
         if (maternity < totalMaternity) {
           return res.status(400).json({
-            message: 'You Dont have enough Maternity Leave days',
+            message:
+              'You Dont have enough Maternity Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
             maternityLeaveTaken,
             daysRequested: daysDetails.totalDays,
             totalMaternity,
@@ -195,7 +198,8 @@ const createLeave = async (req, res) => {
         const totalSick = sickLeaveTaken + daysDetails.totalDays;
         if (sick < totalSick) {
           return res.status(400).json({
-            message: 'You Dont have enough Sick Leave days',
+            message:
+              'You Dont have enough Sick Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
             sickLeaveTaken,
             daysRequested: daysDetails.totalDays,
             totalSick,
@@ -206,7 +210,8 @@ const createLeave = async (req, res) => {
         const totalUnpaid = unPaidLeaveTaken + daysDetails.totalDays;
         if (unpaid < totalUnpaid) {
           return res.status(400).json({
-            message: 'You Dont have enough Unpaid Leave days',
+            message:
+              'You Dont have enough Unpaid Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
             unPaidLeaveTaken,
             daysRequested: daysDetails.totalDays,
             totalUnpaid,
@@ -217,7 +222,8 @@ const createLeave = async (req, res) => {
         const totalStudy = studyLeaveTaken + daysDetails.totalDays;
         if (study < totalStudy) {
           return res.status(400).json({
-            message: 'You Dont have enough Study Leave days',
+            message:
+              'You Dont have enough Study Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
             studyLeaveTaken,
             daysRequested: daysDetails.totalDays,
             totalStudy,
@@ -231,7 +237,8 @@ const createLeave = async (req, res) => {
         const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalAnnual;
         if (chk1) {
           return res.status(400).json({
-            message: 'You Dont have enough Annual Leave days',
+            message:
+              'You Dont have enough Annual Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
             annualLeaveTaken,
             homeLeaveTaken,
             daysRequested: daysDetails.totalDays,

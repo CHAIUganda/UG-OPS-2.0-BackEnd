@@ -5,7 +5,7 @@ const User = require('../../../model/User');
 
 const handleSnoozedContractNotifications = async () => {
   try {
-    const expiryIn = 32;
+    const expiryIn = 31;
     const user = await User.find({});
     user.password = undefined;
 
@@ -33,7 +33,7 @@ const handleSnoozedContractNotifications = async () => {
           const CurrentDate = moment().tz('Africa/Kampala').format();
           snoozeDate = moment(snoozeDate);
           const diff = snoozeDate.diff(CurrentDate, 'days') + 1;
-          // chk if notifications have been snoozed for 32 days
+          // chk if notifications have been snoozed for 31 days
           // eslint-disable-next-line eqeqeq
           if (diff == expiryIn) {
             // reset snooze to false
