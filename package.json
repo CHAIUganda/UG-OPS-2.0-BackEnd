@@ -1,0 +1,43 @@
+{
+  "name": "ugopps2",
+  "version": "1.0.0",
+  "description": "Rest APi using express and mongo db",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "@powershell -NoProfile -ExecutionPolicy Unrestricted -Command $env:DEBUG='server'; npx nodemon index"
+  },
+  "keywords": [
+    "Restful",
+    "API",
+    "Express",
+    "Mongodb"
+  ],
+  "author": "CHAI-UG",
+  "license": "ISC",
+  "dependencies": {
+    "@okta/jwt-verifier": "^1.0.0",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "cron": "^1.8.2",
+    "debug": "^4.1.1",
+    "dotenv": "^8.2.0",
+    "eslint-config-prettier": "^6.10.0",
+    "eslint-plugin-prettier": "^3.1.2",
+    "express": "^4.17.1",
+    "express-validator": "^6.3.1",
+    "ics": "^2.19.0",
+    "jsonwebtoken": "^8.5.1",
+    "log4js": "^6.1.2",
+    "moment-timezone": "^0.5.28",
+    "mongoose": "^5.8.9",
+    "nodemailer": "^6.4.2"
+  },
+  "devDependencies": {
+    "eslint": "^6.1.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.18.2",
+    "nodemon": "^2.0.2"
+  }
+}
