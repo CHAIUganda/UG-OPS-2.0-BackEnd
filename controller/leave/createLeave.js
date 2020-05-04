@@ -300,7 +300,7 @@ ${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateStri
         const notificationType = 'Leave';
         // prettier-ignore
         // eslint-disable-next-line max-len
-        const notificationMessage = '';
+        const notificationMessage = `${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateString()} to ${endDate.toDateString()}.`;
         await storeNotification(
           supervisor,
           notificationTitle,

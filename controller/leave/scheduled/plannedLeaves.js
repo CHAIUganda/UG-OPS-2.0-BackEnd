@@ -7,6 +7,11 @@ const Mailer = require('../../../helpers/Mailer');
 
 const plannedLeaves = async () => {
   try {
+    const startsIn = 28;
+    const startsIn2 = 21;
+    const startsIn3 = 14;
+    const startsIn4 = 7;
+    const startsIn5 = 3;
     const logger = log4js.getLogger('Timed');
     // set timezone to kampala
     const CurrentDate = moment().tz('Africa/Kampala').format();
@@ -66,7 +71,7 @@ Your Planned leave from ${arr[controller].startDate.toDateString()} to ${arr[con
         if (
           // prettier-ignore
           // eslint-disable-next-line
-          diff == expiryIn || diff == expiryIn2 || diff == expiryIn3
+          diff == startsIn || diff == startsIn2 || diff == startsIn3 || diff == startsIn4 || diff == startsIn5
         ) {
           // sends mail to user
           // prettier-ignore
