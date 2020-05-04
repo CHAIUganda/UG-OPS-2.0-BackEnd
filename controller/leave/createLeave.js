@@ -291,7 +291,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
       // prettier-ignore
       const textSupervisor = `Hello  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
+${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateString()} to ${endDate.toDateString()}.${footer}.
                                       `;
       if (status === 'Pending Supervisor') {
         Mailer(from, supervisor.email, subject, textSupervisor, '');
@@ -300,7 +300,7 @@ ${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateStri
         const notificationType = 'Leave';
         // prettier-ignore
         // eslint-disable-next-line max-len
-        const notificationMessage = `${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateString()} to ${endDate.toDateString()}`;
+        const notificationMessage = `${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateString()} to ${endDate.toDateString()}.`;
         await storeNotification(
           supervisor,
           notificationTitle,
