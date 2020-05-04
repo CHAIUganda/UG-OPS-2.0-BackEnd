@@ -115,6 +115,8 @@ const UserSchema = mongoose.Schema({
       status: String,
       createDate: Date,
       linkTo: String,
+      refType: String,
+      refId: mongoose.Schema.Types.ObjectId,
     },
   ],
 });

@@ -34,6 +34,8 @@ const supervisorHandleLeave = async (req, res) => {
         message: 'User does not Exist',
       });
     }
+    let refType;
+    let refId;
 
     const supervisor = await User.findOne({
       email: user.supervisorEmail,
@@ -96,10 +98,13 @@ Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateStrin
           Mailer(from, to, subject, text, '');
           // save notification on user obj
           const notificationTitle = 'Leave has been approved by supervisor';
-          const notificationType = 'Leave';
+          const notificationType = '/hr/Apply4Leave';
+          refType = 'Leaves';
+          refId = leave._id;
           // eslint-disable-next-line max-len
           const notificationMessage = `Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved your supervisor. It is now pending Country director approval`;
-          await storeNotification(user, notificationTitle, notificationMessage, notificationType);
+          // eslint-disable-next-line max-len
+          await storeNotification(user, notificationTitle, notificationMessage, notificationType, refType, refId);
           // email to CD
           // prettier-ignore
           const textCd = `Hello  ${cd.fName}, 
@@ -109,12 +114,14 @@ ${user.fName}  ${user.lName} is requesting for a Home Leave from ${leave.startDa
           Mailer(from, cd.email, subject, textCd, '');
           // save notification on user obj
           const cdnotificationTitle = `${user.fName}  ${user.lName} is requesting for Home Leave`;
-          const cdnotificationType = 'Leave';
+          const cdnotificationType = '/hr/SuperviseLeave';
+          refType = 'Leaves';
+          refId = leave._id;
           // prettier-ignore
           // eslint-disable-next-line max-len
           const cdnotificationMessage = `${user.fName}  ${user.lName} is requesting for Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}`;
           // eslint-disable-next-line max-len
-          await storeNotification(cd, cdnotificationTitle, cdnotificationMessage, cdnotificationType);
+          await storeNotification(cd, cdnotificationTitle, cdnotificationMessage, cdnotificationType, refType, refId);
 
           res.status(200).json({
             message: 'Leave has been Approved, Pending CD approval'
@@ -138,18 +145,23 @@ Your Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDate
           Mailer(from, to, subject, text, user.supervisorEmail);
           // save notification on user obj
           const notificationTitle = 'Leave has been approved by the Country director';
-          const notificationType = 'Leave';
+          const notificationType = '/hr/Apply4Leave';
+          refType = 'Leaves';
+          refId = leave._id;
           // eslint-disable-next-line max-len
           const notificationMessage = `Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by the Country director`;
-          await storeNotification(user, notificationTitle, notificationMessage, notificationType);
+          // eslint-disable-next-line max-len
+          await storeNotification(user, notificationTitle, notificationMessage, notificationType, refType, refId);
 
           const supervisornotificationTitle = `${user.fName}  ${user.lName}'s Home Leave has been approved by the Country director `;
-          const supervisornotificationType = 'Leave';
+          const supervisornotificationType = '/hr/SuperviseLeave';
+          refType = 'Leaves';
+          refId = leave._id;
           // prettier-ignore
           // eslint-disable-next-line max-len
           const supervisornotificationMessage = `${user.fName}  ${user.lName}'s Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by the Country director`;
           // eslint-disable-next-line max-len
-          await storeNotification(supervisor, supervisornotificationTitle, supervisornotificationMessage, supervisornotificationType);
+          await storeNotification(supervisor, supervisornotificationTitle, supervisornotificationMessage, supervisornotificationType, refType, refId);
 
 
           res.status(200).json({
@@ -174,18 +186,23 @@ Cancellation of your Home Leave from ${leave.startDate.toDateString()} to ${leav
           Mailer(from, user.email, subject, textStaff, cd.email);
           // save notification on user obj
           const notificationTitle = 'Cancellation of Home Leave has been approved by your Supervsor';
-          const notificationType = 'Leave';
+          const notificationType = '/hr/Apply4Leave';
+          refType = 'Leaves';
+          refId = leave._id;
           // eslint-disable-next-line max-len
           const notificationMessage = `Cancellation of your Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by your supervisor.`;
-          await storeNotification(user, notificationTitle, notificationMessage, notificationType);
+          // eslint-disable-next-line max-len
+          await storeNotification(user, notificationTitle, notificationMessage, notificationType, refType, refId);
 
           const cdnotificationTitle = `${user.fName}  ${user.lName}'s Home Leave Cancellation has been approved by the Supervisor `;
-          const cdnotificationType = 'Leave';
+          const cdnotificationType = '/hr/SuperviseLeave';
+          refType = 'Leaves';
+          refId = leave._id;
           // prettier-ignore
           // eslint-disable-next-line max-len
           const cdnotificationMessage = `${user.fName}  ${user.lName}'s Home Leave Cancellation from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by the Supervisor`;
           // eslint-disable-next-line max-len
-          await storeNotification(cd, cdnotificationTitle, cdnotificationMessage, cdnotificationType);
+          await storeNotification(cd, cdnotificationTitle, cdnotificationMessage, cdnotificationType, refType, refId);
 
 
           res.status(200).json({
@@ -233,18 +250,23 @@ Modification of your taken Home Leave from ${leave.takenPending.startDate.toDate
           Mailer(from, user.email, subject, textStaff, cd.email);
           // save notification on user obj
           const notificationTitle = 'Modification of your taken Home Leave has been approved by your Supervisor';
-          const notificationType = 'Leave';
+          const notificationType = '/hr/Apply4Leave';
+          refType = 'Leaves';
+          refId = leave._id;
           // eslint-disable-next-line max-len
           const notificationMessage = `Modification of your taken Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by your supervisor.`;
-          await storeNotification(user, notificationTitle, notificationMessage, notificationType);
+          // eslint-disable-next-line max-len
+          await storeNotification(user, notificationTitle, notificationMessage, notificationType, refType, refId);
 
           const cdnotificationTitle = `${user.fName}  ${user.lName}'s Home Leave Modification has been approved by the Supervisor `;
-          const cdnotificationType = 'Leave';
+          const cdnotificationType = '/hr/SuperviseLeave';
+          refType = 'Leaves';
+          refId = leave._id;
           // prettier-ignore
           // eslint-disable-next-line max-len
           const cdnotificationMessage = `${user.fName}  ${user.lName}'s Home Leave Modification from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by the Supervisor`;
           // eslint-disable-next-line max-len
-          await storeNotification(cd, cdnotificationTitle, cdnotificationMessage, cdnotificationType);
+          await storeNotification(cd, cdnotificationTitle, cdnotificationMessage, cdnotificationType, refType, refId);
 
 
           res.status(200).json({
@@ -284,11 +306,14 @@ Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.end
                        `;
           Mailer(from, user.email, subject, textStaff, '');
           // save notification on user obj
-          const notificationTitle = 'Cancellation of Home Leave has been approved by your Supervsor';
-          const notificationType = 'Leave';
+          const notificationTitle = 'Cancellation of your Leave has been approved by your Supervsor';
+          const notificationType = '/hr/Apply4Leave';
+          refType = 'Leaves';
+          refId = leave._id;
           // eslint-disable-next-line max-len
-          const notificationMessage = `Cancellation of your Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by your supervisor.`;
-          await storeNotification(user, notificationTitle, notificationMessage, notificationType);
+          const notificationMessage = `Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by your supervisor.`;
+          // eslint-disable-next-line max-len
+          await storeNotification(user, notificationTitle, notificationMessage, notificationType, refType, refId);
           res.status(200).json({
             message: 'Leave Cancellation has been Approved'
           });
@@ -332,11 +357,14 @@ Modification of your taken Leave from ${leave.takenPending.startDate.toDateStrin
                          `;
           Mailer(from, user.email, subject, textStaff, '');
           // save notification on user obj
-          const notificationTitle = 'Modification of your taken Home Leave has been approved by your Supervisor';
-          const notificationType = 'Leave';
+          const notificationTitle = 'Modification of your taken Leave has been approved by your Supervisor';
+          const notificationType = '/hr/Apply4Leave';
+          refType = 'Leaves';
+          refId = leave._id;
           // eslint-disable-next-line max-len
-          const notificationMessage = `Modification of your taken Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by your supervisor.`;
-          await storeNotification(user, notificationTitle, notificationMessage, notificationType);
+          const notificationMessage = `Modification of your taken Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by your supervisor.`;
+          // eslint-disable-next-line max-len
+          await storeNotification(user, notificationTitle, notificationMessage, notificationType, refType, refId);
 
           res.status(200).json({
             message: 'Leave modification has been Approved'
@@ -357,10 +385,13 @@ Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateStrin
                  `;
           Mailer(from, to, subject, text, '');
           const notificationTitle = 'Leave has been approved by supervisor';
-          const notificationType = 'Leave';
+          const notificationType = '/hr/Apply4Leave';
+          refType = 'Leaves';
+          refId = leave._id;
           // eslint-disable-next-line max-len
           const notificationMessage = `Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved your supervisor.`;
-          await storeNotification(user, notificationTitle, notificationMessage, notificationType);
+          // eslint-disable-next-line max-len
+          await storeNotification(user, notificationTitle, notificationMessage, notificationType, refType, refId);
 
           res.status(200).json({
             message: 'Leave has been Approved'
@@ -392,11 +423,21 @@ Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateStrin
           // prettier-ignore
           const text = `Dear ${user.fName}, 
 
-Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by your supervisor${footer}.
+Your Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by your supervisor${footer}.
                                    `;
           Mailer(from, to, subject, text, '');
+          // save notification on user obj
+          const notificationTitle = 'Leave has been declined by supervisor';
+          const notificationType = '/hr/Apply4Leave';
+          refType = 'Leaves';
+          refId = leave._id;
+          // eslint-disable-next-line max-len
+          const notificationMessage = `Your Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined your supervisor.`;
+          // eslint-disable-next-line max-len
+          await storeNotification(user, notificationTitle, notificationMessage, notificationType, refType, refId);
+
           res.status(200).json({
-            message: 'Leave has been Declined by supervisor'
+            message: 'Leave has been Declined'
           });
         } else if (leave.status === 'Pending Country Director') {
           // change status to rejected and notify
@@ -412,9 +453,30 @@ Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateStrin
           // prettier-ignore
           const text = `Dear ${user.fName}, 
 
-Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by the Country director.${footer}.
+Your Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by the Country director.${footer}.
                                    `;
           Mailer(from, to, subject, text, user.supervisorEmail);
+          // save notification on user obj
+          const notificationTitle = 'Leave has been declined by the Country director';
+          const notificationType = '/hr/Apply4Leave';
+          refType = 'Leaves';
+          refId = leave._id;
+          // eslint-disable-next-line max-len
+          const notificationMessage = `Your Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by the Country director`;
+          // eslint-disable-next-line max-len
+          await storeNotification(user, notificationTitle, notificationMessage, notificationType, refType, refId);
+
+          const supervisornotificationTitle = `${user.fName}  ${user.lName}'s Home Leave has been declined by the Country director `;
+          const supervisornotificationType = '/hr/SuperviseLeave';
+          refType = 'Leaves';
+          refId = leave._id;
+          // prettier-ignore
+          // eslint-disable-next-line max-len
+          const supervisornotificationMessage = `${user.fName}  ${user.lName}'s Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by the Country director`;
+          // eslint-disable-next-line max-len
+          await storeNotification(supervisor, supervisornotificationTitle, supervisornotificationMessage, supervisornotificationType, refType, refId);
+
+
           res.status(200).json({
             message: 'Leave has been Declined'
           });
@@ -435,6 +497,27 @@ Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateStrin
 Cancellation of your Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by your supervisor.${footer}.
                          `;
           Mailer(from, user.email, subject, textStaff, cd.email);
+          // save notification on user obj
+          const notificationTitle = 'Cancellation of Home Leave has been declined by your Supervsor';
+          const notificationType = '/hr/Apply4Leave';
+          refType = 'Leaves';
+          refId = leave._id;
+          // eslint-disable-next-line max-len
+          const notificationMessage = `Cancellation of your Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by your supervisor.`;
+          // eslint-disable-next-line max-len
+          await storeNotification(user, notificationTitle, notificationMessage, notificationType, refType, refId);
+
+          const cdnotificationTitle = `${user.fName}  ${user.lName}'s Home Leave Cancellation has been declined by the Supervisor `;
+          const cdnotificationType = '/hr/SuperviseLeave';
+          refType = 'Leaves';
+          refId = leave._id;
+          // prettier-ignore
+          // eslint-disable-next-line max-len
+          const cdnotificationMessage = `${user.fName}  ${user.lName}'s Home Leave Cancellation from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by the Supervisor`;
+          // eslint-disable-next-line max-len
+          await storeNotification(cd, cdnotificationTitle, cdnotificationMessage, cdnotificationType, refType, refId);
+
+
           res.status(200).json({
             message: 'Leave Cancellation has been Declined'
           });
@@ -467,6 +550,27 @@ Cancellation of your Home Leave from ${leave.startDate.toDateString()} to ${leav
 Modification of your taken Home Leave from ${leave.takenPending.startDate.toDateString()} to ${leave.takenPending.endDate.toDateString()} has been declined by your supervisor.${footer}.
                          `;
           Mailer(from, user.email, subject, textStaff, cd.email);
+          // save notification on user obj
+          const notificationTitle = 'Modification of your taken Home Leave has been declined by your Supervisor';
+          const notificationType = '/hr/Apply4Leave';
+          refType = 'Leaves';
+          refId = leave._id;
+          // eslint-disable-next-line max-len
+          const notificationMessage = `Modification of your taken Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by your supervisor.`;
+          // eslint-disable-next-line max-len
+          await storeNotification(user, notificationTitle, notificationMessage, notificationType, refType, refId);
+
+          const cdnotificationTitle = `${user.fName}  ${user.lName}'s Home Leave Modification has been declined by the Supervisor `;
+          const cdnotificationType = '/hr/SuperviseLeave';
+          refType = 'Leaves';
+          refId = leave._id;
+          // prettier-ignore
+          // eslint-disable-next-line max-len
+          const cdnotificationMessage = `${user.fName}  ${user.lName}'s Home Leave Modification from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by the Supervisor`;
+          // eslint-disable-next-line max-len
+          await storeNotification(cd, cdnotificationTitle, cdnotificationMessage, cdnotificationType, refType, refId);
+
+
           res.status(200).json({
             message: 'Leave modification has been Declined'
           });
@@ -493,9 +597,19 @@ Modification of your taken Home Leave from ${leave.takenPending.startDate.toDate
           // prettier-ignore
           const textStaff = `Hello  ${user.fName}, 
   
-  Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by your supervisor.${footer}.
+Cancellation of your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by your supervisor.${footer}.
                          `;
           Mailer(from, user.email, subject, textStaff, '');
+          // save notification on user obj
+          const notificationTitle = 'Cancellation of Home Leave has been declined by your Supervsor';
+          const notificationType = '/hr/Apply4Leave';
+          refType = 'Leaves';
+          refId = leave._id;
+          // eslint-disable-next-line max-len
+          const notificationMessage = `Cancellation of your Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by your supervisor.`;
+          // eslint-disable-next-line max-len
+          await storeNotification(user, notificationTitle, notificationMessage, notificationType, refType, refId);
+
           res.status(200).json({
             message: 'Leave Cancellation has been Declined'
           });
@@ -528,6 +642,16 @@ Modification of your taken Home Leave from ${leave.takenPending.startDate.toDate
 Modification of your taken Home Leave from ${leave.takenPending.startDate.toDateString()} to ${leave.takenPending.endDate.toDateString()} has been declined by your supervisor.${footer}.
                          `;
           Mailer(from, user.email, subject, textStaff, '');
+          // save notification on user obj
+          const notificationTitle = 'Modification of your taken Home Leave has been declined by your Supervisor';
+          const notificationType = '/hr/Apply4Leave';
+          refType = 'Leaves';
+          refId = leave._id;
+          // eslint-disable-next-line max-len
+          const notificationMessage = `Modification of your taken Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by your supervisor.`;
+          // eslint-disable-next-line max-len
+          await storeNotification(user, notificationTitle, notificationMessage, notificationType, refType, refId);
+
           res.status(200).json({
             message: 'Leave Modification has been Declined'
           });
@@ -546,6 +670,16 @@ Modification of your taken Home Leave from ${leave.takenPending.startDate.toDate
 Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined by your supervisor.${footer}.
                                        `;
           Mailer(from, to, subject, text, '');
+          // save notification on user obj
+          const notificationTitle = 'Leave has been declined by supervisor';
+          const notificationType = '/hr/Apply4Leave';
+          refType = 'Leaves';
+          refId = leave._id;
+          // eslint-disable-next-line max-len
+          const notificationMessage = `Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been declined your supervisor.`;
+          // eslint-disable-next-line max-len
+          await storeNotification(user, notificationTitle, notificationMessage, notificationType, refType, refId);
+
           res.status(200).json({
             message: 'Leave has been Declined'
           });

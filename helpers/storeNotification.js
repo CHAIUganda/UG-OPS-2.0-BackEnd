@@ -1,6 +1,13 @@
 const moment = require('moment-timezone');
 
-const storeNotification = async (user, title, message, type) => {
+const storeNotification = async (
+  user,
+  title,
+  message,
+  type,
+  refType,
+  refId
+) => {
   try {
     // set timezone to kampala
     const CurrentDate = moment().tz('Africa/Kampala');
@@ -12,6 +19,8 @@ const storeNotification = async (user, title, message, type) => {
       status: 'unRead',
       createDate: today,
       linkTo: type,
+      refType,
+      refId,
     };
     user.notifications.push(notification);
     await user.save();
