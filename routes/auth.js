@@ -18,51 +18,33 @@ router.post(
   '/registerUser',
   [
     // input validations
-    check('fName', 'Please Enter a Valid First Name')
-      .not()
-      .isEmpty(),
-    check('lName', 'Please Enter a Valid Last Name')
-      .not()
-      .isEmpty(),
+    check('fName', 'Please Enter a Valid First Name').not().isEmpty(),
+    check('lName', 'Please Enter a Valid Last Name').not().isEmpty(),
     check('contractStartDate', 'Please Enter a Valid Contract Start Date')
       .not()
       .isEmpty(),
-    check('gender', 'Please Enter a Valid Gender')
-      .not()
-      .isEmpty(),
-    check('title', 'Please Enter a Valid Staff Title')
-      .not()
-      .isEmpty(),
+    check('gender', 'Please Enter a Valid Gender').not().isEmpty(),
+    check('title', 'Please Enter a Valid Staff Title').not().isEmpty(),
     check('contractEndDate', 'Please Enter a Valid Contract End Date')
       .not()
       .isEmpty(),
-    check('birthDate', 'Please Enter a Valid BirthDate')
-      .not()
-      .isEmpty(),
-    check('contractType', 'Please Enter a Valid Contract Type')
-      .not()
-      .isEmpty(),
-    check('type', 'Please Specify the type of Staff')
-      .not()
-      .isEmpty(),
+    check('birthDate', 'Please Enter a Valid BirthDate').not().isEmpty(),
+    check('contractType', 'Please Enter a Valid Contract Type').not().isEmpty(),
+    check('type', 'Please Specify the type of Staff').not().isEmpty(),
     // check('level', 'Please Specify the Staff Level')
     //   .not()
     //   .isEmpty(),
 
-    check('team', 'Please Specify the  Staff team')
-      .not()
-      .isEmpty(),
-    check('programId', 'Please Specify the staff Program Id')
-      .not()
-      .isEmpty(),
+    check('team', 'Please Specify the  Staff team').not().isEmpty(),
+    check('programId', 'Please Specify the staff Program Id').not().isEmpty(),
     check(
       'supervisorEmail',
       'Please supply a valid Supervisor Email'
     ).isEmail(),
     check('email', 'Please enter a valid email').isEmail(),
     check('password', 'Please enter a valid password').isLength({
-      min: 6
-    })
+      min: 6,
+    }),
   ],
   /* authenticator, */
   authController.registerUser
@@ -78,13 +60,28 @@ router.post(
   [
     // input validations
     check('email', 'Please enter a valid email').isEmail(),
-    check('contractId', 'Please Provide a ContractId')
-      .not()
-      .isEmpty()
+    check('contractId', 'Please Provide a ContractId').not().isEmpty(),
   ],
   authenticator,
   /* authenticator, */
   authController.editUser
+);
+
+/**
+ * @method - POST
+ * @param - /handleNotifications
+ * @description - User Modification
+ */
+router.post(
+  '/handleNotifications',
+  [
+    // input validations
+    check('staffEmail', 'Please enter a valid email').isEmail(),
+    check('notificationId', 'Please Provide a notificationId').not().isEmpty(),
+  ],
+  authenticator,
+  /* authenticator, */
+  authController.handleNotifications
 );
 
 /**
@@ -97,8 +94,8 @@ router.post(
   [
     check('email', 'Please enter a valid email').isEmail(),
     check('password', 'Minimum password length is 6').isLength({
-      min: 6
-    })
+      min: 6,
+    }),
   ],
   authController.login
 );

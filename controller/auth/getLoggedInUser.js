@@ -48,8 +48,13 @@ const getLoggedInUser = async (req, res) => {
       leaves,
       createdAt,
       supervisorEmail,
-      notifications,
     } = user;
+
+    const unReadNotifications = user.notifications;
+
+    const notifications = unReadNotifications.filter(
+      (notification) => notification.status === 'unRead'
+    );
 
     const userSupervisor = await User.findOne({
       email: supervisorEmail,
