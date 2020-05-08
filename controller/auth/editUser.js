@@ -253,7 +253,7 @@ const editUser = async (req, res) => {
       .status(201)
       .json({ message: 'User details have been Modified successfully' });
   } catch (err) {
-    debug(err.message);
+    console.log(err.message);
     res.status(500).json({ message: 'Error in Modifying User' });
   }
 };
