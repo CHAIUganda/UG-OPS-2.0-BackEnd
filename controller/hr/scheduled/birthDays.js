@@ -9,7 +9,7 @@ const birthDays = async () => {
     user.password = undefined;
 
     // initialize emailing necessities
-    const chaiAll = 'paulsseb@hotmail.com';
+    const chaiAll = 'spaul@clintonhealthaccess.org';
     const from = 'UGOperations@clintonhealthaccess.org';
     const footer = `
 
