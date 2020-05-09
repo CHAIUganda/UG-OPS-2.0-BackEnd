@@ -69,6 +69,16 @@ const registerUser = async (req, res) => {
   }
   if (!hr === true) {
     hr = false;
+  } else {
+    const hrrole = await User.findOne({
+      'roles.hr': true,
+    });
+
+    if (hrrole) {
+      return res.status(400).json({
+        message: 'A User with an HR Role Already Exists',
+      });
+    }
   }
   if (!supervisor === true) {
     supervisor = false;

@@ -77,13 +77,33 @@ const editUser = async (req, res) => {
     if (admin == null) {
       admin = user.roles.admin;
     }
-    if (hr == null) {
+    if (hr === true) {
+      const hrrole = await User.findOne({
+        'roles.hr': true,
+      });
+
+      if (hrrole) {
+        return res.status(400).json({
+          message: `${hrrole.fName} ${hrrole.lName} Already has the HR role on the system. First edit that user removing the role. `,
+        });
+      }
+    } else {
       hr = user.roles.hr;
     }
     if (supervisor == null) {
       supervisor = user.roles.supervisor;
     }
-    if (countryDirector == null) {
+    if (countryDirector === true) {
+      const cdrole = await User.findOne({
+        'roles.countryDirector': true,
+      });
+
+      if (cdrole) {
+        return res.status(400).json({
+          message: `${cdrole.fName} ${cdrole.lName} Already has the Country Director role on the system. First edit that user removing the role. `,
+        });
+      }
+    } else {
       countryDirector = user.roles.countryDirector;
     }
 
