@@ -76,7 +76,7 @@ const registerUser = async (req, res) => {
 
     if (hrrole) {
       return res.status(400).json({
-        message: 'A User with an HR Role Already Exists',
+        message: `${hrrole.fName} ${hrrole.lName} Already has the HR role on the system. First edit that user removing the role. `,
       });
     }
   }
@@ -92,7 +92,7 @@ const registerUser = async (req, res) => {
 
     if (cd) {
       return res.status(400).json({
-        message: 'A User with a Country Director Role Already Exists',
+        message: `${cd.fName} ${cd.lName} Already has the Country Director role on the system. First edit that user removing the role. `,
       });
     }
   }
