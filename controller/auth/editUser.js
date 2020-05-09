@@ -77,7 +77,8 @@ const editUser = async (req, res) => {
     if (admin == null) {
       admin = user.roles.admin;
     }
-    if (hr === true) {
+    // eslint-disable-next-line eqeqeq
+    if (hr == true) {
       const hrrole = await User.findOne({
         'roles.hr': true,
       });
@@ -87,7 +88,8 @@ const editUser = async (req, res) => {
           message: `${hrrole.fName} ${hrrole.lName} Already has the HR role on the system. First edit that user removing the role. `,
         });
       }
-    } else if (hr === false) {
+      // eslint-disable-next-line eqeqeq
+    } else if (hr == false) {
       hr = false;
     } else {
       hr = user.roles.hr;
