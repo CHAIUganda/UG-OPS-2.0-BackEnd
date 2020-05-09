@@ -33,6 +33,9 @@ const createLeave = async (req, res) => {
   if (comment == null) {
     comment = '';
   }
+  // set timezone to kampala
+  let CurrentDate = moment().tz('Africa/Kampala').format();
+  CurrentDate = new Date(CurrentDate);
 
   try {
     const user = await User.findOne({
@@ -92,6 +95,41 @@ const createLeave = async (req, res) => {
       programShortForm = userProgram.shortForm;
     }
     if (status === 'Pending Supervisor' || status === 'Planned') {
+      if (status === 'Planned') {
+        // prettier-ignore
+        if (moment(CurrentDate).isAfter(startDate)) {
+          return res.status(400).json({
+            message:
+                  'You cannot Plan for a date in the past',
+            CurrentDate,
+            startDate
+          });
+        }
+        if (moment(CurrentDate).isSame(startDate)) {
+          return res.status(400).json({
+            message: 'You cannot Plan for a date that already started',
+            CurrentDate,
+            startDate,
+          });
+        }
+
+        if (moment(CurrentDate).isAfter(endDate)) {
+          return res.status(400).json({
+            message: 'You cannot Plan for a date in the past',
+            CurrentDate,
+            endDate,
+          });
+        }
+
+        if (moment(CurrentDate).isSame(endDate)) {
+          return res.status(400).json({
+            message: 'Sorry you, cannot Plan for a leave in the past',
+            CurrentDate,
+            endDate,
+          });
+        }
+      }
+
       const publicHolidays = await PublicHoliday.find({});
       const daysDetails = getLeaveDaysNo(startDate, endDate, publicHolidays);
       // set timezone to kampala
