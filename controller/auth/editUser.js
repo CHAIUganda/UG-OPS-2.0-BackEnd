@@ -77,19 +77,17 @@ const editUser = async (req, res) => {
     if (admin == null) {
       admin = user.roles.admin;
     }
-    // eslint-disable-next-line eqeqeq
-    if (hr == true) {
+    if (hr === true) {
       const hrrole = await User.findOne({
         'roles.hr': true,
       });
-
+      // .equals(_id)
       if (hrrole) {
         return res.status(400).json({
           message: `${hrrole.fName} ${hrrole.lName} Already has the HR role on the system. First edit that user removing the role. `,
         });
       }
-      // eslint-disable-next-line eqeqeq
-    } else if (hr == false) {
+    } else if (hr === false) {
       hr = false;
     } else {
       hr = user.roles.hr;
@@ -108,7 +106,7 @@ const editUser = async (req, res) => {
         });
       }
     } else if (countryDirector === false) {
-      hr = false;
+      countryDirector = false;
     } else {
       countryDirector = user.roles.countryDirector;
     }
