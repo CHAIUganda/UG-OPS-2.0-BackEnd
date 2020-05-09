@@ -87,6 +87,8 @@ const editUser = async (req, res) => {
           message: `${hrrole.fName} ${hrrole.lName} Already has the HR role on the system. First edit that user removing the role. `,
         });
       }
+    } else if (hr === false) {
+      hr = false;
     } else {
       hr = user.roles.hr;
     }
@@ -103,6 +105,8 @@ const editUser = async (req, res) => {
           message: `${cdrole.fName} ${cdrole.lName} Already has the Country Director role on the system. First edit that user removing the role. `,
         });
       }
+    } else if (countryDirector === false) {
+      hr = false;
     } else {
       countryDirector = user.roles.countryDirector;
     }
