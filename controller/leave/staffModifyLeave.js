@@ -501,7 +501,7 @@ ${user.fName}  ${user.lName} has modified their HomeLeave, now to be off from ${
             // prettier-ignore
             const text = `Hello  ${hr.fName}, 
 
-${user.fName}  ${user.lName} has modified their HomeLeave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
+${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
                          `;
             Mailer(from, hr.email, subject, text, '');
             // save notification on user obj
@@ -511,7 +511,7 @@ ${user.fName}  ${user.lName} has modified their HomeLeave, now to be off from ${
             refId = leave._id;
             // prettier-ignore
             // eslint-disable-next-line max-len
-            const hrnotificationMessage = `${user.fName}  ${user.lName} has modified their HomeLeave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}`;
+            const hrnotificationMessage = `${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}`;
             // eslint-disable-next-line max-len
             await storeNotification(hr, hrnotificationTitle, hrnotificationMessage, hrnotificationType, refType, refId);
 
@@ -520,7 +520,7 @@ ${user.fName}  ${user.lName} has modified their HomeLeave, now to be off from ${
             // prettier-ignore
             const textSupervisor = `Hello  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} has modified their HomeLeave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
+${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
                          `;
             Mailer(from, supervisor.email, subject, textSupervisor, '');
             // save notification on user obj
@@ -530,13 +530,13 @@ ${user.fName}  ${user.lName} has modified their HomeLeave, now to be off from ${
             refId = leave._id;
             // prettier-ignore
             // eslint-disable-next-line max-len
-            const supervisornotificationMessage = `${user.fName}  ${user.lName} has modified their HomeLeave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}`;
+            const supervisornotificationMessage = `${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}`;
             // eslint-disable-next-line max-len
             await storeNotification(supervisor, supervisornotificationTitle, supervisornotificationMessage, supervisornotificationType, refType, refId);
 
 
             res.status(200).json({
-              message: 'Leave has been taken Modified successfully.'
+              message: 'Leave has been Modified successfully.'
             });
           }
         }
