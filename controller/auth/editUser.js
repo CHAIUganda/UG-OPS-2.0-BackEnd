@@ -81,7 +81,7 @@ const editUser = async (req, res) => {
       const hrrole = await User.findOne({
         'roles.hr': true,
       });
-      // .equals(_id)
+      // chk if that hr already exists and it is not the same user
       if (hrrole && !hrrole._id.equals(user._id)) {
         return res.status(400).json({
           message: `${hrrole.fName} ${hrrole.lName} Already has the HR role on the system. First edit that user removing the role from them. `,
@@ -99,8 +99,8 @@ const editUser = async (req, res) => {
       const cdrole = await User.findOne({
         'roles.countryDirector': true,
       });
-
-      if (cdrole) {
+      // chk if that cd already exists and it is not the same user
+      if (cdrole && !cdrole._id.equals(user._id)) {
         return res.status(400).json({
           message: `${cdrole.fName} ${cdrole.lName} Already has the Country Director role on the system. First edit that user removing the role. `,
         });
