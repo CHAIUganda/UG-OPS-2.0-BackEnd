@@ -82,9 +82,9 @@ const editUser = async (req, res) => {
         'roles.hr': true,
       });
       // .equals(_id)
-      if (hrrole) {
+      if (hrrole && !hrrole._id.equals(user._id)) {
         return res.status(400).json({
-          message: `${hrrole.fName} ${hrrole.lName} Already has the HR role on the system. First edit that user removing the role. `,
+          message: `${hrrole.fName} ${hrrole.lName} Already has the HR role on the system. First edit that user removing the role from them. `,
         });
       }
     } else if (hr === false) {
