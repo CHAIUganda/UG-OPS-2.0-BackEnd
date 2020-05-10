@@ -428,8 +428,31 @@ ${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateStri
             },
           }
         );
+        const leaveRemade = {
+          _id: leaveToTake._id,
+          startDate,
+          endDate,
+          type,
+          staff: {
+            email: user.email,
+            fName: user.fName,
+            lName: user.lName,
+          },
+          supervisorEmail: user.supervisorEmail,
+          comment,
+          status: leaveToTake.status,
+          programId,
+          program: Leaveprogram,
+          programShortForm: LeaveprogramShortForm,
+          leaveDays: daysDetails.leaveDays,
+          daysTaken: daysDetails.totalDays,
+          weekendDays: daysDetails.weekendDays,
+          publicHolidays: daysDetails.holidayDays,
+        };
+
         res.status(200).json({
           message: 'Leave has been Modified successfully.',
+          leave: leaveRemade,
         });
       } else {
         return res.status(400).json({

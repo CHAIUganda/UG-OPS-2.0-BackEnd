@@ -8,6 +8,7 @@ const Mailer = require('../../helpers/Mailer');
 const getLeavesTaken = require('./getLeavesTaken');
 const getLeaveDaysNo = require('./getLeaveDaysNo');
 const PublicHoliday = require('../../model/PublicHoliday');
+const Program = require('../../model/Program');
 const Contract = require('../../model/Contract');
 const storeNotification = require('../../helpers/storeNotification');
 
@@ -115,6 +116,26 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
     const oldEndDate = leave.endDate;
     const oldComment = leave.comment;
     const oldType = leave.type;
+    const publicHolidays = await PublicHoliday.find({});
+    const daysDetails = getLeaveDaysNo(startDate, endDate, publicHolidays);
+    const leaveDetails = await getLeavesTaken(user);
+
+    const { programId } = user;
+    let program;
+    let programShortForm;
+
+    const userProgram = await Program.findOne({
+      _id: programId,
+    });
+
+    if (!userProgram) {
+      program = null;
+      programShortForm = null;
+      // eslint-disable-next-line no-else-return
+    } else {
+      program = userProgram.name;
+      programShortForm = userProgram.shortForm;
+    }
 
     // if leave is taken by staff notify the HR and Supervisor.
     // handle leave here
@@ -173,14 +194,6 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
           // eslint-disable-next-line operator-linebreak
           moment(endDate).isAfter(oldEndDate)
         ) {
-          const publicHolidays = await PublicHoliday.find({});
-          const daysDetails = getLeaveDaysNo(
-            startDate,
-            endDate,
-            publicHolidays
-          );
-          const leaveDetails = await getLeavesTaken(user);
-
           const { annualLeaveBF } = user;
 
           const {
@@ -364,9 +377,31 @@ ${user.fName}  ${user.lName} is requesting to modify their leave. To be off from
             refType,
             refId
           );
+          const leaveRemade = {
+            _id: leave._id,
+            startDate,
+            endDate,
+            type,
+            staff: {
+              email: user.email,
+              fName: user.fName,
+              lName: user.lName,
+            },
+            supervisorEmail: user.supervisorEmail,
+            comment,
+            status: 'Pending Supervisor',
+            programId,
+            program,
+            programShortForm,
+            leaveDays: daysDetails.leaveDays,
+            daysTaken: daysDetails.totalDays,
+            weekendDays: daysDetails.weekendDays,
+            publicHolidays: daysDetails.holidayDays,
+          };
 
           res.status(200).json({
             message: 'Leave Modification Request has been sent successfully.',
+            leave: leaveRemade,
           });
         } else {
           // leave is still in approved time
@@ -467,9 +502,31 @@ ${user.fName}  ${user.lName} has modified their HomeLeave, now to be off from ${
             // eslint-disable-next-line max-len
             await storeNotification(supervisor, supervisornotificationTitle, supervisornotificationMessage, supervisornotificationType, refType, refId);
 
+            const leaveRemade = {
+              _id: leave._id,
+              startDate,
+              endDate,
+              type,
+              staff: {
+                email: user.email,
+                fName: user.fName,
+                lName: user.lName,
+              },
+              supervisorEmail: user.supervisorEmail,
+              comment,
+              status: leave.status,
+              programId,
+              program,
+              programShortForm,
+              leaveDays: daysDetails.leaveDays,
+              daysTaken: daysDetails.totalDays,
+              weekendDays: daysDetails.weekendDays,
+              publicHolidays: daysDetails.holidayDays,
+            };
 
             res.status(200).json({
-              message: 'Leave has been taken Modified successfully.'
+              message: 'Leave has been Modified successfully.',
+              leave: leaveRemade
             });
           } else {
           // Leave not home
@@ -534,9 +591,31 @@ ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${star
             // eslint-disable-next-line max-len
             await storeNotification(supervisor, supervisornotificationTitle, supervisornotificationMessage, supervisornotificationType, refType, refId);
 
+            const leaveRemade = {
+              _id: leave._id,
+              startDate,
+              endDate,
+              type,
+              staff: {
+                email: user.email,
+                fName: user.fName,
+                lName: user.lName,
+              },
+              supervisorEmail: user.supervisorEmail,
+              comment,
+              status: leave.status,
+              programId,
+              program,
+              programShortForm,
+              leaveDays: daysDetails.leaveDays,
+              daysTaken: daysDetails.totalDays,
+              weekendDays: daysDetails.weekendDays,
+              publicHolidays: daysDetails.holidayDays,
+            };
 
             res.status(200).json({
-              message: 'Leave has been Modified successfully.'
+              message: 'Leave has been Modified successfully.',
+              leave: leaveRemade
             });
           }
         }
@@ -619,9 +698,31 @@ ${user.fName}  ${user.lName} Decided not to take their HomeLeave from ${leave.st
           // eslint-disable-next-line max-len
           await storeNotification(supervisor, supervisornotificationTitle, supervisornotificationMessage, supervisornotificationType, refType, refId);
 
+          const leaveRemade = {
+            _id: leave._id,
+            startDate: leave.startDate,
+            endDate: leave.endDate,
+            type,
+            staff: {
+              email: user.email,
+              fName: user.fName,
+              lName: user.lName,
+            },
+            supervisorEmail: user.supervisorEmail,
+            comment,
+            status: 'Not Taken',
+            programId,
+            program,
+            programShortForm,
+            leaveDays: daysDetails.leaveDays,
+            daysTaken: daysDetails.totalDays,
+            weekendDays: daysDetails.weekendDays,
+            publicHolidays: daysDetails.holidayDays,
+          };
 
           res.status(200).json({
-            message: 'Leave has been Cancelled'
+            message: 'Leave has been Cancelled',
+            leave: leaveRemade
           });
         } else {
           // Leave not home
@@ -672,9 +773,31 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
           // eslint-disable-next-line max-len
           await storeNotification(supervisor, supervisornotificationTitle, supervisornotificationMessage, supervisornotificationType, refType, refId);
 
+          const leaveRemade = {
+            _id: leave._id,
+            startDate: leave.startDate,
+            endDate: leave.endDate,
+            type,
+            staff: {
+              email: user.email,
+              fName: user.fName,
+              lName: user.lName,
+            },
+            supervisorEmail: user.supervisorEmail,
+            comment,
+            status: 'Not Taken',
+            programId,
+            program,
+            programShortForm,
+            leaveDays: daysDetails.leaveDays,
+            daysTaken: daysDetails.totalDays,
+            weekendDays: daysDetails.weekendDays,
+            publicHolidays: daysDetails.holidayDays,
+          };
 
           res.status(200).json({
-            message: 'Leave has been Cancelled'
+            message: 'Leave has been Cancelled',
+            leave: leaveRemade
           });
         }
       } else {
@@ -712,9 +835,6 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
 
         // chk if staff is an expat or tcn to allow cd notication
         // prettier-ignore
-        const publicHolidays = await PublicHoliday.find({});
-        const daysDetails = getLeaveDaysNo(startDate, endDate, publicHolidays);
-        const leaveDetails = await getLeavesTaken(user);
 
         const { annualLeaveBF } = user;
 
@@ -908,9 +1028,31 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken Home leave. New
             refType,
             refId
           );
+          const leaveRemade = {
+            _id: leave._id,
+            startDate: leave.startDate,
+            endDate: leave.endDate,
+            type,
+            staff: {
+              email: user.email,
+              fName: user.fName,
+              lName: user.lName,
+            },
+            supervisorEmail: user.supervisorEmail,
+            comment,
+            status: 'Pending Change',
+            programId,
+            program,
+            programShortForm,
+            leaveDays: daysDetails.leaveDays,
+            daysTaken: daysDetails.totalDays,
+            weekendDays: daysDetails.weekendDays,
+            publicHolidays: daysDetails.holidayDays,
+          };
 
           res.status(200).json({
             message: 'Leave Modification request sent successfully.',
+            leave: leaveRemade,
           });
         } else {
           // Leave not home
@@ -963,9 +1105,31 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken leave. New Date
             refType,
             refId
           );
+          const leaveRemade = {
+            _id: leave._id,
+            startDate: leave.startDate,
+            endDate: leave.endDate,
+            type,
+            staff: {
+              email: user.email,
+              fName: user.fName,
+              lName: user.lName,
+            },
+            supervisorEmail: user.supervisorEmail,
+            comment,
+            status: 'Pending Change',
+            programId,
+            program,
+            programShortForm,
+            leaveDays: daysDetails.leaveDays,
+            daysTaken: daysDetails.totalDays,
+            weekendDays: daysDetails.weekendDays,
+            publicHolidays: daysDetails.holidayDays,
+          };
 
           res.status(200).json({
             message: 'Leave Modification request sent successfully.',
+            leave: leaveRemade,
           });
         }
       } else if (action === 'cancelLeave') {
@@ -1005,8 +1169,30 @@ ${user.fName}  ${user.lName} is requesting to Cancel their Taken leave Which was
           refId
         );
 
+        const leaveRemade = {
+          _id: leave._id,
+          startDate: leave.startDate,
+          endDate: leave.endDate,
+          type,
+          staff: {
+            email: user.email,
+            fName: user.fName,
+            lName: user.lName,
+          },
+          supervisorEmail: user.supervisorEmail,
+          comment,
+          status: 'Pending Not Taken',
+          programId,
+          program,
+          programShortForm,
+          leaveDays: daysDetails.leaveDays,
+          daysTaken: daysDetails.totalDays,
+          weekendDays: daysDetails.weekendDays,
+          publicHolidays: daysDetails.holidayDays,
+        };
         res.status(200).json({
           message: 'Cancellation Pending Supervisor Approval',
+          leave: leaveRemade,
         });
       } else {
         return res.status(400).json({
@@ -1050,10 +1236,6 @@ ${user.fName}  ${user.lName} is requesting to Cancel their Taken leave Which was
           });
         }
         // chk if staff is an expat or tcn to allow cd notication
-        // prettier-ignore
-        const publicHolidays = await PublicHoliday.find({});
-        const daysDetails = getLeaveDaysNo(startDate, endDate, publicHolidays);
-        const leaveDetails = await getLeavesTaken(user);
 
         const { annualLeaveBF } = user;
 
@@ -1239,8 +1421,31 @@ ${user.fName}  ${user.lName} has modified their Leave request, now asking to be 
           refId
         );
 
+        const leaveRemade = {
+          _id: leave._id,
+          startDate,
+          endDate,
+          type,
+          staff: {
+            email: user.email,
+            fName: user.fName,
+            lName: user.lName,
+          },
+          supervisorEmail: user.supervisorEmail,
+          comment,
+          status: leave.status,
+          programId,
+          program,
+          programShortForm,
+          leaveDays: daysDetails.leaveDays,
+          daysTaken: daysDetails.totalDays,
+          weekendDays: daysDetails.weekendDays,
+          publicHolidays: daysDetails.holidayDays,
+        };
+
         res.status(200).json({
           message: 'Leave has been Modified successfully.',
+          leave: leaveRemade,
         });
       } else if (action === 'cancelLeave') {
         // prettier-ignore
@@ -1278,8 +1483,31 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
           refId
         );
 
+        const leaveRemade = {
+          _id: leave._id,
+          startDate: leave.startDate,
+          endDate: leave.endDate,
+          type,
+          staff: {
+            email: user.email,
+            fName: user.fName,
+            lName: user.lName,
+          },
+          supervisorEmail: user.supervisorEmail,
+          comment,
+          status: 'Cancelled',
+          programId,
+          program,
+          programShortForm,
+          leaveDays: daysDetails.leaveDays,
+          daysTaken: daysDetails.totalDays,
+          weekendDays: daysDetails.weekendDays,
+          publicHolidays: daysDetails.holidayDays,
+        };
+
         res.status(200).json({
-          message: 'Leave has been Cancelled',
+          message: 'Leave has been Cancelled successfully.',
+          leave: leaveRemade,
         });
       } else {
         return res.status(400).json({
@@ -1329,10 +1557,6 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
           });
         }
         // chk if staff is an expat or tcn to allow cd notication
-        // prettier-ignore
-        const publicHolidays = await PublicHoliday.find({});
-        const daysDetails = getLeaveDaysNo(startDate, endDate, publicHolidays);
-        const leaveDetails = await getLeavesTaken(user);
 
         const { annualLeaveBF } = user;
 
@@ -1516,9 +1740,31 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
           refType,
           refId
         );
+        const leaveRemade = {
+          _id: leave._id,
+          startDate,
+          endDate,
+          type,
+          staff: {
+            email: user.email,
+            fName: user.fName,
+            lName: user.lName,
+          },
+          supervisorEmail: user.supervisorEmail,
+          comment,
+          status: 'Pending Supervisor',
+          programId,
+          program,
+          programShortForm,
+          leaveDays: daysDetails.leaveDays,
+          daysTaken: daysDetails.totalDays,
+          weekendDays: daysDetails.weekendDays,
+          publicHolidays: daysDetails.holidayDays,
+        };
 
         res.status(200).json({
           message: 'Leave has modified successfully.',
+          leave: leaveRemade,
         });
       } else if (action === 'cancelLeave') {
         // prettier-ignore
@@ -1555,8 +1801,31 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
           refId
         );
 
+        const leaveRemade = {
+          _id: leave._id,
+          startDate: leave.startDate,
+          endDate: leave.endDate,
+          type,
+          staff: {
+            email: user.email,
+            fName: user.fName,
+            lName: user.lName,
+          },
+          supervisorEmail: user.supervisorEmail,
+          comment,
+          status: 'Cancelled',
+          programId,
+          program,
+          programShortForm,
+          leaveDays: daysDetails.leaveDays,
+          daysTaken: daysDetails.totalDays,
+          weekendDays: daysDetails.weekendDays,
+          publicHolidays: daysDetails.holidayDays,
+        };
+
         res.status(200).json({
-          message: 'Leave has been Cancelled',
+          message: 'Leave has been Cancelled successfully.',
+          leave: leaveRemade,
         });
       } else {
         return res.status(400).json({
