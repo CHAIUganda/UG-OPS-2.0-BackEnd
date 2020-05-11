@@ -10,7 +10,17 @@ const getUsersWorkPermits = async (req, res) => {
     const { expiryIn } = req.params;
     const user = await User.find({});
     user.password = undefined;
-
+    // check if HR exists in System
+    const hr = await User.findOne({ 'roles.hr': true });
+    if (!hr) {
+      console.log('HR not found in the system, Please Register the HR');
+      const errorMessage = {
+        code: 404,
+        message: 'HR not found in the system, Please Register the HR',
+      };
+      throw errorMessage;
+    }
+    const { notifications } = hr;
     const combinedArray = [];
 
     const recurseProcessLeave = async (controller, arr) => {
@@ -125,6 +135,10 @@ const getUsersWorkPermits = async (req, res) => {
             // prettier-ignore
             // eslint-disable-next-line eqeqeq
             && (diff < expiryIn || diff == expiryIn)) {
+              const notificationDetails = notifications.filter(
+                // prettier-ignore
+                (notification) => notification.refId.equals(workPermitId) && notification.refType === 'Work Permits'
+              );
               const userRemade = {
                 _id,
                 fName,
@@ -152,6 +166,7 @@ const getUsersWorkPermits = async (req, res) => {
                 wpDismiss,
                 wpSnooze,
                 daysLeftonWorkPermit,
+                notificationDetails
               };
 
               combinedArray.push(userRemade);

@@ -4,6 +4,7 @@ const log4js = require('log4js');
 const Leave = require('../../../model/Leave');
 const User = require('../../../model/User');
 const Mailer = require('../../../helpers/Mailer');
+const storeNotification = require('../../../helpers/storeNotification');
 
 const takeLeaves = async () => {
   try {
@@ -109,6 +110,39 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
   ${user.fName}  ${user.lName} will be off from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()}.${footer}.
                            `;
             Mailer(from, supervisor.email, subject, textSupervisor, '');
+
+            // save notification on user obj
+            const notificationTitle = `${user.fName}  ${user.lName}'s Home Leave has started today`;
+            const notificationType = null;
+            const refType = 'Leaves';
+            const refId = arr[controller]._id;
+            // prettier-ignore
+            // eslint-disable-next-line max-len
+            const notificationMessage = `${user.fName}  ${user.lName} will be off from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()}.`;
+            await storeNotification(
+              supervisor,
+              notificationTitle,
+              notificationMessage,
+              notificationType,
+              refType,
+              refId
+            );
+            await storeNotification(
+              hr,
+              notificationTitle,
+              notificationMessage,
+              notificationType,
+              refType,
+              refId
+            );
+            await storeNotification(
+              cd,
+              notificationTitle,
+              notificationMessage,
+              notificationType,
+              refType,
+              refId
+            );
           } else {
           // Leave not home
           // change status to taken
@@ -142,6 +176,30 @@ Your leave from ${arr[controller].startDate.toDateString()} to ${arr[controller]
   ${user.fName}  ${user.lName} will be off from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()}.${footer}.
                            `;
             Mailer(from, supervisor.email, subject, textSupervisor, '');
+            // save notification on user obj
+            const notificationTitle = `${user.fName}  ${user.lName}'s Leave has started today`;
+            const notificationType = null;
+            const refType = 'Leaves';
+            const refId = arr[controller]._id;
+            // prettier-ignore
+            // eslint-disable-next-line max-len
+            const notificationMessage = `${user.fName}  ${user.lName} will be off from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()}.`;
+            await storeNotification(
+              supervisor,
+              notificationTitle,
+              notificationMessage,
+              notificationType,
+              refType,
+              refId
+            );
+            await storeNotification(
+              hr,
+              notificationTitle,
+              notificationMessage,
+              notificationType,
+              refType,
+              refId
+            );
           }
         }
 

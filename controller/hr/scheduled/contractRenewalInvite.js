@@ -6,6 +6,7 @@ const Contract = require('../../../model/Contract');
 const Program = require('../../../model/Program');
 const User = require('../../../model/User');
 const Mailer = require('../../../helpers/Mailer');
+const storeNotification = require('../../../helpers/storeNotification');
 
 const contractRenewalInvite = async () => {
   try {
@@ -153,6 +154,38 @@ ${fName} ${lName}'s Contract will expiry in ${diff} days as of ${today.toDateStr
                     textUser,
                     cc,
                     content
+                  );
+                  // save notification on user obj
+                  const notificationTitle = `${fName} ${lName}'s Contract will expiry in ${diff} days`;
+                  const notificationType = '/hr/ContractsExpiry';
+                  const refType = 'Contracts';
+                  const refId = contract._id;
+                  // prettier-ignore
+                  // eslint-disable-next-line max-len
+                  const notificationMessage = `${fName} ${lName}'s Contract will expiry in ${diff} days, this is a notification to initiate their contract renewal process.`;
+                  await storeNotification(
+                    supervisor,
+                    notificationTitle,
+                    notificationMessage,
+                    notificationType,
+                    refType,
+                    refId
+                  );
+                  await storeNotification(
+                    hr,
+                    notificationTitle,
+                    notificationMessage,
+                    notificationType,
+                    refType,
+                    refId
+                  );
+                  await storeNotification(
+                    programMngr,
+                    notificationTitle,
+                    notificationMessage,
+                    notificationType,
+                    refType,
+                    refId
                   );
                   recurseProcessLeave(controller + 1, arr);
                 } else {

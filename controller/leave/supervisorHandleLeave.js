@@ -93,7 +93,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
           // prettier-ignore
           const text = `Dear ${user.fName}, 
 
-Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved your supervisor. It is now pending Country director approval${footer}.
+Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved your supervisor. It is now pending Country director approval.${footer}.
                          `;
           Mailer(from, to, subject, text, '');
           // save notification on user obj
@@ -102,14 +102,14 @@ Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateStrin
           refType = 'Leaves';
           refId = leave._id;
           // eslint-disable-next-line max-len
-          const notificationMessage = `Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved your supervisor. It is now pending Country director approval`;
+          const notificationMessage = `Your Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved your supervisor. It is now pending Country director approval.`;
           // eslint-disable-next-line max-len
           await storeNotification(user, notificationTitle, notificationMessage, notificationType, refType, refId);
           // email to CD
           // prettier-ignore
           const textCd = `Hello  ${cd.fName}, 
 
-${user.fName}  ${user.lName} is requesting for a Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
+${user.fName}  ${user.lName} is requesting for a Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}.${footer}.
                          `;
           Mailer(from, cd.email, subject, textCd, '');
           // save notification on user obj
@@ -139,7 +139,7 @@ ${user.fName}  ${user.lName} is requesting for a Home Leave from ${leave.startDa
           // prettier-ignore
           const text = `Dear ${user.fName}, 
 
-Your Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by the Country director${footer}.
+Your Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been approved by the Country director.${footer}.
                                    `;
 
           Mailer(from, to, subject, text, user.supervisorEmail);

@@ -10,6 +10,7 @@ const PublicHoliday = require('../../model/PublicHoliday');
 const Contract = require('../../model/Contract');
 const Program = require('../../model/Program');
 const getLeavesTaken = require('./getLeavesTaken');
+const storeNotification = require('../../helpers/storeNotification');
 
 const handlePlannedLeave = async (req, res) => {
   const errors = validationResult(req);
@@ -164,6 +165,23 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
 ${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
                                         `;
         Mailer(from, supervisor.email, subject, textSupervisor, '');
+
+        // save notification on user obj
+        const notificationTitle = `${user.fName}  ${user.lName} is requesting to be off`;
+        const notificationType = '/hr/SuperviseLeave';
+        const refType = 'Leaves';
+        const refId = leaveToTake._id;
+        // prettier-ignore
+        // eslint-disable-next-line max-len
+        const notificationMessage = `${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateString()} to ${endDate.toDateString()}.`;
+        await storeNotification(
+          supervisor,
+          notificationTitle,
+          notificationMessage,
+          notificationType,
+          refType,
+          refId
+        );
         // eslint-disable-next-line object-curly-newline
         const leave = {
           startDate,

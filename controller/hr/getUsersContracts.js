@@ -10,8 +10,18 @@ const getUsersContracts = async (req, res) => {
     const { expiryIn } = req.params;
     const user = await User.find({});
     user.password = undefined;
-
     const combinedArray = [];
+    // check if HR exists in System
+    const hr = await User.findOne({ 'roles.hr': true });
+    if (!hr) {
+      console.log('HR not found in the system, Please Register the HR');
+      const errorMessage = {
+        code: 404,
+        message: 'HR not found in the system, Please Register the HR',
+      };
+      throw errorMessage;
+    }
+    const { notifications } = hr;
 
     const recurseProcessLeave = async (controller, arr) => {
       if (controller < arr.length) {
@@ -128,6 +138,10 @@ const getUsersContracts = async (req, res) => {
           // prettier-ignore
           // eslint-disable-next-line eqeqeq
           && (diff < expiryIn || diff == expiryIn)) {
+            const notificationDetails = notifications.filter(
+              // prettier-ignore
+              (notification) => notification.refId.equals(contractId) && notification.refType === 'Contracts'
+            );
             const userRemade = {
               _id,
               fName,
@@ -156,6 +170,7 @@ const getUsersContracts = async (req, res) => {
               contractDismiss,
               contractSnooze,
               daysLeftonContract,
+              notificationDetails
             };
 
             combinedArray.push(userRemade);
