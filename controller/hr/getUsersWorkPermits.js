@@ -137,7 +137,7 @@ const getUsersWorkPermits = async (req, res) => {
             && (diff < expiryIn || diff == expiryIn)) {
               const notificationDetails = notifications.filter(
                 // prettier-ignore
-                (notification) => notification.refId.equals(workPermitId) && notification.refType === 'Work Permits'
+                (notification) => notification.refId.equals(workPermitId) && notification.refType === 'Work Permits' && notification.linkTo === '/hr/WorkPermitsExpiry'
               );
               const userRemade = {
                 _id,

@@ -71,7 +71,7 @@ const getSupervisorLeaves = async (req, res) => {
         const notificationDetails = notifications.filter(
           // prettier-ignore
           // eslint-disable-next-line eqeqeq
-          (notification) => notification.refId.equals(_id) && notification.refType === 'Leaves'
+          (notification) => notification.refId.equals(_id) && notification.refType === 'Leaves' && notification.linkTo === '/hr/SuperviseLeave'
         );
 
         const leaveRemade = {
