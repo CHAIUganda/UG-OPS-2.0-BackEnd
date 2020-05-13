@@ -140,7 +140,7 @@ const getUsersContracts = async (req, res) => {
           && (diff < expiryIn || diff == expiryIn)) {
             const notificationDetails = notifications.filter(
               // prettier-ignore
-              (notification) => notification.refId.equals(contractId) && notification.refType === 'Contracts' && notification.linkTo === '/hr/ContractsExpiry'
+              (notification) => notification.refId.equals(contractId) && notification.refType === 'Contracts' && notification.linkTo === '/hr/ContractsExpiry' && notification.status === 'unRead'
             );
             const userRemade = {
               _id,

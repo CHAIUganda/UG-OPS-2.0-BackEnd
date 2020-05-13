@@ -91,7 +91,7 @@ const getStaffLeaves = async (req, res) => {
         const Leavestatus = arr[controller].status;
         const notificationDetails = notifications.filter(
           // prettier-ignore
-          (notification) => notification.refId.equals(_id) && notification.refType === 'Leaves' && notification.linkTo === '/hr/Apply4Leave'
+          (notification) => notification.refId.equals(_id) && notification.refType === 'Leaves' && notification.linkTo === '/hr/Apply4Leave' && notification.status === 'unRead'
         );
 
         const leaveRemade = {
