@@ -12,6 +12,8 @@ const getUsersWorkPermits = require('./getUsersWorkPermits');
 const deleteProgram = require('./deleteProgram');
 const handleContractNotifications = require('./handleContractNotifications');
 const handleWPNotifications = require('./handleWPNotifications');
+const addStaffNewContract = require('./addStaffNewContract');
+const addStaffNewWP = require('./addStaffNewWP');
 
 // Handle new public holiday
 exports.createPublicHoliday = createPublicHoliday;
@@ -44,3 +46,9 @@ exports.handleContractNotifications = handleContractNotifications;
 
 // handle WorkPermit Notifications
 exports.handleWPNotifications = handleWPNotifications;
+
+// handle addStaffContract
+exports.addStaffNewContract = addStaffNewContract;
+
+// handle add Staff Work Permit
+exports.addStaffNewWP = addStaffNewWP;
