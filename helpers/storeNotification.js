@@ -35,7 +35,7 @@ const storeNotification = async (
     };
     user.notifications.push(notification);
 
-    pusher.trigger('notifications', 'ugops2', {
+    pusher.trigger('notifications', user.email, {
       _id: notification._id,
       title,
       message,
