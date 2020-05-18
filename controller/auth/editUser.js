@@ -37,6 +37,9 @@ const editUser = async (req, res) => {
     supervisor,
     admin,
     countryDirector,
+    deputyCountryDirector,
+    procurementAdmin,
+    financeAdmin,
     workPermitStartDate,
     workPermitEndDate,
     workPermitStatus,
@@ -77,6 +80,59 @@ const editUser = async (req, res) => {
     if (admin == null) {
       admin = user.roles.admin;
     }
+
+    if (deputyCountryDirector === true) {
+      const deputyCountryDirectorrole = await User.findOne({
+        'roles.deputyCountryDirector': true,
+      });
+      // chk if that hr already exists and it is not the same user
+      if (
+        // eslint-disable-next-line operator-linebreak
+        deputyCountryDirectorrole &&
+        !deputyCountryDirectorrole._id.equals(user._id)
+      ) {
+        return res.status(400).json({
+          message: `${deputyCountryDirectorrole.fName} ${deputyCountryDirectorrole.lName} Already has the Deputy Country Director  role on the system. First edit that user removing the role. `,
+        });
+      }
+    } else if (deputyCountryDirector === false) {
+      deputyCountryDirector = false;
+    } else {
+      deputyCountryDirector = user.roles.deputyCountryDirector;
+    }
+
+    if (procurementAdmin === true) {
+      const procurementAdminrole = await User.findOne({
+        'roles.procurementAdmin': true,
+      });
+      // chk if that hr already exists and it is not the same user
+      if (procurementAdminrole && !procurementAdminrole._id.equals(user._id)) {
+        return res.status(400).json({
+          message: `${procurementAdminrole.fName} ${procurementAdminrole.lName} Already has the Procurement Admin role on the system. First edit that user removing the role. `,
+        });
+      }
+    } else if (procurementAdmin === false) {
+      procurementAdmin = false;
+    } else {
+      procurementAdmin = user.roles.procurementAdmin;
+    }
+
+    if (financeAdmin === true) {
+      const financeAdminrole = await User.findOne({
+        'roles.financeAdmin': true,
+      });
+      // chk if that hr already exists and it is not the same user
+      if (financeAdminrole && !financeAdminrole._id.equals(user._id)) {
+        return res.status(400).json({
+          message: `${financeAdminrole.fName} ${financeAdminrole.lName} Already has the Finance Admin role on the system. First edit that user removing the role. `,
+        });
+      }
+    } else if (financeAdmin === false) {
+      financeAdmin = false;
+    } else {
+      financeAdmin = user.roles.financeAdmin;
+    }
+
     if (hr === true) {
       const hrrole = await User.findOne({
         'roles.hr': true,

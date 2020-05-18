@@ -107,6 +107,19 @@ const UserSchema = mongoose.Schema({
       type: Boolean,
       default: false,
     },
+    deputyCountryDirector: {
+      type: Boolean,
+      default: false,
+    },
+    procurementAdmin: {
+      type: Boolean,
+      default: false,
+    },
+    financeAdmin: {
+      // To track is user is CD
+      type: Boolean,
+      default: false,
+    },
   },
   notifications: [
     {

@@ -42,6 +42,9 @@ const registerUser = async (req, res) => {
     admin,
     programId,
     countryDirector,
+    deputyCountryDirector,
+    procurementAdmin,
+    financeAdmin,
     bankAccounts,
     nssfNumber,
     tinNumber,
@@ -67,6 +70,49 @@ const registerUser = async (req, res) => {
   if (!admin === true) {
     admin = false;
   }
+
+  if (!financeAdmin === true) {
+    financeAdmin = false;
+  } else {
+    const financeAdminrole = await User.findOne({
+      'roles.financeAdmin': true,
+    });
+
+    if (financeAdminrole) {
+      return res.status(400).json({
+        message: `${financeAdminrole.fName} ${financeAdminrole.lName} Already has the Finance Admin role on the system. First edit that user removing the role. `,
+      });
+    }
+  }
+
+  if (!procurementAdmin === true) {
+    procurementAdmin = false;
+  } else {
+    const procurementAdminrole = await User.findOne({
+      'roles.procurementAdmin': true,
+    });
+
+    if (procurementAdminrole) {
+      return res.status(400).json({
+        message: `${procurementAdminrole.fName} ${procurementAdminrole.lName} Already has the Procurement Admin role on the system. First edit that user removing the role. `,
+      });
+    }
+  }
+
+  if (!deputyCountryDirector === true) {
+    deputyCountryDirector = false;
+  } else {
+    const deputyCountryDirectorrole = await User.findOne({
+      'roles.deputyCountryDirector': true,
+    });
+
+    if (deputyCountryDirectorrole) {
+      return res.status(400).json({
+        message: `${deputyCountryDirectorrole.fName} ${deputyCountryDirectorrole.lName} Already has the Deputy Country Director  role on the system. First edit that user removing the role. `,
+      });
+    }
+  }
+
   if (!hr === true) {
     hr = false;
   } else {
@@ -135,6 +181,9 @@ const registerUser = async (req, res) => {
         hr,
         supervisor,
         countryDirector,
+        deputyCountryDirector,
+        procurementAdmin,
+        financeAdmin,
       },
       title,
       birthDate,

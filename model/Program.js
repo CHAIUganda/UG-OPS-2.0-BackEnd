@@ -6,17 +6,21 @@ const ProgramSchema = mongoose.Schema({
   name: {
     // Name of the Program
     type: String,
-    required: true
+    required: true,
   },
   shortForm: {
     // Name of the Program
     type: String,
-    required: true
+    required: true,
   },
   programManagerId: {
     type: mongoose.Schema.Types.ObjectId,
-    required: true
-  }
+    required: true,
+  },
+  operationsLeadId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: false,
+  },
 });
 
 // export model Program with ProgramSchema

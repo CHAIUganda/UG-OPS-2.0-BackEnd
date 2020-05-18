@@ -68,6 +68,9 @@ router.post(
     check('programManagerId', 'Please Enter a Valid Program manager Id')
       .not()
       .isEmpty(),
+    check('operationsLeadId', 'Please Enter a Valid Operations Lead Id')
+      .not()
+      .isEmpty(),
   ],
   hrController.createProgram
 );
