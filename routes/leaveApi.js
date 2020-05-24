@@ -1,4 +1,4 @@
-// Filename : leave.js
+// Filename : leaveApi.js
 const express = require('express');
 const { check } = require('express-validator/check');
 
@@ -20,19 +20,11 @@ router.post(
     // check("startDate", "Please Enter a Valid Date").matches(),
 
     // input validations date validation pending
-    check('startDate', 'Please Enter a Valid StartDate')
-      .not()
-      .isEmpty(),
-    check('endDate', 'Please Enter a Valid EndDate')
-      .not()
-      .isEmpty(),
-    check('type', 'Please Enter a Valid Leave Type')
-      .not()
-      .isEmpty(),
+    check('startDate', 'Please Enter a Valid StartDate').not().isEmpty(),
+    check('endDate', 'Please Enter a Valid EndDate').not().isEmpty(),
+    check('type', 'Please Enter a Valid Leave Type').not().isEmpty(),
     check('staffEmail', 'Please Enter a Valid Email').isEmail(),
-    check('status', 'Please enter a valid status')
-      .not()
-      .isEmpty()
+    check('status', 'Please enter a valid status').not().isEmpty(),
   ],
   authenticator,
   leaveController.createLeave
@@ -72,13 +64,9 @@ router.get(
 router.post(
   '/supervisorHandleLeave',
   [
-    check('leaveId', 'Please Enter a Valid Leave Id')
-      .not()
-      .isEmpty(),
-    check('status', 'Please Enter a Valid Status')
-      .not()
-      .isEmpty(),
-    check('staffEmail', 'Please Enter a Valid Staff Email').isEmail()
+    check('leaveId', 'Please Enter a Valid Leave Id').not().isEmpty(),
+    check('status', 'Please Enter a Valid Status').not().isEmpty(),
+    check('staffEmail', 'Please Enter a Valid Staff Email').isEmail(),
   ],
   authenticator,
   leaveController.supervisorHandleLeave
@@ -130,19 +118,11 @@ router.get(
 router.post(
   '/staffModifyLeave',
   [
-    check('startDate', 'Please Enter a Valid StartDate')
-      .not()
-      .isEmpty(),
-    check('endDate', 'Please Enter a Valid EndDate')
-      .not()
-      .isEmpty(),
-    check('leaveId', 'Please Enter a Valid Leave Id')
-      .not()
-      .isEmpty(),
-    check('action', 'Please Enter an action')
-      .not()
-      .isEmpty(),
-    check('staffEmail', 'Please Enter a Valid Staff Email').isEmail()
+    check('startDate', 'Please Enter a Valid StartDate').not().isEmpty(),
+    check('endDate', 'Please Enter a Valid EndDate').not().isEmpty(),
+    check('leaveId', 'Please Enter a Valid Leave Id').not().isEmpty(),
+    check('action', 'Please Enter an action').not().isEmpty(),
+    check('staffEmail', 'Please Enter a Valid Staff Email').isEmail(),
   ],
   authenticator,
   leaveController.staffModifyLeave
@@ -158,13 +138,9 @@ router.post(
 router.post(
   '/handlePlannedLeave',
   [
-    check('leaveId', 'Please Enter a Valid Leave Id')
-      .not()
-      .isEmpty(),
-    check('action', 'Please Enter an action')
-      .not()
-      .isEmpty(),
-    check('staffEmail', 'Please Enter a Valid Staff Email').isEmail()
+    check('leaveId', 'Please Enter a Valid Leave Id').not().isEmpty(),
+    check('action', 'Please Enter an action').not().isEmpty(),
+    check('staffEmail', 'Please Enter a Valid Staff Email').isEmail(),
   ],
   authenticator,
   leaveController.handlePlannedLeave
@@ -183,7 +159,7 @@ router.post(
     // input validations date validation pending
     check('id', 'Please Enter a Valid id for the public holiday')
       .not()
-      .isEmpty()
+      .isEmpty(),
   ],
   authenticator,
   leaveController.removeLeave

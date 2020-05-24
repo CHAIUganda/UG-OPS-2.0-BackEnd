@@ -1,9 +1,9 @@
-// Filename : leave.js
+// Filename : hrApi.js
 const express = require('express');
 const { check } = require('express-validator/check');
 
 const router = express.Router();
-// Import leave controller
+// Import hr controller
 const hrController = require('../controller/hr/hrController');
 
 /**

@@ -12,6 +12,7 @@ const authenticator = require('./middleware/authenticator'); // to be rplaced wi
 const auth = require('./routes/auth');
 const leaveApi = require('./routes/leaveApi');
 const hrApi = require('./routes/hrApi');
+const procurementApi = require('./routes/procurementApi');
 
 // Initialise the app
 const app = express();
@@ -35,6 +36,7 @@ app.get('/', (req, res) => res.send('Welcome to UG-OPS 2 API'));
 app.use('/auth', auth);
 app.use('/leaveApi', authenticator, leaveApi);
 app.use('/hrApi', authenticator, hrApi);
+app.use('/procurementApi', authenticator, procurementApi);
 
 // Launch app to listen to specified port
 app.listen(port, () => {
