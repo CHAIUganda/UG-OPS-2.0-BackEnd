@@ -61,7 +61,9 @@ const staffModifyLeave = async (req, res) => {
       accruedAnnualLeave = 0;
     } else {
       // compute accrued days fromstart of contract
-      const leaveEndDate = moment(CurrentDate);
+      // current date since not leave enddate provided here
+      const endDateMonth = endDate.getMonth();
+      const leaveEndDate = moment(endDate);
       const contractStartDate = moment(contract.contractStartDate);
       let monthOnContract = leaveEndDate.diff(contractStartDate, 'months');
       monthOnContract = Math.trunc(monthOnContract);
@@ -69,8 +71,17 @@ const staffModifyLeave = async (req, res) => {
       if (monthOnContract === 0) {
         accruedAnnualLeave = 0;
       } else {
-        // accruedAnnualLeave = currentMonth * 1.75;
-        accruedAnnualLeave = Math.trunc(monthOnContract * 1.75);
+        // acrue anual leave basing calender yr if current yr diff frm contract start yr
+        // eslint-disable-next-line no-lonely-if
+        if (moment(CurrentDate).isAfter(contractStartDate, 'year')) {
+          if (endDateMonth === 0) {
+            accruedAnnualLeave = 0;
+          } else {
+            accruedAnnualLeave = endDateMonth * 1.75;
+          }
+        } else {
+          accruedAnnualLeave = Math.trunc(monthOnContract * 1.75);
+        }
       }
     }
     // check if HR exists in System
