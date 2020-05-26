@@ -19,11 +19,9 @@ const ProcurementSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     required: false,
   },
-  category: {
-    type: String,
-    required: false,
-  },
+  category: [String],
   descOfOther: {
+    // if categories include other then decs needed.
     type: String,
     required: false,
   },
@@ -37,18 +35,6 @@ const ProcurementSchema = mongoose.Schema({
       required: false,
     },
   },
-  datesNeeded: {
-    from: {
-      // datetime format  2020-05-18
-      type: Date,
-      required: false,
-    },
-    to: {
-      // datetime format  2020-05-18
-      type: Date,
-      required: false,
-    },
-  },
   keyObjAsPerWp: {
     type: String,
     required: false,
@@ -56,41 +42,33 @@ const ProcurementSchema = mongoose.Schema({
   keyActivitiesAsPerWp: [String],
   specifications: {
     printingArtAndDesign: {
-      quantityToPrint: {
-        type: Number,
-        required: false,
-      },
-      description: {
-        type: String,
-        required: false,
-      },
-      moreDetailsIfdesignNeeded: {
-        type: String,
-        required: false,
-      },
+      item: [
+        {
+          quantityToPrint: String,
+          description: String,
+          moreDetailsIfdesignNeeded: String,
+          sampleNeed: String,
+          colourNeeded: String,
+          typeOfBinding: String,
+          typeOfPaper: String,
+          paperSize: String,
+        },
+      ],
       accountCode: {
         type: String,
         required: false,
       },
-      sampleNeed: {
-        type: Boolean,
-        default: false,
-      },
-      colourNeeded: {
-        type: String,
-        required: false,
-      },
-      typeOfBinding: {
-        type: String,
-        required: false,
-      },
-      typeOfPaper: {
-        type: String,
-        required: false,
-      },
-      paperSize: {
-        type: String,
-        required: false,
+      datesNeeded: {
+        from: {
+          // datetime format  2020-05-18
+          type: Date,
+          required: false,
+        },
+        to: {
+          // datetime format  2020-05-18
+          type: Date,
+          required: false,
+        },
       },
       additionalSupportnDocs: [
         {
@@ -101,14 +79,12 @@ const ProcurementSchema = mongoose.Schema({
       ],
     },
     carHire: {
-      typeOfCar: {
-        type: String,
-        required: false,
-      },
-      numberOfCars: {
-        type: Number,
-        required: false,
-      },
+      item: [
+        {
+          typeOfCar: String,
+          numberOfCars: String,
+        },
+      ],
       districtsToVisit: [String],
       durationOfTrip: {
         daysNo: {
@@ -123,6 +99,18 @@ const ProcurementSchema = mongoose.Schema({
       pickUpTime: {
         type: String,
         required: false,
+      },
+      datesNeeded: {
+        from: {
+          // datetime format  2020-05-18
+          type: Date,
+          required: false,
+        },
+        to: {
+          // datetime format  2020-05-18
+          type: Date,
+          required: false,
+        },
       },
       pickUpLocation: {
         type: Boolean,
@@ -148,6 +136,18 @@ const ProcurementSchema = mongoose.Schema({
           quantity: String,
         },
       ],
+      datesNeeded: {
+        from: {
+          // datetime format  2020-05-18
+          type: Date,
+          required: false,
+        },
+        to: {
+          // datetime format  2020-05-18
+          type: Date,
+          required: false,
+        },
+      },
       accountCode: {
         type: String,
         required: false,
@@ -161,6 +161,18 @@ const ProcurementSchema = mongoose.Schema({
       numberOfParticipants: {
         type: Number,
         required: false,
+      },
+      datesNeeded: {
+        from: {
+          // datetime format  2020-05-18
+          type: Date,
+          required: false,
+        },
+        to: {
+          // datetime format  2020-05-18
+          type: Date,
+          required: false,
+        },
       },
       amenitiesRequired: [String],
       locationOfMeeting: {
@@ -200,6 +212,18 @@ const ProcurementSchema = mongoose.Schema({
       accountCode: {
         type: String,
         required: false,
+      },
+      datesNeeded: {
+        from: {
+          // datetime format  2020-05-18
+          type: Date,
+          required: false,
+        },
+        to: {
+          // datetime format  2020-05-18
+          type: Date,
+          required: false,
+        },
       },
       additionalSupportnDocs: [
         {
@@ -255,6 +279,18 @@ const ProcurementSchema = mongoose.Schema({
         type: String,
         required: false,
       },
+      datesNeeded: {
+        from: {
+          // datetime format  2020-05-18
+          type: Date,
+          required: false,
+        },
+        to: {
+          // datetime format  2020-05-18
+          type: Date,
+          required: false,
+        },
+      },
       additionalSupportnDocs: [
         {
           name: String,
@@ -302,6 +338,18 @@ const ProcurementSchema = mongoose.Schema({
       accountCode: {
         type: String,
         required: false,
+      },
+      datesNeeded: {
+        from: {
+          // datetime format  2020-05-18
+          type: Date,
+          required: false,
+        },
+        to: {
+          // datetime format  2020-05-18
+          type: Date,
+          required: false,
+        },
       },
       additionalSupportnDocs: [
         {
@@ -400,6 +448,7 @@ const ProcurementSchema = mongoose.Schema({
         required: false,
       },
       comment: {
+        // comment required if choose diff from recommended
         type: String,
         required: false,
       },
@@ -503,6 +552,11 @@ const ProcurementSchema = mongoose.Schema({
   isModfied: {
     type: Boolean,
     default: false,
+  },
+  createDate: {
+    type: Date,
+    // default: Date.now() captures date and time
+    required: false,
   },
 });
 

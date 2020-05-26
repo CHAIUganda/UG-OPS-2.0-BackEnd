@@ -17,10 +17,19 @@ router.post(
     // valid date 25/12
 
     // input validations date validation pending
-    check('name', 'Please Enter a Valid name for the public holiday')
+    check('pId', 'Please Enter a Project where the request belongs')
       .not()
       .isEmpty(),
-    check('date', 'Please Enter a Valid date for the public holiday')
+    check('gId', 'Please Enter a Grant where the request belongs')
+      .not()
+      .isEmpty(),
+    check('objectCode', 'Please Enter the ObjectCode').not().isEmpty(),
+    check('staffId', 'Please Enter the staff requesting').not().isEmpty(),
+    check('category', 'Please Enter the catedory of the request')
+      .not()
+      .isEmpty(),
+    check('priceRange', 'Please Enter the proce range').not().isEmpty(),
+    check('specifications', 'Please Enter the specifications of the request')
       .not()
       .isEmpty(),
   ],
