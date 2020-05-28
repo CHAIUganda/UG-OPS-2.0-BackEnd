@@ -34,19 +34,23 @@ const storeNotification = async (
       refId,
     };
     await user.notifications.push(notification);
-    await user.save();
-
-    pusher.trigger('notifications', user.email, {
-      _id: notification._id,
-      title,
-      message,
-      status: 'unRead',
-      createDate: today,
-      linkTo: type,
-      refType,
-      refId,
-      staffEmail: user.email,
-    });
+    await user.save
+      .then(() => {
+        pusher.trigger('notifications', user.email, {
+          _id: notification._id,
+          title,
+          message,
+          status: 'unRead',
+          createDate: today,
+          linkTo: type,
+          refType,
+          refId,
+          staffEmail: user.email,
+        });
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
   } catch (err) {
     console.log(err.message);
   }
