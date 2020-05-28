@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
 const debug = require('debug')('server');
 
-const Mailer = async (from, to, subject, text, cc, content, htmlAttach) => {
+const Mailer = (from, to, subject, text, cc, content, htmlAttach) => {
   // Send the email
   const transporter = nodemailer.createTransport({
     host: 'smtp.office365.com', // hostname
