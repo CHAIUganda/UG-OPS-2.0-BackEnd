@@ -111,7 +111,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
 ${fName} ${lName}'s Work Permit will expiry in ${diff} days as of ${today.toDateString()}. This is a remainder to start its renewal process."${footer}.
                                                     `;
                   const cc = `${programMngr.email},${supervisor.email}`;
-                  Mailer(from, hr.email, subject, textUser, '');
+                  Mailer(from, hr.email, subject, textUser, cc);
                   // save notification on user obj
                   const notificationTitle = `${fName} ${lName}'s WorkPermit will expiry in ${diff} days`;
                   const notificationType = '/hr/WorkPermitsExpiry';
@@ -121,14 +121,6 @@ ${fName} ${lName}'s Work Permit will expiry in ${diff} days as of ${today.toDate
                   // eslint-disable-next-line max-len
                   const notificationMessage = `${fName} ${lName}'s Work Permit will expiry in ${diff} days, this is a notification to initiate their contract renewal process.`;
                   await storeNotification(
-                    supervisor,
-                    notificationTitle,
-                    notificationMessage,
-                    null,
-                    refType,
-                    refId
-                  );
-                  await storeNotification(
                     hr,
                     notificationTitle,
                     notificationMessage,
@@ -136,14 +128,23 @@ ${fName} ${lName}'s Work Permit will expiry in ${diff} days as of ${today.toDate
                     refType,
                     refId
                   );
-                  await storeNotification(
-                    programMngr,
-                    notificationTitle,
-                    notificationMessage,
-                    null,
-                    refType,
-                    refId
-                  );
+                  // await storeNotification(
+                  //   supervisor,
+                  //   notificationTitle,
+                  //   notificationMessage,
+                  //   null,
+                  //   refType,
+                  //   refId
+                  // );
+
+                  // await storeNotification(
+                  //   programMngr,
+                  //   notificationTitle,
+                  //   notificationMessage,
+                  //   null,
+                  //   refType,
+                  //   refId
+                  // );
 
                   recurseProcessLeave(controller + 1, arr);
                 } else {
