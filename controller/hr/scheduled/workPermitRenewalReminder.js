@@ -155,9 +155,12 @@ ${fName} ${lName}'s Work Permit will expiry in ${diff} days as of ${today.toDate
         } else {
           recurseProcessLeave(controller + 1, arr);
         }
+      } else {
+        console.log('out of loop');
       }
     };
     await recurseProcessLeave(0, user);
+    console.log('finished');
   } catch (e) {
     debug(e.message);
     console.log(e.message);
