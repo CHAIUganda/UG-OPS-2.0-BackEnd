@@ -120,14 +120,14 @@ ${fName} ${lName}'s Work Permit will expiry in ${diff} days as of ${today.toDate
                   // prettier-ignore
                   // eslint-disable-next-line max-len
                   const notificationMessage = `${fName} ${lName}'s Work Permit will expiry in ${diff} days, this is a notification to initiate their contract renewal process.`;
-                  storeNotification(
-                    supervisor,
-                    notificationTitle,
-                    notificationMessage,
-                    null,
-                    refType,
-                    refId
-                  );
+                  // storeNotification(
+                  //   supervisor,
+                  //   notificationTitle,
+                  //   notificationMessage,
+                  //   null,
+                  //   refType,
+                  //   refId
+                  // );
                   storeNotification(
                     hr,
                     notificationTitle,
@@ -136,14 +136,14 @@ ${fName} ${lName}'s Work Permit will expiry in ${diff} days as of ${today.toDate
                     refType,
                     refId
                   );
-                  storeNotification(
-                    programMngr,
-                    notificationTitle,
-                    notificationMessage,
-                    null,
-                    refType,
-                    refId
-                  );
+                  // storeNotification(
+                  //   programMngr,
+                  //   notificationTitle,
+                  //   notificationMessage,
+                  //   null,
+                  //   refType,
+                  //   refId
+                  // );
 
                   recurseProcessLeave(controller + 1, arr);
                 } else {
