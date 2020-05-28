@@ -34,7 +34,7 @@ const storeNotification = async (
       refId,
     };
     user.notifications.push(notification);
-    await user.save();
+    // await user.save();
 
     pusher.trigger('notifications', user.email, {
       _id: notification._id,
