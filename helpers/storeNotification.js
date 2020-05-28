@@ -35,11 +35,9 @@ const storeNotification = async (
       refType,
       refId,
     };
-    // await user.notifications.push(notification);
-    // await user.save();
 
-    // modify user
-    await User.updateOne(
+    // store notification on user obj
+    User.updateOne(
       {
         _id: user._id,
       },
