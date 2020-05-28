@@ -120,7 +120,7 @@ ${fName} ${lName}'s Work Permit will expiry in ${diff} days as of ${today.toDate
                   // prettier-ignore
                   // eslint-disable-next-line max-len
                   const notificationMessage = `${fName} ${lName}'s Work Permit will expiry in ${diff} days, this is a notification to initiate their contract renewal process.`;
-                  await storeNotification(
+                  storeNotification(
                     supervisor,
                     notificationTitle,
                     notificationMessage,
@@ -128,7 +128,7 @@ ${fName} ${lName}'s Work Permit will expiry in ${diff} days as of ${today.toDate
                     refType,
                     refId
                   );
-                  await storeNotification(
+                  storeNotification(
                     hr,
                     notificationTitle,
                     notificationMessage,
@@ -136,7 +136,7 @@ ${fName} ${lName}'s Work Permit will expiry in ${diff} days as of ${today.toDate
                     refType,
                     refId
                   );
-                  await storeNotification(
+                  storeNotification(
                     programMngr,
                     notificationTitle,
                     notificationMessage,
