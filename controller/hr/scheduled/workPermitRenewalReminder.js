@@ -111,7 +111,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
 ${fName} ${lName}'s Work Permit will expiry in ${diff} days as of ${today.toDateString()}. This is a remainder to start its renewal process."${footer}.
                                                     `;
                   const cc = `${programMngr.email},${supervisor.email}`;
-                  Mailer(from, hr.email, subject, textUser, cc);
+                  Mailer(from, hr.email, subject, textUser, '');
                   // save notification on user obj
                   const notificationTitle = `${fName} ${lName}'s WorkPermit will expiry in ${diff} days`;
                   const notificationType = '/hr/WorkPermitsExpiry';
