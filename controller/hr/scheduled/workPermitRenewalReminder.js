@@ -113,38 +113,37 @@ ${fName} ${lName}'s Work Permit will expiry in ${diff} days as of ${today.toDate
                   const cc = `${programMngr.email},${supervisor.email}`;
                   Mailer(from, hr.email, subject, textUser, cc);
                   // save notification on user obj
-                  // const notificationTitle = `${fName} ${lName}'s WorkPermit will expiry in ${diff} days`;
-                  // const notificationType = '/hr/WorkPermitsExpiry';
-                  // const refType = 'Work Permits';
-                  // const refId = workPermit._id;
+                  const notificationTitle = `${fName} ${lName}'s WorkPermit will expiry in ${diff} days`;
+                  const notificationType = '/hr/WorkPermitsExpiry';
+                  const refType = 'Work Permits';
+                  const refId = workPermit._id;
                   // prettier-ignore
                   // eslint-disable-next-line max-len
-                  // const notificationMessage = `${fName} ${lName}'s Work Permit will expiry in ${diff} days, this is a notification to initiate their contract renewal process.`;
-                  // await storeNotification(
-                  //   hr,
-                  //   notificationTitle,
-                  //   notificationMessage,
-                  //   notificationType,
-                  //   refType,
-                  //   refId
-                  // );
-                  // await storeNotification(
-                  //   supervisor,
-                  //   notificationTitle,
-                  //   notificationMessage,
-                  //   null,
-                  //   refType,
-                  //   refId
-                  // );
-
-                  // await storeNotification(
-                  //   programMngr,
-                  //   notificationTitle,
-                  //   notificationMessage,
-                  //   null,
-                  //   refType,
-                  //   refId
-                  // );
+                  const notificationMessage = `${fName} ${lName}'s Work Permit will expiry in ${diff} days, this is a notification to initiate their contract renewal process.`;
+                  await storeNotification(
+                    supervisor,
+                    notificationTitle,
+                    notificationMessage,
+                    null,
+                    refType,
+                    refId
+                  );
+                  await storeNotification(
+                    hr,
+                    notificationTitle,
+                    notificationMessage,
+                    notificationType,
+                    refType,
+                    refId
+                  );
+                  await storeNotification(
+                    programMngr,
+                    notificationTitle,
+                    notificationMessage,
+                    null,
+                    refType,
+                    refId
+                  );
 
                   recurseProcessLeave(controller + 1, arr);
                 } else {
