@@ -2,8 +2,6 @@ const moment = require('moment-timezone');
 const Pusher = require('pusher');
 const mongoose = require('mongoose');
 
-const User = require('../model/User');
-
 const storeNotification = async (
   user,
   title,
@@ -35,19 +33,9 @@ const storeNotification = async (
       refType,
       refId,
     };
+    await user.notifications.push(notification);
+    await user.save();
 
-    // store notification on user obj
-    User.updateOne(
-      {
-        _id: user._id,
-      },
-      {
-        // eslint-disable-next-line max-len
-        $push: {
-          notifications: notification,
-        },
-      }
-    );
     pusher.trigger('notifications', user.email, {
       _id: notification._id,
       title,
