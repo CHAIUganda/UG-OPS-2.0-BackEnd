@@ -124,7 +124,7 @@ ${fName} ${lName}'s Work Permit will expiry in ${diff} days as of ${today.toDate
                     supervisor,
                     notificationTitle,
                     notificationMessage,
-                    notificationType,
+                    null,
                     refType,
                     refId
                   );
@@ -140,7 +140,7 @@ ${fName} ${lName}'s Work Permit will expiry in ${diff} days as of ${today.toDate
                     programMngr,
                     notificationTitle,
                     notificationMessage,
-                    notificationType,
+                    null,
                     refType,
                     refId
                   );

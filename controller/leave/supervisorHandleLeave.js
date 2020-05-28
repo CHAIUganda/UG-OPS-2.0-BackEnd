@@ -195,7 +195,7 @@ Cancellation of your Home Leave from ${leave.startDate.toDateString()} to ${leav
           await storeNotification(user, notificationTitle, notificationMessage, notificationType, refType, refId);
 
           const cdnotificationTitle = `${user.fName}  ${user.lName}'s Home Leave Cancellation has been approved by the Supervisor `;
-          const cdnotificationType = '/hr/SuperviseLeave';
+          const cdnotificationType = null;
           refType = 'Leaves';
           refId = leave._id;
           // prettier-ignore
@@ -259,7 +259,7 @@ Modification of your taken Home Leave from ${leave.takenPending.startDate.toDate
           await storeNotification(user, notificationTitle, notificationMessage, notificationType, refType, refId);
 
           const cdnotificationTitle = `${user.fName}  ${user.lName}'s Home Leave Modification has been approved by the Supervisor `;
-          const cdnotificationType = '/hr/SuperviseLeave';
+          const cdnotificationType = null;
           refType = 'Leaves';
           refId = leave._id;
           // prettier-ignore
@@ -467,7 +467,7 @@ Your Home Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDate
           await storeNotification(user, notificationTitle, notificationMessage, notificationType, refType, refId);
 
           const supervisornotificationTitle = `${user.fName}  ${user.lName}'s Home Leave has been declined by the Country director.`;
-          const supervisornotificationType = '/hr/SuperviseLeave';
+          const supervisornotificationType = null;
           refType = 'Leaves';
           refId = leave._id;
           // prettier-ignore
@@ -508,7 +508,7 @@ Cancellation of your Home Leave from ${leave.startDate.toDateString()} to ${leav
           await storeNotification(user, notificationTitle, notificationMessage, notificationType, refType, refId);
 
           const cdnotificationTitle = `${user.fName}  ${user.lName}'s Home Leave Cancellation has been declined by the Supervisor.`;
-          const cdnotificationType = '/hr/SuperviseLeave';
+          const cdnotificationType = null;
           refType = 'Leaves';
           refId = leave._id;
           // prettier-ignore
@@ -561,7 +561,7 @@ Modification of your taken Home Leave from ${leave.takenPending.startDate.toDate
           await storeNotification(user, notificationTitle, notificationMessage, notificationType, refType, refId);
 
           const cdnotificationTitle = `${user.fName}  ${user.lName}'s Home Leave Modification has been declined by the Supervisor `;
-          const cdnotificationType = '/hr/SuperviseLeave';
+          const cdnotificationType = null;
           refType = 'Leaves';
           refId = leave._id;
           // prettier-ignore

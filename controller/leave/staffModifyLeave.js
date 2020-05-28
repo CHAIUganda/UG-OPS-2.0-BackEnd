@@ -194,7 +194,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
           });
         }
 
-        // work on re approval
+        // work on re approval if leave is outside of intial approved period
         if (
           // eslint-disable-next-line operator-linebreak
           moment(startDate).isAfter(oldEndDate) ||
@@ -466,7 +466,7 @@ ${user.fName}  ${user.lName} has modified their HomeLeave, now to be off from ${
             Mailer(from, hr.email, subject, text, '');
             // save notification on user obj
             const hrnotificationTitle = `${user.fName}  ${user.lName} has modified their Home Leave`;
-            const hrnotificationType = '/hr/SuperviseLeave';
+            const hrnotificationType = null;
             refType = 'Leaves';
             refId = leave._id;
             // prettier-ignore
@@ -485,7 +485,7 @@ ${user.fName}  ${user.lName} has modified their HomeLeave, now to be off from ${
             Mailer(from, cd.email, subject, textCd, '');
             // save notification on user obj
             const cdnotificationTitle = `${user.fName}  ${user.lName} has modified their Home Leave`;
-            const cdnotificationType = '/hr/SuperviseLeave';
+            const cdnotificationType = null;
             refType = 'Leaves';
             refId = leave._id;
             // prettier-ignore
@@ -504,7 +504,7 @@ ${user.fName}  ${user.lName} has modified their HomeLeave, now to be off from ${
             Mailer(from, supervisor.email, subject, textSupervisor, '');
             // save notification on user obj
             const supervisornotificationTitle = `${user.fName}  ${user.lName} has modified their Home Leave`;
-            const supervisornotificationType = '/hr/SuperviseLeave';
+            const supervisornotificationType = null;
             refType = 'Leaves';
             refId = leave._id;
             // prettier-ignore
@@ -574,7 +574,7 @@ ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${star
             Mailer(from, hr.email, subject, text, '');
             // save notification on user obj
             const hrnotificationTitle = `${user.fName}  ${user.lName} has modified their Home Leave`;
-            const hrnotificationType = '/hr/SuperviseLeave';
+            const hrnotificationType = null;
             refType = 'Leaves';
             refId = leave._id;
             // prettier-ignore
@@ -593,7 +593,7 @@ ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${star
             Mailer(from, supervisor.email, subject, textSupervisor, '');
             // save notification on user obj
             const supervisornotificationTitle = `${user.fName}  ${user.lName} has modified their Home Leave`;
-            const supervisornotificationType = '/hr/SuperviseLeave';
+            const supervisornotificationType = null;
             refType = 'Leaves';
             refId = leave._id;
             // prettier-ignore
@@ -662,7 +662,7 @@ ${user.fName}  ${user.lName} Decided not to take their HomeLeave from ${leave.st
           Mailer(from, hr.email, subject, text, '');
           // save notification on user obj
           const hrnotificationTitle = `${user.fName}  ${user.lName} has Decided not to take their HomeLeave`;
-          const hrnotificationType = '/hr/SuperviseLeave';
+          const hrnotificationType = null;
           refType = 'Leaves';
           refId = leave._id;
           // prettier-ignore
@@ -681,7 +681,7 @@ ${user.fName}  ${user.lName} Decided not to take their HomeLeave from ${leave.st
           Mailer(from, cd.email, subject, textCd, '');
           // save notification on user obj
           const cdnotificationTitle = `${user.fName}  ${user.lName} hasDecided not to take their HomeLeave`;
-          const cdnotificationType = '/hr/SuperviseLeave';
+          const cdnotificationType = null;
           refType = 'Leaves';
           refId = leave._id;
           // prettier-ignore
@@ -700,7 +700,7 @@ ${user.fName}  ${user.lName} Decided not to take their HomeLeave from ${leave.st
           Mailer(from, supervisor.email, subject, textSupervisor, '');
           // save notification on user obj
           const supervisornotificationTitle = `${user.fName}  ${user.lName} has Decided not to take their HomeLeave`;
-          const supervisornotificationType = '/hr/SuperviseLeave';
+          const supervisornotificationType = null;
           refType = 'Leaves';
           refId = leave._id;
           // prettier-ignore
@@ -757,7 +757,7 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
           Mailer(from, hr.email, subject, text, '');
           // save notification on user obj
           const hrnotificationTitle = `${user.fName}  ${user.lName} has Decided not to take their Leave`;
-          const hrnotificationType = '/hr/SuperviseLeave';
+          const hrnotificationType = null;
           refType = 'Leaves';
           refId = leave._id;
           // prettier-ignore
@@ -775,7 +775,7 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
           Mailer(from, supervisor.email, subject, textSupervisor, '');
           // save notification on user obj
           const supervisornotificationTitle = `${user.fName}  ${user.lName} has Decided not to take their Leave`;
-          const supervisornotificationType = '/hr/SuperviseLeave';
+          const supervisornotificationType = null;
           refType = 'Leaves';
           refId = leave._id;
           // prettier-ignore
@@ -1478,7 +1478,7 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
 
         // save notification on user obj
         const supervisornotificationTitle = `${user.fName}  ${user.lName} has Decided to cancel their Leave request`;
-        const supervisornotificationType = '/hr/SuperviseLeave';
+        const supervisornotificationType = null;
         refType = 'Leaves';
         refId = leave._id;
         // prettier-ignore
@@ -1796,7 +1796,7 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
         Mailer(from, supervisor.email, subject, textSupervisor, cc);
         // save notification on user obj
         const supervisornotificationTitle = `${user.fName}  ${user.lName} Decided to cancel their Home Leave request`;
-        const supervisornotificationType = '/hr/SuperviseLeave';
+        const supervisornotificationType = null;
         refType = 'Leaves';
         refId = leave._id;
         // prettier-ignore
