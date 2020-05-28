@@ -17,8 +17,8 @@ log4js.configure({
 // const logger = log4js.getLogger('Timed');
 
 const schedule = new CronJob(
-  '0 36 00 * * *',
-  async () => {
+  '0 14 01 * * *',
+  () => {
     console.log('Checking for birthdays and Ripe leaves');
     // contains auto scheduled jobs to be done by system
     // changes status of leaves to taken if he startdate comes
@@ -31,7 +31,7 @@ const schedule = new CronJob(
     // checks for contracts about to expire and sends invites to concerned personnel
     contractRenewalInvite();
     // checks for Workpermits about toexpire and sends invites to concerned personnel
-    await workPermitRenewalReminder();
+    workPermitRenewalReminder();
     // sends BD wishes on people's BDS
     birthDays();
     // activates or deactivates contract when date comes

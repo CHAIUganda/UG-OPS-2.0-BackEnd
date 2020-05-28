@@ -152,11 +152,15 @@ ${fName} ${lName}'s Work Permit will expiry in ${diff} days as of ${today.toDate
 
                 recurseProcessLeave(controller + 1, arr);
               }
+              recurseProcessLeave(controller + 1, arr);
             }
+            recurseProcessLeave(controller + 1, arr);
           }
+          recurseProcessLeave(controller + 1, arr);
         } else {
           recurseProcessLeave(controller + 1, arr);
         }
+        recurseProcessLeave(controller + 1, arr);
       }
     };
     await recurseProcessLeave(0, user);
