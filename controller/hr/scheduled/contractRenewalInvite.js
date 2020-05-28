@@ -191,8 +191,6 @@ ${fName} ${lName}'s Contract will expiry in ${diff} days as of ${today.toDateStr
                 } else {
                   recurseProcessLeave(controller + 1, arr);
                 }
-
-                recurseProcessLeave(controller + 1, arr);
               }
             }
           }
