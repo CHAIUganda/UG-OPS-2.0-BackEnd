@@ -33,9 +33,6 @@ const createProcurement = async (req, res) => {
   // Pending Procurement Response, Pending Requestor Response, Pending Procurement Response
   // LPO Pending Program Manager, LPO Pending Country Leadership, Approved
   const status = 'Pending Procurement Response';
-  // if (comment == null) {
-  //   comment = '';
-  // }
   // set timezone to kampala
   let CurrentDate = moment().tz('Africa/Kampala').format();
   CurrentDate = new Date(CurrentDate);
@@ -116,7 +113,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
 ${user.fName}  ${user.lName} has sent in a Procurement Request. Please Login into Ugopps to respond to the request.${footer}.
                                       `;
 
-    Mailer(from, procurementRemade.email, subject, textProcurementAdmin, '');
+    Mailer(from, procurementAdmin.email, subject, textProcurementAdmin, '');
     // save notification on user obj
     const notificationTitle = `${user.fName}  ${user.lName} has sent in a Procurement Request.`;
     const notificationType = '/procurement';

@@ -47,7 +47,7 @@ const ProcurementSchema = mongoose.Schema({
           quantityToPrint: String,
           description: String,
           moreDetailsIfdesignNeeded: String,
-          sampleNeed: String,
+          sampleNeed: Boolean,
           colourNeeded: String,
           typeOfBinding: String,
           typeOfPaper: String,
@@ -70,13 +70,6 @@ const ProcurementSchema = mongoose.Schema({
           required: false,
         },
       },
-      additionalSupportnDocs: [
-        {
-          name: String,
-          desc: String,
-          path: String,
-        },
-      ],
     },
     carHire: {
       item: [
@@ -120,13 +113,6 @@ const ProcurementSchema = mongoose.Schema({
         type: String,
         required: false,
       },
-      additionalSupportnDocs: [
-        {
-          name: String,
-          desc: String,
-          path: String,
-        },
-      ],
     },
     stationary: {
       item: [
@@ -183,13 +169,6 @@ const ProcurementSchema = mongoose.Schema({
         type: String,
         required: false,
       },
-      additionalSupportnDocs: [
-        {
-          name: String,
-          desc: String,
-          path: String,
-        },
-      ],
     },
     accomodation: {
       guestNames: [String],
@@ -225,13 +204,6 @@ const ProcurementSchema = mongoose.Schema({
           required: false,
         },
       },
-      additionalSupportnDocs: [
-        {
-          name: String,
-          desc: String,
-          path: String,
-        },
-      ],
     },
     dataCollectors: {
       dateOfOrientation: {
@@ -255,13 +227,6 @@ const ProcurementSchema = mongoose.Schema({
         type: String,
         required: false,
       },
-      additionalSupportnDocs: [
-        {
-          name: String,
-          desc: String,
-          path: String,
-        },
-      ],
     },
     computerAndAccessories: {
       item: [
@@ -291,13 +256,6 @@ const ProcurementSchema = mongoose.Schema({
           required: false,
         },
       },
-      additionalSupportnDocs: [
-        {
-          name: String,
-          desc: String,
-          path: String,
-        },
-      ],
     },
     medicalEquipment: {
       item: [
@@ -315,13 +273,6 @@ const ProcurementSchema = mongoose.Schema({
         type: String,
         required: false,
       },
-      additionalSupportnDocs: [
-        {
-          name: String,
-          desc: String,
-          path: String,
-        },
-      ],
     },
     other: {
       item: [
@@ -351,15 +302,15 @@ const ProcurementSchema = mongoose.Schema({
           required: false,
         },
       },
-      additionalSupportnDocs: [
-        {
-          name: String,
-          desc: String,
-          path: String,
-        },
-      ],
     },
   },
+  additionalSupportnDocs: [
+    {
+      name: String,
+      desc: String,
+      path: String,
+    },
+  ],
   response: {
     requires3Quote: {
       type: Boolean,

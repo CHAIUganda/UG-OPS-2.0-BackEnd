@@ -2,6 +2,8 @@
 require('dotenv').config();
 const express = require('express');
 const debug = require('debug')('server');
+const morgan = require('morgan');
+const fileUpload = require('express-fileupload');
 const cors = require('cors');
 const InitiateMongoServer = require('./config/db');
 const schedule = require('./helpers/schedule');
@@ -21,6 +23,16 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
+app.use(morgan('dev'));
+// enable files upload
+app.use(
+  fileUpload({
+    createParentPath: true,
+    limits: {
+      fileSize: 10 * 1024 * 1024 * 1024, // 10 MB max file(s) size
+    },
+  })
+);
 
 // Initiate Mongo Server
 InitiateMongoServer();

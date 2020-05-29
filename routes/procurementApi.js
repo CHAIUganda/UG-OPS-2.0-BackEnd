@@ -25,15 +25,27 @@ router.post(
       .isEmpty(),
     check('objectCode', 'Please Enter the ObjectCode').not().isEmpty(),
     check('staffId', 'Please Enter the staff requesting').not().isEmpty(),
-    check('category', 'Please Enter the catedory of the request')
+    check('category', 'Please Enter the category of the request')
       .not()
       .isEmpty(),
-    check('priceRange', 'Please Enter the proce range').not().isEmpty(),
+    check('priceRange', 'Please Enter the price range').not().isEmpty(),
     check('specifications', 'Please Enter the specifications of the request')
       .not()
       .isEmpty(),
   ],
   procurementController.createProcurement
+);
+
+/**
+ * @method - POST
+ * @description - uploading supporting files on a procurement request
+ * @param - /additionSupportnDocsOnRequest
+ */
+
+// addnDocs should be the name of the input tag sending files
+router.post(
+  '/additionSupportnDocsOnRequest',
+  procurementController.additionSupportnDocsOnRequest
 );
 
 module.exports = router;
