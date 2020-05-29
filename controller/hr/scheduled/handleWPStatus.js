@@ -119,8 +119,6 @@ ${fName} ${lName}'s Work Permit that ran from ${workPermitStartDate.toDateString
                   } else {
                     recurseProcessLeave(controller + 1, arr);
                   }
-
-                  recurseProcessLeave(controller + 1, arr);
                 }
               } else if (workPermit.workPermitStatus === 'Pending') {
                 workPermitStartDate = workPermit.workPermitStartDate;
@@ -168,8 +166,6 @@ ${fName} ${lName}'s WorkPermit that rans from ${workPermitStartDate.toDateString
                   } else {
                     recurseProcessLeave(controller + 1, arr);
                   }
-
-                  recurseProcessLeave(controller + 1, arr);
                 }
               } else {
                 recurseProcessLeave(controller + 1, arr);

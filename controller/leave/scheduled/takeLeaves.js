@@ -47,163 +47,167 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
         if (!user) {
           logger.error(`Staff not found. Email: ${staffEmail} LeaveId: ${_id}`);
           recurseProcessLeave(controller + 1, arr);
-        }
-
-        // check if Supervisor exists in System
-        const supervisor = await User.findOne({ email: supervisorEmail });
-        if (!supervisor) {
-          logger.error(
-            `Supervisor not found Email: ${supervisorEmail} LeaveId: ${_id} staffEmail: ${staffEmail}`
-          );
-          recurseProcessLeave(controller + 1, arr);
-        }
-
-        const today = new Date(CurrentDate);
-        const leaveStart = new Date(startDate);
-        if (moment(today.toDateString()).isSame(leaveStart.toDateString())) {
-          // prettier-ignore
-          if (
-            (user.type === 'expat' || user.type === 'tcn') && arr[controller].type === 'Home'
-          ) {
-          // check if CD exists in System
-            const cd = await User.findOne({ 'roles.countryDirector': true });
-            if (!cd) {
-              logger.error(
-                `Country Director not found  LeaveId: ${_id} staffEmail: ${staffEmail}`
-              );
-              recurseProcessLeave(controller + 1, arr);
-            }
-
-            // change status to taken
-            await Leave.updateOne(
-              {
-                _id
-              },
-              { $set: { status: 'Taken' } }
+        } else {
+          // check if Supervisor exists in System
+          const supervisor = await User.findOne({ email: supervisorEmail });
+          if (!supervisor) {
+            logger.error(
+              `Supervisor not found Email: ${supervisorEmail} LeaveId: ${_id} staffEmail: ${staffEmail}`
             );
-            // sends mail to cd supervisor HR and notification about status
-            // prettier-ignore
-            // email to staff
-            const textUser = `Hello  ${user.fName}, 
+            recurseProcessLeave(controller + 1, arr);
+          } else {
+            const today = new Date(CurrentDate);
+            const leaveStart = new Date(startDate);
+            if (
+              moment(today.toDateString()).isSame(leaveStart.toDateString())
+            ) {
+              // prettier-ignore
+              if (
+                (user.type === 'expat' || user.type === 'tcn') && arr[controller].type === 'Home'
+              ) {
+              // check if CD exists in System
+                const cd = await User.findOne({ 'roles.countryDirector': true });
+                if (!cd) {
+                  logger.error(
+                    `Country Director not found  LeaveId: ${_id} staffEmail: ${staffEmail}`
+                  );
+                  recurseProcessLeave(controller + 1, arr);
+                }
+
+                // change status to taken
+                await Leave.updateOne(
+                  {
+                    _id
+                  },
+                  { $set: { status: 'Taken' } }
+                );
+                // sends mail to cd supervisor HR and notification about status
+                // prettier-ignore
+                // email to staff
+                const textUser = `Hello  ${user.fName}, 
   
 Your leave from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()} has started.${footer}.
                            `;
-            Mailer(from, user.email, subject, textUser, '');
+                Mailer(from, user.email, subject, textUser, '');
 
-            // email to HR
-            const text = `Hello  ${hr.fName}, 
+                // email to HR
+                const text = `Hello  ${hr.fName}, 
   
 ${user.fName}  ${user.lName} will be off from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()}.${footer}.
                            `;
-            Mailer(from, hr.email, subject, text, '');
+                Mailer(from, hr.email, subject, text, '');
 
-            // email to CD
-            const textCd = `Hello  ${cd.fName}, 
+                // email to CD
+                const textCd = `Hello  ${cd.fName}, 
   
 ${user.fName}  ${user.lName} will be off from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()}.${footer}.
                            `;
-            Mailer(from, cd.email, subject, textCd, '');
+                Mailer(from, cd.email, subject, textCd, '');
 
-            // email to Supervisor
-            const textSupervisor = `Hello  ${supervisor.fName}, 
+                // email to Supervisor
+                const textSupervisor = `Hello  ${supervisor.fName}, 
   
 ${user.fName}  ${user.lName} will be off from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()}.${footer}.
                            `;
-            Mailer(from, supervisor.email, subject, textSupervisor, '');
+                Mailer(from, supervisor.email, subject, textSupervisor, '');
 
-            // save notification on user obj
-            const notificationTitle = `${user.fName}  ${user.lName}'s Home Leave has started today`;
-            const notificationType = null;
-            const refType = 'Leaves';
-            const refId = arr[controller]._id;
-            // prettier-ignore
-            // eslint-disable-next-line max-len
-            const notificationMessage = `${user.fName}  ${user.lName} will be off from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()}.`;
-            await storeNotification(
-              supervisor,
-              notificationTitle,
-              notificationMessage,
-              notificationType,
-              refType,
-              refId
-            );
-            await storeNotification(
-              hr,
-              notificationTitle,
-              notificationMessage,
-              notificationType,
-              refType,
-              refId
-            );
-            await storeNotification(
-              cd,
-              notificationTitle,
-              notificationMessage,
-              notificationType,
-              refType,
-              refId
-            );
-          } else {
-          // Leave not home
-          // change status to taken
+                // save notification on user obj
+                const notificationTitle = `${user.fName}  ${user.lName}'s Home Leave has started today`;
+                const notificationType = null;
+                const refType = 'Leaves';
+                const refId = arr[controller]._id;
+                // prettier-ignore
+                // eslint-disable-next-line max-len
+                const notificationMessage = `${user.fName}  ${user.lName} will be off from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()}.`;
+                await storeNotification(
+                  supervisor,
+                  notificationTitle,
+                  notificationMessage,
+                  notificationType,
+                  refType,
+                  refId
+                );
+                await storeNotification(
+                  hr,
+                  notificationTitle,
+                  notificationMessage,
+                  notificationType,
+                  refType,
+                  refId
+                );
+                await storeNotification(
+                  cd,
+                  notificationTitle,
+                  notificationMessage,
+                  notificationType,
+                  refType,
+                  refId
+                );
+                recurseProcessLeave(controller + 1, arr);
+              } else {
+              // Leave not home
+              // change status to taken
 
-            // change status to taken
-            await Leave.updateOne(
-              {
-                _id
-              },
-              { $set: { status: 'Taken' } }
-            );
-            // sends mail to cd supervisor HR and notification about status
-            // prettier-ignore
+                // change status to taken
+                await Leave.updateOne(
+                  {
+                    _id
+                  },
+                  { $set: { status: 'Taken' } }
+                );
+                // sends mail to cd supervisor HR and notification about status
+                // prettier-ignore
 
-            // email to staff
-            const textUser = `Hello  ${user.fName}, 
+                // email to staff
+                const textUser = `Hello  ${user.fName}, 
   
 Your leave from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()} has started.${footer}.
                                               `;
-            Mailer(from, user.email, subject, textUser, '');
-            // email to HR
-            const text = `Hello  ${hr.fName}, 
+                Mailer(from, user.email, subject, textUser, '');
+                // email to HR
+                const text = `Hello  ${hr.fName}, 
   
 ${user.fName}  ${user.lName} will be off from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()}.${footer}.
                            `;
-            Mailer(from, hr.email, subject, text, '');
+                Mailer(from, hr.email, subject, text, '');
 
-            // email to Supervisor
-            const textSupervisor = `Hello  ${supervisor.fName}, 
+                // email to Supervisor
+                const textSupervisor = `Hello  ${supervisor.fName}, 
   
 ${user.fName}  ${user.lName} will be off from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()}.${footer}.
                            `;
-            Mailer(from, supervisor.email, subject, textSupervisor, '');
-            // save notification on user obj
-            const notificationTitle = `${user.fName}  ${user.lName}'s Leave has started today`;
-            const notificationType = null;
-            const refType = 'Leaves';
-            const refId = arr[controller]._id;
-            // prettier-ignore
-            // eslint-disable-next-line max-len
-            const notificationMessage = `${user.fName}  ${user.lName} will be off from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()}.`;
-            await storeNotification(
-              supervisor,
-              notificationTitle,
-              notificationMessage,
-              notificationType,
-              refType,
-              refId
-            );
-            await storeNotification(
-              hr,
-              notificationTitle,
-              notificationMessage,
-              notificationType,
-              refType,
-              refId
-            );
+                Mailer(from, supervisor.email, subject, textSupervisor, '');
+                // save notification on user obj
+                const notificationTitle = `${user.fName}  ${user.lName}'s Leave has started today`;
+                const notificationType = null;
+                const refType = 'Leaves';
+                const refId = arr[controller]._id;
+                // prettier-ignore
+                // eslint-disable-next-line max-len
+                const notificationMessage = `${user.fName}  ${user.lName} will be off from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()}.`;
+                await storeNotification(
+                  supervisor,
+                  notificationTitle,
+                  notificationMessage,
+                  notificationType,
+                  refType,
+                  refId
+                );
+                await storeNotification(
+                  hr,
+                  notificationTitle,
+                  notificationMessage,
+                  notificationType,
+                  refType,
+                  refId
+                );
+                recurseProcessLeave(controller + 1, arr);
+              }
+            } else {
+              recurseProcessLeave(controller + 1, arr);
+            }
           }
         }
-
-        recurseProcessLeave(controller + 1, arr);
       }
     };
 

@@ -110,8 +110,6 @@ ${fName} ${lName}'s Contract that ran from ${contractStartDate.toDateString()} t
                   } else {
                     recurseProcessLeave(controller + 1, arr);
                   }
-
-                  recurseProcessLeave(controller + 1, arr);
                 }
               } else if (contract.contractStatus === 'Pending') {
                 contractStartDate = contract.contractStartDate;
@@ -159,8 +157,6 @@ ${fName} ${lName}'s Contract that rans from ${contractStartDate.toDateString()} 
                   } else {
                     recurseProcessLeave(controller + 1, arr);
                   }
-
-                  recurseProcessLeave(controller + 1, arr);
                 }
               } else {
                 recurseProcessLeave(controller + 1, arr);

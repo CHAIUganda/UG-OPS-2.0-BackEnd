@@ -44,11 +44,10 @@ const handleSnoozedContractNotifications = async () => {
               },
               { $set: { contractSnooze: false, snoozeDate: undefined } }
             );
+            recurseProcessLeave(controller + 1, arr);
           } else {
             recurseProcessLeave(controller + 1, arr);
           }
-
-          recurseProcessLeave(controller + 1, arr);
         }
       }
     };

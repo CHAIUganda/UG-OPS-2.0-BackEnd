@@ -136,6 +136,7 @@ const createLeave = async (req, res) => {
       // const CurrentDate = moment().tz('Africa/Kampala').format();
       endDate = new Date(endDate);
       startDate = new Date(startDate);
+      const endDateMonth = endDate.getMonth();
       if (moment(startDate).isAfter(endDate)) {
         return res.status(400).json({
           message: 'Start Date cannot be after End date',
@@ -153,8 +154,17 @@ const createLeave = async (req, res) => {
       if (monthOnContract === 0) {
         accruedAnnualLeave = 0;
       } else {
-        // accruedAnnualLeave = currentMonth * 1.75;
-        accruedAnnualLeave = Math.trunc(monthOnContract * 1.75);
+        // acrue anual leave basing calender yr if current yr diff frm contract start yr
+        // eslint-disable-next-line no-lonely-if
+        if (moment(CurrentDate).isAfter(contractStartDate, 'year')) {
+          if (endDateMonth === 0) {
+            accruedAnnualLeave = 0;
+          } else {
+            accruedAnnualLeave = endDateMonth * 1.75;
+          }
+        } else {
+          accruedAnnualLeave = Math.trunc(monthOnContract * 1.75);
+        }
       }
       const { annualLeaveBF } = user;
       const leaveDetails = await getLeavesTaken(user);

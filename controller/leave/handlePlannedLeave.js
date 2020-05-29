@@ -286,6 +286,8 @@ ${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateStri
           accruedAnnualLeave = 0;
         } else {
           // compute accrued days fromstart of contract
+          // current date since not leave enddate provided here
+          const endDateMonth = CurrentDate.getMonth();
           const leaveEndDate = moment(CurrentDate);
           const contractStartDate = moment(contract.contractStartDate);
           let monthOnContract = leaveEndDate.diff(contractStartDate, 'months');
@@ -294,8 +296,17 @@ ${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateStri
           if (monthOnContract === 0) {
             accruedAnnualLeave = 0;
           } else {
-            // accruedAnnualLeave = currentMonth * 1.75;
-            accruedAnnualLeave = Math.trunc(monthOnContract * 1.75);
+            // acrue anual leave basing calender yr if current yr diff frm contract start yr
+            // eslint-disable-next-line no-lonely-if
+            if (moment(CurrentDate).isAfter(contractStartDate, 'year')) {
+              if (endDateMonth === 0) {
+                accruedAnnualLeave = 0;
+              } else {
+                accruedAnnualLeave = endDateMonth * 1.75;
+              }
+            } else {
+              accruedAnnualLeave = Math.trunc(monthOnContract * 1.75);
+            }
           }
         }
         const { annualLeaveBF } = user;
