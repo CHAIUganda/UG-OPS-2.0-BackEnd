@@ -14,7 +14,8 @@ const oktaJwtVerifier = new OktaJwtVerifier({
  * contents are attached to req.jwt
  */
 const authenticationRequired = (req, res, next) => {
-  const authHeader = req.headers.authorization || '';
+  // const authHeader = req.headers.authorization || '';
+  const authHeader = req.header('token');
   const match = authHeader.match(/Bearer (.+)/);
 
   if (!match) {
