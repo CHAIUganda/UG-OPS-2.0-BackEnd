@@ -7,8 +7,8 @@ const fileUpload = require('express-fileupload');
 const cors = require('cors');
 const InitiateMongoServer = require('./config/db');
 const schedule = require('./helpers/schedule');
-// const authenticationRequired = require('./middleware/oktaAuthenticator');
-const authenticator = require('./middleware/authenticator'); // to be rplaced with Okta auth
+const authenticationRequired = require('./middleware/oktaAuthenticator');
+// const authenticator = require('./middleware/authenticator'); // to be rplaced with Okta auth
 
 // Import routes
 const auth = require('./routes/auth');
@@ -46,9 +46,9 @@ app.get('/', (req, res) => res.send('Welcome to UG-OPS 2 API'));
 // Use Api routes in the App
 // app.use('/auth', authenticationRequired, auth);
 app.use('/auth', auth);
-app.use('/leaveApi', authenticator, leaveApi);
-app.use('/hrApi', authenticator, hrApi);
-app.use('/procurementApi', authenticator, procurementApi);
+app.use('/leaveApi', authenticationRequired, leaveApi);
+app.use('/hrApi', authenticationRequired, hrApi);
+app.use('/procurementApi', authenticationRequired, procurementApi);
 
 // Launch app to listen to specified port
 app.listen(port, () => {

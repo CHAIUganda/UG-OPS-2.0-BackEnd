@@ -7,7 +7,8 @@ const { check } = require('express-validator/check');
 const authController = require('../controller/auth/authController');
 
 const router = express.Router();
-const authenticator = require('../middleware/authenticator');
+// const authenticator = require('../middleware/authenticator');
+const authenticationRequired = require('../middleware/oktaAuthenticator');
 
 /**
  * @method - POST
@@ -61,7 +62,7 @@ router.post(
     // input validations
     check('staffId', 'Please enter a valid Staff ID').not().isEmpty(),
   ],
-  authenticator,
+  authenticationRequired,
   /* authenticator, */
   authController.editUser
 );
@@ -78,7 +79,7 @@ router.post(
     check('staffEmail', 'Please enter a valid email').isEmail(),
     check('notificationId', 'Please Provide a notificationId').not().isEmpty(),
   ],
-  authenticator,
+  authenticationRequired,
   /* authenticator, */
   authController.handleNotifications
 );
@@ -106,7 +107,11 @@ router.post(
  * calls controller after checking inputs
  * @param - /auth/me
  */
-router.get('/getLoggedInUser', authenticator, authController.getLoggedInUser);
+router.get(
+  '/getLoggedInUser',
+  authenticationRequired,
+  authController.getLoggedInUser
+);
 
 /**
  * @method - GET
@@ -115,6 +120,6 @@ router.get('/getLoggedInUser', authenticator, authController.getLoggedInUser);
  * calls controller after checking inputs
  * @param - /auth/getUsers
  */
-router.get('/getUsers', authenticator, authController.getUsers);
+router.get('/getUsers', authenticationRequired, authController.getUsers);
 
 module.exports = router;
