@@ -15,6 +15,7 @@ const auth = require('./routes/auth');
 const leaveApi = require('./routes/leaveApi');
 const hrApi = require('./routes/hrApi');
 const procurementApi = require('./routes/procurementApi');
+const financeApi = require('./routes/financeApi');
 
 // Initialise the app
 const app = express();
@@ -49,6 +50,7 @@ app.use('/auth', auth);
 app.use('/leaveApi', authenticationRequired, leaveApi);
 app.use('/hrApi', authenticationRequired, hrApi);
 app.use('/procurementApi', authenticationRequired, procurementApi);
+app.use('/financeApi', authenticationRequired, financeApi);
 
 // Launch app to listen to specified port
 app.listen(port, () => {

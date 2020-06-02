@@ -7,8 +7,6 @@ const PublicHoliday = require('../../model/PublicHoliday');
 
 const getSupervisorLeaves = async (req, res) => {
   try {
-    // request.user is getting fetched from Middleware after token authentication
-
     const staffEmail = req.params.email;
     const { status } = req.params;
     const user = await User.findOne({ email: staffEmail });

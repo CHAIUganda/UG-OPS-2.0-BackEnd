@@ -46,7 +46,7 @@ router.post(
 );
 
 /**
- * @method - GET
+ * @method - POst
  * @description - Get public holidays.
  * @param - /getPublicHolidays
  */
@@ -96,7 +96,7 @@ router.post(
 /**
  * @method - GET
  * @description - Get Programs.
- * @param - /agetPrograms
+ * @param - /getPrograms
  */
 router.get('/getPrograms', hrController.getPrograms);
 
