@@ -13,8 +13,11 @@ const editProject = async (req, res) => {
 
   // prettier-ignore
   // eslint-disable-next-line object-curly-newline
-  const { id, pId, status, name, description } = req.body;
+  const { id } = req.body;
 
+  // prettier-ignore
+  // eslint-disable-next-line object-curly-newline
+  let { pId, status, name, description } = req.body;
   try {
     const project = await Project.findOne({
       _id: id,
@@ -23,6 +26,19 @@ const editProject = async (req, res) => {
       return res.status(400).json({
         message: 'This Project does not exist in the system',
       });
+    }
+
+    if (pId == null) {
+      pId = project.pId;
+    }
+    if (status == null) {
+      status = project.status;
+    }
+    if (name == null) {
+      name = project.name;
+    }
+    if (description == null) {
+      description = project.description;
     }
 
     // modify Project

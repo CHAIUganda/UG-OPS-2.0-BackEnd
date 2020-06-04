@@ -119,4 +119,66 @@ router.post(
  */
 router.get('/getObjectives/:status', financeController.getObjectives);
 
+/**
+ * @method - POST
+ * @description - Create a Account
+ * @param - /createAccount
+ */
+router.post(
+  '/createAccount',
+  [
+    check('accountCode', 'Please Enter a Valid AccountCode').not().isEmpty(),
+    check('financialGrouping', 'Please Enter a financial group')
+      .not()
+      .isEmpty(),
+    check('description', 'Please Enter a Description').not().isEmpty(),
+    check('useDecsription', 'Please Enter the account use description')
+      .not()
+      .isEmpty(),
+    check('status', 'Please a status for the Account').not().isEmpty(),
+    check(
+      'costedWorkPlans',
+      'Please a state if the AccountCode is tobe included on CWPs'
+    )
+      .not()
+      .isEmpty(),
+    check(
+      'quickBooks',
+      'Please a state if the AccountCode is tobe included in Quickbooks'
+    )
+      .not()
+      .isEmpty(),
+    check(
+      'usedInCountry',
+      'Please a state if the AccountCode is tobe used IN COUNTRY'
+    )
+      .not()
+      .isEmpty(),
+  ],
+  financeController.createAccount
+);
+
+/**
+ * @method - POST
+ * @description - editAccount.
+ * @param - /editAccount
+ */
+router.post(
+  '/editAccount',
+  [
+    // input validations
+    check('id', 'Please Enter a mongoose id (_id) for the Account')
+      .not()
+      .isEmpty(),
+  ],
+  financeController.editAccount
+);
+
+/**
+ * @method - GET
+ * @description - getAccounts.
+ * @param - /getAccounts
+ */
+router.get('/getAccounts/:status', financeController.getAccounts);
+
 module.exports = router;

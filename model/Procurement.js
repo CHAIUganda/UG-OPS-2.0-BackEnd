@@ -106,7 +106,7 @@ const ProcurementSchema = mongoose.Schema({
         },
       },
       pickUpLocation: {
-        type: Boolean,
+        type: String,
         default: false,
       },
       accountCode: {

@@ -13,7 +13,11 @@ const editGrant = async (req, res) => {
 
   // prettier-ignore
   // eslint-disable-next-line object-curly-newline
-  const { id, gId, status, name, description } = req.body;
+  const { id } = req.body;
+
+  // prettier-ignore
+  // eslint-disable-next-line object-curly-newline
+  let { gId, status, name, description } = req.body;
 
   try {
     const grant = await Grant.findOne({
@@ -23,6 +27,18 @@ const editGrant = async (req, res) => {
       return res.status(400).json({
         message: 'This Grant does not exist in the system',
       });
+    }
+    if (gId == null) {
+      gId = grant.gId;
+    }
+    if (status == null) {
+      status = grant.status;
+    }
+    if (name == null) {
+      name = grant.name;
+    }
+    if (description == null) {
+      description = grant.description;
     }
 
     // modify Grant

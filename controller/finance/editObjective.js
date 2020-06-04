@@ -13,7 +13,11 @@ const editObjective = async (req, res) => {
 
   // prettier-ignore
   // eslint-disable-next-line object-curly-newline
-  const { id, objectiveCode, status, name, description } = req.body;
+  const { id } = req.body;
+
+  // prettier-ignore
+  // eslint-disable-next-line object-curly-newline
+  let { objectiveCode, status, name, description } = req.body;
 
   try {
     const objective = await Objective.findOne({
@@ -23,6 +27,19 @@ const editObjective = async (req, res) => {
       return res.status(400).json({
         message: 'This Objective does not exist in the system',
       });
+    }
+
+    if (objectiveCode == null) {
+      objectiveCode = objective.objectiveCode;
+    }
+    if (status == null) {
+      status = objective.status;
+    }
+    if (name == null) {
+      name = objective.name;
+    }
+    if (description == null) {
+      description = objective.description;
     }
 
     // modify Objective

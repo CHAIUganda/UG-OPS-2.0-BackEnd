@@ -49,6 +49,7 @@ const additionSupportnDocsOnRequest = async (req, res) => {
             desc: '',
             path: `${__dirname}\\uploads\\supportnDocs\\${fileName}`,
           };
+          // additional supporting docs on a P request are stored in 1 array
           procurement.additionalSupportnDocs.push(additionalSupportnDocs);
           await procurement.save();
 

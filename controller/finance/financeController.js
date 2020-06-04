@@ -9,6 +9,9 @@ const getProjects = require('./getProjects');
 const createObjective = require('./createObjective');
 const editObjective = require('./editObjective');
 const getObjectives = require('./getObjectives');
+const createAccount = require('./createAccount');
+const editAccount = require('./editAccount');
+const getAccounts = require('./getAccounts');
 
 // Handle creation of a Grant
 exports.createGrant = createGrant;
@@ -36,3 +39,12 @@ exports.editObjective = editObjective;
 
 // Handle get Objectives
 exports.getObjectives = getObjectives;
+
+// Handle creation of a Account
+exports.createAccount = createAccount;
+
+// Handle Editing of a Account Details
+exports.editAccount = editAccount;
+
+// Handle get Accounts
+exports.getAccounts = getAccounts;

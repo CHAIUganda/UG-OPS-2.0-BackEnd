@@ -80,7 +80,6 @@ router.post(
     check('notificationId', 'Please Provide a notificationId').not().isEmpty(),
   ],
   authenticationRequired,
-  /* authenticator, */
   authController.handleNotifications
 );
 
