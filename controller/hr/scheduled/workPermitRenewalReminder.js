@@ -36,7 +36,7 @@ const workPermitRenewalReminder = async () => {
       throw errorMessage;
     }
     // initialize emailing necessities
-    const subject = 'Uganda Operations WorkPermits';
+    const subject = 'Uganda Operations Work Permits';
     const from = 'UGOperations@clintonhealthaccess.org';
     const footer = `
 
@@ -108,7 +108,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
                   // prettier-ignore
                   const textUser = `Hello  ${hr.fName}, 
         
-${fName} ${lName}'s Work Permit will expiry in ${diff} days as of ${today.toDateString()}. This is a remainder to start its renewal process."${footer}.
+${fName} ${lName}'s Work Permit will expiry in ${diff} days as of ${today.toDateString()}. This is a remainder to start their work permit renewal process."${footer}.
                                                     `;
                   const cc = `${programMngr.email},${supervisor.email}`;
                   Mailer(from, hr.email, subject, textUser, cc);

@@ -317,6 +317,7 @@ const ProcurementSchema = mongoose.Schema({
       default: false,
     },
     recommendedVendor: {
+      // quote1
       type: String,
       required: false,
     },
@@ -327,7 +328,7 @@ const ProcurementSchema = mongoose.Schema({
     quotations: {
       quote1: {
         vendor: {
-          type: String,
+          type: mongoose.Schema.Types.ObjectId,
           required: false,
         },
         price: {
@@ -339,17 +340,13 @@ const ProcurementSchema = mongoose.Schema({
           required: false,
         },
         dates: {
-          type: String,
-          required: false,
-        },
-        path: {
           type: String,
           required: false,
         },
       },
       quote2: {
         vendor: {
-          type: String,
+          type: mongoose.Schema.Types.ObjectId,
           required: false,
         },
         price: {
@@ -361,17 +358,13 @@ const ProcurementSchema = mongoose.Schema({
           required: false,
         },
         dates: {
-          type: String,
-          required: false,
-        },
-        path: {
           type: String,
           required: false,
         },
       },
       quote3: {
         vendor: {
-          type: String,
+          type: mongoose.Schema.Types.ObjectId,
           required: false,
         },
         price: {
@@ -386,15 +379,17 @@ const ProcurementSchema = mongoose.Schema({
           type: String,
           required: false,
         },
-        path: {
-          type: String,
-          required: false,
-        },
       },
     },
+    quoteFiles: [
+      {
+        name: String,
+        path: String,
+      },
+    ],
     choosenQuote: {
       quoteNumber: {
-        // can be quote1
+        // can be quote1 quote2 quote3
         type: String,
         required: false,
       },

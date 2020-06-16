@@ -97,11 +97,11 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
                 ) {
                   // email to staff
                   // prettier-ignore
-                  const textUser = `Hello  ${supervisor.fName}, 
+                  const textUser = `Hello  ${hr.fName}, 
         
-${fName} ${lName}'s Contract will expiry in ${diff} days as of ${today.toDateString()}. This is an invitation to discuss their contract renewal. Please find attached the calender Invite "Add to your Calender"${footer}.
+${fName} ${lName}'s Contract will expiry in ${diff} days as of ${today.toDateString()}. This is a remainder to start  their contract renewal process.${footer}.
                                                     `;
-                  const cc = `${programMngr.email},${hr.email}`;
+                  const cc = `${programMngr.email},${supervisor.email}`;
                   // Create new Calendar and set optional fields
 
                   // create a new event
@@ -139,22 +139,17 @@ ${fName} ${lName}'s Contract will expiry in ${diff} days as of ${today.toDateStr
                       },
                     ],
                   };
+                  // eslint-disable-next-line no-unused-vars
                   let content;
-                  await ics.createEvent(event, (error, value) => {
+                  ics.createEvent(event, (error, value) => {
                     if (error) {
                       console.log(error);
                       return;
                     }
                     content = value;
                   });
-                  Mailer(
-                    from,
-                    supervisor.email,
-                    subject,
-                    textUser,
-                    cc,
-                    content
-                  );
+                  // Mailer(from,supervisor.email,subject,textUser,cc,content);
+                  Mailer(from, hr.email, subject, textUser, cc);
                   // save notification on user obj
                   const notificationTitle = `${fName} ${lName}'s Contract will expiry in ${diff} days`;
                   const notificationType = '/hr/ContractsExpiry';

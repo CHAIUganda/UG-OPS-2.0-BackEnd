@@ -1,10 +1,18 @@
 // const moment = require('moment-timezone');
 const debug = require('debug')('leave-controller');
 const moment = require('moment-timezone');
+const { validationResult } = require('express-validator/check');
 const Procurement = require('../../model/Procurement');
+const errorToString = require('../../helpers/errorToString');
 
 const additionSupportnDocsOnRequest = async (req, res) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        message: errorToString(errors.array()),
+      });
+    }
     // set timezone to kampala
     let CurrentDate = moment()
       .tz('Africa/Kampala')
@@ -27,12 +35,11 @@ const additionSupportnDocsOnRequest = async (req, res) => {
           // move addDoc to uploads directory
           // addDoc.mv(`./uploads/supportnDocs/${addDoc.name}`);
           const nm = addDoc.name.split('.');
+          const fileType = 'SupportnDoc';
           const fileex = nm[nm.length - 1];
           const fileName = `${procurementId}_${moment(CurrentDate).format(
             'YYYY-MM-DD'
-          )}_${moment(CurrentDate).format('HH-mm-ss')}_${
-            controller + 1
-          }.${fileex}`;
+          )}_${fileType}_${controller + 1}.${fileex}`;
 
           addDoc.mv(`${__dirname}\\uploads\\supportnDocs\\${fileName}`);
           const procurement = await Procurement.findOne({

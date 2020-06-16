@@ -65,7 +65,7 @@ Your Planned leave from ${arr[controller].startDate.toDateString()} to ${arr[con
           } else {
             leaveStart = moment(leaveStart);
             const diff = leaveStart.diff(CurrentDate, 'days') + 1;
-            // send invite in 3 2 1 months to expiry
+            // send  in startsIn days to expiry
 
             if (
               // prettier-ignore

@@ -1,7 +1,6 @@
 const { validationResult } = require('express-validator/check');
 // const moment = require('moment-timezone');
 const debug = require('debug')('leave-controller');
-const moment = require('moment-timezone');
 const Program = require('../../model/Program');
 const errorToString = require('../../helpers/errorToString');
 const Procurement = require('../../model/Procurement');
@@ -9,7 +8,7 @@ const User = require('../../model/User');
 const Mailer = require('../../helpers/Mailer');
 const storeNotification = require('../../helpers/storeNotification');
 
-const createProcurement = async (req, res) => {
+const procurementResponse = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
@@ -19,44 +18,37 @@ const createProcurement = async (req, res) => {
 
   // prettier-ignore
   const {
-    pId,
-    gId,
-    objectCode,
-    staffId,
-    category,
-    descOfOther,
-    priceRange,
-    keyObjAsPerWp,
-    keyActivitiesAsPerWp,
-    specifications,
+    procurementId,
+    requires3Quote,
+    recommendedVendor,
+    recommendedVendorJustification,
+    quotations,
   } = req.body;
-  // Pending Procurement Response, Pending Requestor Response, Pending LPO
+  // Pending Procurement Response, Pending Requestor Response, Pending Procurement Response
   // LPO Pending Program Manager, LPO Pending Country Leadership, Approved
-  const status = 'Pending Procurement Response';
-  // set timezone to kampala
-  let CurrentDate = moment().tz('Africa/Kampala').format();
-  CurrentDate = new Date(CurrentDate);
 
   try {
-    const user = await User.findOne({
-      _id: staffId,
+    // check if route requestor is procurementAdmin
+
+    const chkProcurement = await Procurement.findOne({
+      _id: procurementId,
     });
-    if (!user) {
+    if (!chkProcurement) {
       return res.status(400).json({
-        message: 'User does not Exist',
+        message: 'Procurement Request does not Exist',
       });
     }
 
-    // check if procurement Admin exists in System
-    const procurementAdmin = await User.findOne({
-      'roles.procurementAdmin': true,
+    const requestor = await User.findOne({
+      _id: chkProcurement.staffId,
     });
-    if (!procurementAdmin) {
+    if (!requestor) {
       return res.status(400).json({
-        message: 'Procurement Admin is not Registered in the system',
+        message: 'Requesting User does not Exist',
       });
     }
-    const { programId } = user;
+
+    const { programId } = requestor;
     let program;
     let programShortForm;
 
@@ -84,46 +76,51 @@ Clinton Health Access Initiative
   
 Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
 
-    const procurementRemade = new Procurement({
-      pId,
-      gId,
-      objectCode,
-      staffId,
-      category,
-      descOfOther,
-      priceRange,
-      keyObjAsPerWp,
-      keyActivitiesAsPerWp,
-      specifications,
-      status,
-      createDate: CurrentDate,
-    });
-    // procurement id saved on staff collection
-    await User.updateOne(
+    let status;
+
+    if (requires3Quote === true) {
+      status = 'Pending Requestor Response';
+    } else {
+      status = 'Pending LPO';
+    }
+
+    // change procurement details
+    await Procurement.updateOne(
       {
-        _id: staffId,
+        _id: procurementId,
       },
-      { $push: { procurements: procurementRemade._id } }
+      {
+        // eslint-disable-next-line max-len
+        $set: {
+          status,
+          response: {
+            requires3Quote,
+            recommendedVendor,
+            recommendedVendorJustification,
+            quotations,
+          },
+        },
+      }
     );
-    await procurementRemade.save();
     // mail procurement admin
     // prettier-ignore
-    const textProcurementAdmin = `Hello  ${procurementAdmin.fName}, 
+    const textRequestor = `Hello  ${requestor.fName}, 
 
-${user.fName}  ${user.lName} has sent in a Procurement Request. Please Login into Ugopps to respond to the request.${footer}.
+The procurement Team has responded to your request. Please Login into Ugopps to view its current status.${footer}.
                                       `;
 
-    Mailer(from, procurementAdmin.email, subject, textProcurementAdmin, '');
+    Mailer(from, requestor.email, subject, textRequestor, '');
     // save notification on user obj
-    const notificationTitle = `${user.fName}  ${user.lName} has sent in a Procurement Request.`;
+    // prettier-ignore
+    const notificationTitle = 'The procurement Team has responded to your request.';
     const notificationType = '/procurement';
     const refType = 'Procurements';
-    const refId = procurementRemade._id;
+    const refId = procurementId;
     // prettier-ignore
     // eslint-disable-next-line max-len
-    const notificationMessage = `${user.fName}  ${user.lName} has sent in a Procurement Request.`;
+    const notificationMessage = 'The procurement Team has responded to your request. Click on the notification to view its current status.';
     await storeNotification(
-      procurementAdmin,
+      requestor,
       notificationTitle,
       notificationMessage,
       notificationType,
@@ -131,8 +128,7 @@ ${user.fName}  ${user.lName} has sent in a Procurement Request. Please Login int
       refId
     );
 
-    const procurement = {
-      _id: procurementRemade._id,
+    const {
       pId,
       gId,
       objectCode,
@@ -143,10 +139,30 @@ ${user.fName}  ${user.lName} has sent in a Procurement Request. Please Login int
       keyObjAsPerWp,
       keyActivitiesAsPerWp,
       specifications,
+    } = chkProcurement;
+
+    const procurement = {
+      _id: chkProcurement._id,
+      pId,
+      gId,
+      objectCode,
+      staffId,
+      category,
+      descOfOther,
+      priceRange,
+      keyObjAsPerWp,
+      keyActivitiesAsPerWp,
+      specifications,
+      response: {
+        requires3Quote,
+        recommendedVendor,
+        recommendedVendorJustification,
+        quotations,
+      },
       staff: {
-        email: user.email,
-        fName: user.fName,
-        lName: user.lName,
+        email: requestor.email,
+        fName: requestor.fName,
+        lName: requestor.lName,
       },
       status,
       programId,
@@ -169,4 +185,4 @@ ${user.fName}  ${user.lName} has sent in a Procurement Request. Please Login int
   }
 };
 
-module.exports = createProcurement;
+module.exports = procurementResponse;

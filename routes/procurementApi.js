@@ -45,6 +45,15 @@ router.post(
 // addnDocs should be the name of the input tag sending files
 router.post(
   '/additionSupportnDocsOnRequest',
+  [
+    // input validations date validation pending
+    check(
+      'procurementId',
+      'Please Enter a ProcurementId where the attached files belong'
+    )
+      .not()
+      .isEmpty(),
+  ],
   procurementController.additionSupportnDocsOnRequest
 );
 
