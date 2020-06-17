@@ -22,8 +22,21 @@ From the entire team.`;
         // set timezone to kampala
         const CurrentDate = moment().tz('Africa/Kampala').format('YYYY/MM/DD');
         const today = new Date(CurrentDate);
+        let staffBirthDate;
+        if (birthDate) {
+          staffBirthDate = moment(birthDate)
+            .tz('Africa/Kampala')
+            .format('YYYY/MM/DD');
+        } else {
+          staffBirthDate = moment(birthDate)
+            .add(5, 'days')
+            .format('YYYY/MM/DD');
+        }
 
-        const bd = new Date(birthDate);
+        // prettier-ignore
+        let bd = `${new Date().getFullYear()}-${staffBirthDate.split('/')[1]}-${staffBirthDate.split('/')[2]}`;
+
+        bd = new Date(bd);
         // check if bd is same as today and send bd greetings
         if (moment(today.toDateString()).isSame(bd.toDateString())) {
           // email to staff
