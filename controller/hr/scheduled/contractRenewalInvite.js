@@ -99,7 +99,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
                   // prettier-ignore
                   const textUser = `Hello  ${hr.fName}, 
         
-${fName} ${lName}'s Contract will expiry in ${diff} days as of ${today.toDateString()}. This is a remainder to start  their contract renewal process.${footer}.
+${fName} ${lName}'s Contract will expiry in ${diff} days as of ${today.toDateString()}. This is a reminder to start  their contract renewal process.${footer}.
                                                     `;
                   const cc = `${programMngr.email},${supervisor.email}`;
                   // Create new Calendar and set optional fields

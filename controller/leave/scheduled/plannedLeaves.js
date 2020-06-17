@@ -77,7 +77,7 @@ Your Planned leave from ${arr[controller].startDate.toDateString()} to ${arr[con
               // email to staff
               const textUser = `Hello  ${user.fName}, 
   
-Your Planned leave from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()} will start in ${diff} days as of ${today.toDateString()}. This is remainder to apply for it.${footer}.
+Your Planned leave from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()} will start in ${diff} days as of ${today.toDateString()}. This is reminder to apply for it.${footer}.
                                               `;
               Mailer(from, user.email, subject, textUser, '');
               recurseProcessLeave(controller + 1, arr);
