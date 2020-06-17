@@ -37,10 +37,6 @@ From the entire team.`;
         let bd = `${new Date().getFullYear()}-${staffBirthDate.split('/')[1]}-${staffBirthDate.split('/')[2]}`;
 
         bd = new Date(bd);
-        console.log(
-          `today :${today.toDateString()}  Birthday: ${bd.toDateString()}`
-        );
-        console.log(moment(today.toDateString()).isSame(bd.toDateString()));
         // check if bd is same as today and send bd greetings
         if (moment(today.toDateString()).isSame(bd.toDateString())) {
           // email to staff
