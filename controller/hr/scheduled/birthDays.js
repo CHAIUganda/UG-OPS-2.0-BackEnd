@@ -20,27 +20,26 @@ From the entire team.`;
         const { birthDate, email, fName } = arr[controller];
         const subject = `Happy Birthday ${fName}!`;
         // set timezone to kampala
-        const CurrentDate = moment().tz('Africa/Kampala').format('YYYY/MM/DD');
+        const CurrentDate = moment().tz('Africa/Kampala').format('YYYY-MM-DD');
         const today = new Date(CurrentDate);
         let staffBirthDate;
         if (birthDate) {
           staffBirthDate = moment(birthDate)
             .tz('Africa/Kampala')
-            .format('YYYY/MM/DD');
+            .format('YYYY-MM-DD');
         } else {
           staffBirthDate = moment(birthDate)
             .add(5, 'days')
-            .format('YYYY/MM/DD');
+            .format('YYYY-MM-DD');
         }
 
         // prettier-ignore
-        let bd = `${new Date().getFullYear()}-${staffBirthDate.split('/')[1]}-${staffBirthDate.split('/')[2]}`;
-
-        bd = new Date(bd);
+        const bd = `${new Date().getFullYear()}-${staffBirthDate.split('-')[1]}-${staffBirthDate.split('-')[2]}`;
         // check if bd is same as today and send bd greetings
-        if (moment(today.toDateString()).isSame(bd.toDateString())) {
+        if (moment(CurrentDate).isSame(bd)) {
           // email to staff
           // prettier-ignore
+          console.log('bd same 1');
           const imgDay = `bd${today.getDay() + 1}.jpg`;
           const htmlAttach = {
             // prettier-ignore
@@ -54,6 +53,7 @@ From the entire team.`;
               },
             ],
           };
+          console.log('bd same 2');
           const textUser = '';
           Mailer(
             from,
@@ -64,6 +64,7 @@ From the entire team.`;
             undefined,
             htmlAttach
           );
+          console.log('bd same 3');
           recurseProcessLeave(controller + 1, arr);
         } else {
           recurseProcessLeave(controller + 1, arr);

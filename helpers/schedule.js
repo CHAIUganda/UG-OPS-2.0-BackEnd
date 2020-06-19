@@ -17,7 +17,7 @@ log4js.configure({
 // const logger = log4js.getLogger('Timed');
 
 const schedule = new CronJob(
-  '0 38 16 * * *',
+  '0 55 11 * * *',
   () => {
     console.log('Checking for birthdays and Ripe leaves');
     // contains auto scheduled jobs to be done by system
