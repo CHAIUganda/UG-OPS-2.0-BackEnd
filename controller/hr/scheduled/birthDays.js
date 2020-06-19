@@ -39,7 +39,6 @@ From the entire team.`;
         if (moment(CurrentDate).isSame(bd)) {
           // email to staff
           // prettier-ignore
-          console.log('bd same 1');
           const imgDay = `bd${today.getDay() + 1}.jpg`;
           const htmlAttach = {
             // prettier-ignore
@@ -53,7 +52,6 @@ From the entire team.`;
               },
             ],
           };
-          console.log('bd same 2');
           const textUser = '';
           Mailer(
             from,
@@ -64,7 +62,6 @@ From the entire team.`;
             undefined,
             htmlAttach
           );
-          console.log('bd same 3');
           recurseProcessLeave(controller + 1, arr);
         } else {
           recurseProcessLeave(controller + 1, arr);
