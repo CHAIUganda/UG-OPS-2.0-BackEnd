@@ -111,16 +111,16 @@ const staffModifyLeave = async (req, res) => {
     if (type == null) {
       type = leave.type;
     }
-    const subject = 'Uganda Operations Leaves';
     const from = 'UGOperations@clintonhealthaccess.org';
     const footer = `
-
-Regards,
-
+  
+With Regards,
+  
 Uganda Operations
 Clinton Health Access Initiative
-
-Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
+https://ugops.clintonhealthaccess.org
+  
+Disclaimer: This is an auto-generated mail, please do not reply to it.`;
 
     // set old leave values
     const oldStartDate = leave.startDate;
@@ -366,19 +366,21 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
           };
           leave.modificationDetails.modLeaves.push(modLeaves);
           await leave.save();
-          // prettier-ignore
-          const textSupervisor = `Hello  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} is requesting to modify their leave. To be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
+          const subject = 'Request for approved leave modification';
+          // prettier-ignore
+          const textSupervisor = `Dear  ${supervisor.fName}, 
+
+${user.fName} ${user.lName} has modified their Leave and is now requesting for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}
                                       `;
           Mailer(from, supervisor.email, subject, textSupervisor, '');
-          const supervisornotificationTitle = `${user.fName}  ${user.lName} is requesting to modify their leave.`;
+          const supervisornotificationTitle = `${user.fName}  ${user.lName} has modified their leave request.`;
           const supervisornotificationType = '/hr/SuperviseLeave';
           refType = 'Leaves';
           refId = leave._id;
           // prettier-ignore
           // eslint-disable-next-line max-len
-          const supervisornotificationMessage = `${user.fName}  ${user.lName} is requesting to modify their leave. To be off from ${startDate.toDateString()} to ${endDate.toDateString()}`;
+          const supervisornotificationMessage = `${user.fName} ${user.lName} has modified their Leave and is now requesting for ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}`;
           // eslint-disable-next-line max-len
           await storeNotification(
             supervisor,
@@ -453,35 +455,14 @@ ${user.fName}  ${user.lName} is requesting to modify their leave. To be off from
             };
             leave.modificationDetails.modLeaves.push(modLeaves);
             await leave.save();
-
-
-            // sends mail to cd supervisor HR and notification about status
-            // prettier-ignore
-            // email to HR
-            // prettier-ignore
-            const text = `Hello  ${hr.fName}, 
-
-${user.fName}  ${user.lName} has modified their HomeLeave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
-                         `;
-            Mailer(from, hr.email, subject, text, '');
-            // save notification on user obj
-            const hrnotificationTitle = `${user.fName}  ${user.lName} has modified their Home Leave`;
-            const hrnotificationType = null;
-            refType = 'Leaves';
-            refId = leave._id;
-            // prettier-ignore
-            // eslint-disable-next-line max-len
-            const hrnotificationMessage = `${user.fName}  ${user.lName} has modified their HomeLeave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}`;
-            // eslint-disable-next-line max-len
-            await storeNotification(hr, hrnotificationTitle, hrnotificationMessage, hrnotificationType, refType, refId);
-
-
+            // sends mail to cd supervisor and notification about status
+            const subject = 'Approved leave modification';
             // email to CD
             // prettier-ignore
-            const textCd = `Hello  ${cd.fName}, 
+            const textCd = `Dear  ${cd.fName}, 
 
-${user.fName}  ${user.lName} has modified their HomeLeave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
-                         `;
+${user.fName} ${user.lName} has modified their leave, will now be off for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}
+                                     `;
             Mailer(from, cd.email, subject, textCd, '');
             // save notification on user obj
             const cdnotificationTitle = `${user.fName}  ${user.lName} has modified their Home Leave`;
@@ -490,17 +471,17 @@ ${user.fName}  ${user.lName} has modified their HomeLeave, now to be off from ${
             refId = leave._id;
             // prettier-ignore
             // eslint-disable-next-line max-len
-            const cdnotificationMessage = `${user.fName}  ${user.lName} has modified their HomeLeave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}`;
+            const cdnotificationMessage = `${user.fName} ${user.lName} has modified their leave, will now be off for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}`;
             // eslint-disable-next-line max-len
             await storeNotification(cd, cdnotificationTitle, cdnotificationMessage, cdnotificationType, refType, refId);
 
 
             // email to Supervisor
             // prettier-ignore
-            const textSupervisor = `Hello  ${supervisor.fName}, 
+            const textSupervisor = `Dear  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} has modified their HomeLeave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
-                         `;
+${user.fName} ${user.lName} has modified their leave, will now be off for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}
+                                     `;
             Mailer(from, supervisor.email, subject, textSupervisor, '');
             // save notification on user obj
             const supervisornotificationTitle = `${user.fName}  ${user.lName} has modified their Home Leave`;
@@ -509,7 +490,7 @@ ${user.fName}  ${user.lName} has modified their HomeLeave, now to be off from ${
             refId = leave._id;
             // prettier-ignore
             // eslint-disable-next-line max-len
-            const supervisornotificationMessage = `${user.fName}  ${user.lName} has modified their HomeLeave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}`;
+            const supervisornotificationMessage = `${user.fName} ${user.lName} has modified their leave, will now be off for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}`;
             // eslint-disable-next-line max-len
             await storeNotification(supervisor, supervisornotificationTitle, supervisornotificationMessage, supervisornotificationType, refType, refId);
 
@@ -564,31 +545,13 @@ ${user.fName}  ${user.lName} has modified their HomeLeave, now to be off from ${
             leave.modificationDetails.modLeaves.push(modLeaves);
             await leave.save();
 
-            // sends mail to supervisor HR and notification about status
-            // email to HR
-            // prettier-ignore
-            const text = `Hello  ${hr.fName}, 
-
-${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
-                         `;
-            Mailer(from, hr.email, subject, text, '');
-            // save notification on user obj
-            const hrnotificationTitle = `${user.fName}  ${user.lName} has modified their Home Leave`;
-            const hrnotificationType = null;
-            refType = 'Leaves';
-            refId = leave._id;
-            // prettier-ignore
-            // eslint-disable-next-line max-len
-            const hrnotificationMessage = `${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}`;
-            // eslint-disable-next-line max-len
-            await storeNotification(hr, hrnotificationTitle, hrnotificationMessage, hrnotificationType, refType, refId);
-
-
+            // sends mail to supervisor and notification about status
             // email to Supervisor
+            const subject = 'Approved leave modification';
             // prettier-ignore
-            const textSupervisor = `Hello  ${supervisor.fName}, 
+            const textSupervisor = `Dear  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
+${user.fName} ${user.lName} has modified their leave, will now be off for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}
                          `;
             Mailer(from, supervisor.email, subject, textSupervisor, '');
             // save notification on user obj
@@ -598,7 +561,7 @@ ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${star
             refId = leave._id;
             // prettier-ignore
             // eslint-disable-next-line max-len
-            const supervisornotificationMessage = `${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}`;
+            const supervisornotificationMessage = `${user.fName} ${user.lName} has modified their leave, will now be off for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}`;
             // eslint-disable-next-line max-len
             await storeNotification(supervisor, supervisornotificationTitle, supervisornotificationMessage, supervisornotificationType, refType, refId);
 
@@ -652,60 +615,41 @@ ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${star
             { $set: { status: 'Not Taken', comment } }
           );
           // sends mail to cd supervisor HR and notification about status
-          // prettier-ignore
-          // email to HR
-          // prettier-ignore
-          const text = `Hello  ${hr.fName}, 
-
-${user.fName}  ${user.lName} Decided not to take their HomeLeave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
-                         `;
-          Mailer(from, hr.email, subject, text, '');
-          // save notification on user obj
-          const hrnotificationTitle = `${user.fName}  ${user.lName} has Decided not to take their HomeLeave`;
-          const hrnotificationType = null;
-          refType = 'Leaves';
-          refId = leave._id;
-          // prettier-ignore
-          // eslint-disable-next-line max-len
-          const hrnotificationMessage = `${user.fName}  ${user.lName} Decided not to take their HomeLeave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}`;
-          // eslint-disable-next-line max-len
-          await storeNotification(hr, hrnotificationTitle, hrnotificationMessage, hrnotificationType, refType, refId);
-
-
+          const subject = 'Approved leave cancellation';
           // email to CD
           // prettier-ignore
-          const textCd = `Hello  ${cd.fName}, 
+          const textCd = `Dear  ${cd.fName}, 
 
-${user.fName}  ${user.lName} Decided not to take their HomeLeave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
-                         `;
+${user.fName}  ${user.lName} has decided not to take their ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}
+          `;
           Mailer(from, cd.email, subject, textCd, '');
           // save notification on user obj
-          const cdnotificationTitle = `${user.fName}  ${user.lName} hasDecided not to take their HomeLeave`;
+          const cdnotificationTitle = `${user.fName}  ${user.lName} has decided not to take their HomeLeave`;
           const cdnotificationType = null;
           refType = 'Leaves';
           refId = leave._id;
           // prettier-ignore
           // eslint-disable-next-line max-len
-          const cdnotificationMessage = `${user.fName}  ${user.lName} has  Decided not to take their HomeLeave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}`;
+          const cdnotificationMessage = `${user.fName}  ${user.lName} has decided not to take their ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}`;
           // eslint-disable-next-line max-len
           await storeNotification(cd, cdnotificationTitle, cdnotificationMessage, cdnotificationType, refType, refId);
 
 
           // email to Supervisor
           // prettier-ignore
-          const textSupervisor = `Hello  ${supervisor.fName}, 
+          const textSupervisor = `Dear  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} Decided not to take their HomeLeave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
-                         `;
+${user.fName}  ${user.lName} has decided not to take their ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}
+          `;
           Mailer(from, supervisor.email, subject, textSupervisor, '');
           // save notification on user obj
-          const supervisornotificationTitle = `${user.fName}  ${user.lName} has Decided not to take their HomeLeave`;
+          const supervisornotificationTitle = `${user.fName}  ${user.lName} has decided not to take their HomeLeave`;
           const supervisornotificationType = null;
           refType = 'Leaves';
           refId = leave._id;
           // prettier-ignore
           // eslint-disable-next-line max-len
-          const supervisornotificationMessage = `${user.fName}  ${user.lName} has Decided not to take their HomeLeave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}`;
+          const supervisornotificationMessage = `${user.fName}  ${user.lName} has decided not to take their ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}`;
           // eslint-disable-next-line max-len
           await storeNotification(supervisor, supervisornotificationTitle, supervisornotificationMessage, supervisornotificationType, refType, refId);
 
@@ -745,42 +689,23 @@ ${user.fName}  ${user.lName} Decided not to take their HomeLeave from ${leave.st
             },
             { $set: { status: 'Not Taken', comment } }
           );
-          // sends mail to supervisor  HR and notification about status
-          // prettier-ignore
-          // email to HR
-          // pr // email to HR
-          // prettier-ignore
-          const text = `Hello  ${hr.fName}, 
-
-${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
-                                   `;
-          Mailer(from, hr.email, subject, text, '');
-          // save notification on user obj
-          const hrnotificationTitle = `${user.fName}  ${user.lName} has Decided not to take their Leave`;
-          const hrnotificationType = null;
-          refType = 'Leaves';
-          refId = leave._id;
-          // prettier-ignore
-          // eslint-disable-next-line max-len
-          const hrnotificationMessage = `${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}`;
-          // eslint-disable-next-line max-len
-          await storeNotification(hr, hrnotificationTitle, hrnotificationMessage, hrnotificationType, refType, refId);
-
+          // sends mail to supervisor and notification about status
+          const subject = 'Approved leave cancellation';
           // email to Supervisor
           // prettier-ignore
-          const textSupervisor = `Hello  ${supervisor.fName}, 
+          const textSupervisor = `Dear  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
+${user.fName}  ${user.lName} has decided not to take their ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}
                          `;
           Mailer(from, supervisor.email, subject, textSupervisor, '');
           // save notification on user obj
-          const supervisornotificationTitle = `${user.fName}  ${user.lName} has Decided not to take their Leave`;
+          const supervisornotificationTitle = `${user.fName}  ${user.lName} has decided not to take their Leave`;
           const supervisornotificationType = null;
           refType = 'Leaves';
           refId = leave._id;
           // prettier-ignore
           // eslint-disable-next-line max-len
-          const supervisornotificationMessage = `${user.fName}  ${user.lName} has Decided not to take their Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}`;
+          const supervisornotificationMessage = `${user.fName}  ${user.lName} has decided not to take their ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}`;
           // eslint-disable-next-line max-len
           await storeNotification(supervisor, supervisornotificationTitle, supervisornotificationMessage, supervisornotificationType, refType, refId);
 
@@ -1015,10 +940,11 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
               },
             }
           );
+          const subject = 'Taken leave modification';
           // prettier-ignore
-          const textSupervisor = `Hello  ${supervisor.fName}, 
+          const textSupervisor = `Dear  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} is requesting to modify their Taken Home leave. New Dates are ${startDate.toDateString()} to ${endDate.toDateString()}. Please Confirm. ${footer}.
+${user.fName}  ${user.lName} is requesting to modify their taken leave. New details are a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}. Please Confirm. ${footer}
                                       `;
           const cc = `${cd.email},${hr.email}`;
           Mailer(from, supervisor.email, subject, textSupervisor, cc);
@@ -1029,7 +955,7 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken Home leave. New
           refId = leave._id;
           // prettier-ignore
           // eslint-disable-next-line max-len
-          const supervisornotificationMessage = `${user.fName}  ${user.lName}  is requesting to modify their Taken Home leave. New Dates are ${startDate.toDateString()} to ${endDate.toDateString()}. Please Confirm.`;
+          const supervisornotificationMessage = `${user.fName}  ${user.lName} is requesting to modify their taken leave. New details are a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}. Please Confirm.`;
           // eslint-disable-next-line max-len
           await storeNotification(
             supervisor,
@@ -1092,21 +1018,22 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken Home leave. New
               },
             }
           );
+          const subject = 'Taken leave modification';
           // prettier-ignore
-          const textSupervisor = `Hello  ${supervisor.fName}, 
+          const textSupervisor = `Dear  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} is requesting to modify their Taken leave. New Dates are ${startDate.toDateString()} to ${endDate.toDateString()}. Please Confirm. ${footer}.
+${user.fName}  ${user.lName} is requesting to modify their taken leave. New details are a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}. Please Confirm. ${footer}
                                       `;
           const cc = `${hr.email}`;
           Mailer(from, supervisor.email, subject, textSupervisor, cc);
           // save notification on user obj
-          const supervisornotificationTitle = `${user.fName}  ${user.lName} is requesting to modify their Taken leave.`;
+          const supervisornotificationTitle = `${user.fName}  ${user.lName} is requesting to modify their taken leave.`;
           const supervisornotificationType = '/hr/SuperviseLeave';
           refType = 'Leaves';
           refId = leave._id;
           // prettier-ignore
           // eslint-disable-next-line max-len
-          const supervisornotificationMessage = `${user.fName}  ${user.lName}  is requesting to modify their Taken leave. New Dates are ${startDate.toDateString()} to ${endDate.toDateString()}. Please Confirm.`;
+          const supervisornotificationMessage = `${user.fName}  ${user.lName} is requesting to modify their taken leave. New details are a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}. Please Confirm.`;
           // eslint-disable-next-line max-len
           await storeNotification(
             supervisor,
@@ -1153,23 +1080,23 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken leave. New Date
           },
           { $set: { status: 'Pending Not Taken', comment } }
         );
-        // sends mail to cd supervisor HR and notification about status
-        // prettier-ignore
+        // sends mail to supervisor and notification about status
+        const subject = 'Taken leave cancellation';
         // email to Supervisor
         // prettier-ignore
-        const textSupervisor = `Hello  ${supervisor.fName}, 
+        const textSupervisor = `Dear  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} is requesting to Cancel their Taken leave Which was from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}. This is pending your approval${footer}.
+${user.fName} ${user.lName} is requesting to cancel their taken leave which was a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}. This is pending your approval${footer}
                          `;
         Mailer(from, supervisor.email, subject, textSupervisor, '');
         // save notification on user obj
-        const supervisornotificationTitle = `${user.fName}  ${user.lName} is requesting to Cancel their Taken leave.`;
+        const supervisornotificationTitle = `${user.fName}  ${user.lName} is requesting to cancel their taken leave.`;
         const supervisornotificationType = '/hr/SuperviseLeave';
         refType = 'Leaves';
         refId = leave._id;
         // prettier-ignore
         // eslint-disable-next-line max-len
-        const supervisornotificationMessage = `${user.fName}  ${user.lName} is requesting to Cancel their Taken leave Which was from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}. This is pending your approval`;
+        const supervisornotificationMessage = `${user.fName} ${user.lName} is requesting to cancel their taken leave which was a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}. This is pending your approval`;
         // eslint-disable-next-line max-len
         await storeNotification(
           supervisor,
@@ -1404,14 +1331,12 @@ ${user.fName}  ${user.lName} is requesting to Cancel their Taken leave Which was
         };
         leave.modificationDetails.modLeaves.push(modLeaves);
         await leave.save();
-
-        // prettier-ignore
-
+        const subject = 'Leave request modification';
         // email to Supervisor
         // prettier-ignore
-        const textSupervisor = `Hello  ${supervisor.fName}, 
+        const textSupervisor = `Dear  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} has modified their Leave request, now asking to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
+${user.fName}  ${user.lName} has modified their leave request and is now requesting for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}
                          `;
         Mailer(from, supervisor.email, subject, textSupervisor, '');
         // save notification on user obj
@@ -1421,7 +1346,7 @@ ${user.fName}  ${user.lName} has modified their Leave request, now asking to be 
         refId = leave._id;
         // prettier-ignore
         // eslint-disable-next-line max-len
-        const supervisornotificationMessage = `${user.fName}  ${user.lName} has modified their Leave request, now asking to be off from ${startDate.toDateString()} to ${endDate.toDateString()}`;
+        const supervisornotificationMessage = `${user.fName}  ${user.lName} has modified their leave request and is now requesting for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}`;
         // eslint-disable-next-line max-len
         await storeNotification(
           supervisor,
@@ -1468,11 +1393,12 @@ ${user.fName}  ${user.lName} has modified their Leave request, now asking to be 
           },
           { $set: { status: 'Cancelled', comment } }
         );
+        const subject = 'Leave request cancellation';
         // email to Supervisor
         // prettier-ignore
-        const textSupervisor = `Hello  ${supervisor.fName}, 
+        const textSupervisor = `Dear  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
+${user.fName} ${user.lName} has decided to cancel their leave request of a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}
                          `;
         Mailer(from, supervisor.email, subject, textSupervisor, '');
 
@@ -1483,7 +1409,7 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
         refId = leave._id;
         // prettier-ignore
         // eslint-disable-next-line max-len
-        const supervisornotificationMessage = `${user.fName}  ${user.lName} has Decided to cancel their Leave request from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}`;
+        const supervisornotificationMessage = `${user.fName} ${user.lName} has decided to cancel their leave request of a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}`;
         // eslint-disable-next-line max-len
         await storeNotification(
           supervisor,
@@ -1726,22 +1652,23 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
         };
         leave.modificationDetails.modLeaves.push(modLeaves);
         await leave.save();
-
+        const subject = 'Leave request modification';
+        // email to Supervisor
         // prettier-ignore
-        const textSupervisor = `Hello  ${supervisor.fName}, 
-  
-  ${user.fName}  ${user.lName} has modified their Home Leave request, now asking to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
+        const textSupervisor = `Dear  ${supervisor.fName}, 
+
+${user.fName}  ${user.lName} has modified their leave request and is now requesting for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}
                          `;
-        const cc = `${cd.email},${hr.email}`;
+        const cc = `${cd.email}`;
         Mailer(from, supervisor.email, subject, textSupervisor, cc);
         // save notification on user obj
-        const supervisornotificationTitle = `${user.fName}  ${user.lName} has modified their Home Leave request`;
+        const supervisornotificationTitle = `${user.fName}  ${user.lName} has modified their Leave request`;
         const supervisornotificationType = '/hr/SuperviseLeave';
         refType = 'Leaves';
         refId = leave._id;
         // prettier-ignore
         // eslint-disable-next-line max-len
-        const supervisornotificationMessage = `${user.fName}  ${user.lName} has modified their Home Leave request, now asking to be off from ${startDate.toDateString()} to ${endDate.toDateString()}`;
+        const supervisornotificationMessage = `${user.fName}  ${user.lName} has modified their leave request and is now requesting for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}`;
         // eslint-disable-next-line max-len
         await storeNotification(
           supervisor,
@@ -1787,21 +1714,24 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
           { $set: { status: 'Cancelled', comment } }
         );
         // email to Supervisor cc CD
+        const subject = 'Leave request cancellation';
+        // email to Supervisor
         // prettier-ignore
-        const textSupervisor = `Hello  ${supervisor.fName}, 
-  
-  ${user.fName}  ${user.lName} Decided to cancel their Home Leave request from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
-                               `;
-        const cc = `${cd.email},${hr.email}`;
+        const textSupervisor = `Dear  ${supervisor.fName}, 
+
+${user.fName} ${user.lName} has decided to cancel their leave request of a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}
+                         `;
+        const cc = `${cd.email}`;
         Mailer(from, supervisor.email, subject, textSupervisor, cc);
+
         // save notification on user obj
-        const supervisornotificationTitle = `${user.fName}  ${user.lName} Decided to cancel their Home Leave request`;
+        const supervisornotificationTitle = `${user.fName}  ${user.lName} has decided to cancel their Leave request`;
         const supervisornotificationType = null;
         refType = 'Leaves';
         refId = leave._id;
         // prettier-ignore
         // eslint-disable-next-line max-len
-        const supervisornotificationMessage = `${user.fName}  ${user.lName} has Decided to cancel their Home Leave request from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}`;
+        const supervisornotificationMessage = `${user.fName} ${user.lName} has decided to cancel their leave request of a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}`;
         // eslint-disable-next-line max-len
         await storeNotification(
           supervisor,

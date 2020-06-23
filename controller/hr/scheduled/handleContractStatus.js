@@ -100,7 +100,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
                     );
                     // email to HR
                     // prettier-ignore
-                    const textUser = `Hello  ${hr.fName}, 
+                    const textUser = `Dear  ${hr.fName}, 
         
 ${fName} ${lName}'s Contract that ran from ${contractStartDate.toDateString()} to  ${contractEndDate.toDateString()} has expired today. ${footer}.
                                                     `;
@@ -147,7 +147,7 @@ ${fName} ${lName}'s Contract that ran from ${contractStartDate.toDateString()} t
                     );
                     // email to HR
                     // prettier-ignore
-                    const textUser = `Hello  ${hr.fName}, 
+                    const textUser = `Dear  ${hr.fName}, 
         
 ${fName} ${lName}'s Contract that rans from ${contractStartDate.toDateString()} to  ${contractEndDate.toDateString()} has been activated today. ${footer}.
                                                     `;

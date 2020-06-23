@@ -77,16 +77,17 @@ const handlePlannedLeave = async (req, res) => {
     CurrentDate = new Date(CurrentDate);
     endDate = new Date(endDate);
     startDate = new Date(startDate);
-    const subject = 'Uganda Operations Leaves';
+    const subject = 'Request for leave';
     const from = 'UGOperations@clintonhealthaccess.org';
     const footer = `
-
-Regards,
-
+  
+With Regards,
+  
 Uganda Operations
 Clinton Health Access Initiative
-
-Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
+https://ugops.clintonhealthaccess.org
+  
+Disclaimer: This is an auto-generated mail, please do not reply to it.`;
 
     // handle leave here
     if (moment(startDate).isAfter(endDate)) {
@@ -160,10 +161,10 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
         );
         // mail supervisor
         // prettier-ignore
-        const textSupervisor = `Hello  ${supervisor.fName}, 
-  
-${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
-                                        `;
+        const textSupervisor = `Dear  ${supervisor.fName}, 
+
+${user.fName}  ${user.lName} is requesting for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}.${footer}
+                                      `;
         Mailer(from, supervisor.email, subject, textSupervisor, '');
 
         // save notification on user obj
@@ -173,7 +174,7 @@ ${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateStri
         const refId = leaveToTake._id;
         // prettier-ignore
         // eslint-disable-next-line max-len
-        const notificationMessage = `${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateString()} to ${endDate.toDateString()}.`;
+        const notificationMessage = `${user.fName}  ${user.lName} is requesting for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}.`;
         await storeNotification(
           supervisor,
           notificationTitle,
