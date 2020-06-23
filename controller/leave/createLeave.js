@@ -300,16 +300,17 @@ const createLeave = async (req, res) => {
         });
       }
 
-      const subject = 'Uganda Operations Leaves';
+      const subject = 'Request for leave';
       const from = 'UGOperations@clintonhealthaccess.org';
       const footer = `
   
-Regards,
+With Regards,
   
 Uganda Operations
 Clinton Health Access Initiative
+https://ugops.clintonhealthaccess.org
   
-Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
+Disclaimer: This is an auto-generated mail, please do not reply to it.`;
 
       // checks if user has enough leaves days happen here basing on what has been computed
       const { supervisorEmail } = user;
@@ -337,9 +338,9 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
       await leaveRemade.save();
       // mail supervisor
       // prettier-ignore
-      const textSupervisor = `Hello  ${supervisor.fName}, 
+      const textSupervisor = `Dear  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateString()} to ${endDate.toDateString()}.${footer}.
+${user.fName}  ${user.lName} is requesting for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}.${footer}
                                       `;
       if (status === 'Pending Supervisor') {
         Mailer(from, supervisor.email, subject, textSupervisor, '');
@@ -350,7 +351,7 @@ ${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateStri
         const refId = leaveRemade._id;
         // prettier-ignore
         // eslint-disable-next-line max-len
-        const notificationMessage = `${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateString()} to ${endDate.toDateString()}.`;
+        const notificationMessage = `${user.fName}  ${user.lName} is requesting for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}.`;
         await storeNotification(
           supervisor,
           notificationTitle,

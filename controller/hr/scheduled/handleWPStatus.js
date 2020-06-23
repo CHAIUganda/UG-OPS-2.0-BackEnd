@@ -109,7 +109,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
                     );
                     // email to HR
                     // prettier-ignore
-                    const textUser = `Hello  ${hr.fName}, 
+                    const textUser = `Dear  ${hr.fName}, 
         
 ${fName} ${lName}'s Work Permit that ran from ${workPermitStartDate.toDateString()} to  ${workPermitEndDate.toDateString()} has expired today. ${footer}.
                                                     `;
@@ -156,7 +156,7 @@ ${fName} ${lName}'s Work Permit that ran from ${workPermitStartDate.toDateString
                     );
                     // email to HR
                     // prettier-ignore
-                    const textUser = `Hello  ${hr.fName}, 
+                    const textUser = `Dear  ${hr.fName}, 
         
 ${fName} ${lName}'s WorkPermit that rans from ${workPermitStartDate.toDateString()} to  ${workPermitEndDate.toDateString()} has been activated today. ${footer}.
                                                     `;

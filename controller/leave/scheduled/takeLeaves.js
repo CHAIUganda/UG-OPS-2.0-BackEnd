@@ -5,6 +5,8 @@ const Leave = require('../../../model/Leave');
 const User = require('../../../model/User');
 const Mailer = require('../../../helpers/Mailer');
 const storeNotification = require('../../../helpers/storeNotification');
+const getLeaveDaysNo = require('../getLeaveDaysNo');
+const PublicHoliday = require('../../../model/PublicHoliday');
 
 const takeLeaves = async () => {
   try {
@@ -24,21 +26,25 @@ const takeLeaves = async () => {
       throw errorMessage;
     }
     // initialize emailing necessities
-    const subject = 'Uganda Operations Leaves';
+    const subject = 'Leave Started';
     const from = 'UGOperations@clintonhealthaccess.org';
     const footer = `
-
-Regards,
-
+  
+With Regards,
+  
 Uganda Operations
 Clinton Health Access Initiative
-
-Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
+https://ugops.clintonhealthaccess.org
+  
+Disclaimer: This is an auto-generated mail, please do not reply to it.`;
 
     const recurseProcessLeave = async (controller, arr) => {
       if (controller < arr.length) {
-        const { startDate, supervisorEmail, _id } = arr[controller];
+        // eslint-disable-next-line object-curly-newline
+        const { startDate, endDate, supervisorEmail, _id } = arr[controller];
         const staffEmail = arr[controller].staff.email;
+        const publicHolidays = await PublicHoliday.find({});
+        const daysDetails = getLeaveDaysNo(startDate, endDate, publicHolidays);
 
         // check if user exists
         const user = await User.findOne({
@@ -84,31 +90,31 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
                 // sends mail to cd supervisor HR and notification about status
                 // prettier-ignore
                 // email to staff
-                const textUser = `Hello  ${user.fName}, 
+                const textUser = `Dear  ${user.fName}, 
   
-Your leave from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()} has started.${footer}.
+You have started your ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${arr[controller].type} leave from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()}.${footer}.
                            `;
                 Mailer(from, user.email, subject, textUser, '');
 
                 // email to HR
-                const text = `Hello  ${hr.fName}, 
+                const text = `Dear  ${hr.fName}, 
   
-${user.fName}  ${user.lName} will be off from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()}.${footer}.
+${user.fName}  ${user.lName}'s ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${arr[controller].type} leave from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()} has started today.${footer}
                            `;
                 Mailer(from, hr.email, subject, text, '');
 
                 // email to CD
-                const textCd = `Hello  ${cd.fName}, 
+                const textCd = `Dear  ${cd.fName}, 
   
-${user.fName}  ${user.lName} will be off from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()}.${footer}.
-                           `;
+${user.fName}  ${user.lName}'s ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${arr[controller].type} leave from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()} has started today.${footer}
+                `;
                 Mailer(from, cd.email, subject, textCd, '');
 
                 // email to Supervisor
-                const textSupervisor = `Hello  ${supervisor.fName}, 
+                const textSupervisor = `Dear  ${supervisor.fName}, 
   
-${user.fName}  ${user.lName} will be off from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()}.${footer}.
-                           `;
+${user.fName}  ${user.lName}'s ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${arr[controller].type} leave from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()} has started today.${footer}
+                `;
                 Mailer(from, supervisor.email, subject, textSupervisor, '');
 
                 // save notification on user obj
@@ -118,7 +124,7 @@ ${user.fName}  ${user.lName} will be off from ${arr[controller].startDate.toDate
                 const refId = arr[controller]._id;
                 // prettier-ignore
                 // eslint-disable-next-line max-len
-                const notificationMessage = `${user.fName}  ${user.lName} will be off from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()}.`;
+                const notificationMessage = `${user.fName}  ${user.lName}'s ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${arr[controller].type} leave from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()} has started.`;
                 await storeNotification(
                   supervisor,
                   notificationTitle,
@@ -159,22 +165,22 @@ ${user.fName}  ${user.lName} will be off from ${arr[controller].startDate.toDate
                 // prettier-ignore
 
                 // email to staff
-                const textUser = `Hello  ${user.fName}, 
+                const textUser = `Dear  ${user.fName}, 
   
-Your leave from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()} has started.${footer}.
-                                              `;
+You have started your ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${arr[controller].type} leave from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()}.${footer}
+                           `;
                 Mailer(from, user.email, subject, textUser, '');
                 // email to HR
-                const text = `Hello  ${hr.fName}, 
+                const text = `Dear  ${hr.fName}, 
   
-${user.fName}  ${user.lName} will be off from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()}.${footer}.
+${user.fName}  ${user.lName}'s ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${arr[controller].type} leave from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()} has started today.${footer}
                            `;
                 Mailer(from, hr.email, subject, text, '');
 
                 // email to Supervisor
-                const textSupervisor = `Hello  ${supervisor.fName}, 
+                const textSupervisor = `Dear  ${supervisor.fName}, 
   
-${user.fName}  ${user.lName} will be off from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()}.${footer}.
+${user.fName}  ${user.lName}'s ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${arr[controller].type} leave from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()} has started today.${footer}
                            `;
                 Mailer(from, supervisor.email, subject, textSupervisor, '');
                 // save notification on user obj
@@ -184,7 +190,7 @@ ${user.fName}  ${user.lName} will be off from ${arr[controller].startDate.toDate
                 const refId = arr[controller]._id;
                 // prettier-ignore
                 // eslint-disable-next-line max-len
-                const notificationMessage = `${user.fName}  ${user.lName} will be off from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()}.`;
+                const notificationMessage = `${user.fName}  ${user.lName}'s ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${arr[controller].type} leave from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()} has started today.`;
                 await storeNotification(
                   supervisor,
                   notificationTitle,
