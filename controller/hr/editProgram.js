@@ -19,7 +19,7 @@ const editProgram = async (req, res) => {
     shortForm
   } = req.body;
 
-  let { programManagerId } = req.body;
+  let { programManagerId, operationsLeadId } = req.body;
 
   try {
     const program = await Program.findOne({
@@ -43,6 +43,19 @@ const editProgram = async (req, res) => {
       });
     }
 
+    if (operationsLeadId == null) {
+      operationsLeadId = program.operationsLeadId;
+    }
+
+    const userOppsLd = await User.findOne({
+      _id: operationsLeadId,
+    });
+    if (!userOppsLd) {
+      return res.status(400).json({
+        message: 'Operations Lead does not Exist',
+      });
+    }
+
     // modify program
     await Program.updateOne(
       {
@@ -54,6 +67,7 @@ const editProgram = async (req, res) => {
           name,
           shortForm,
           programManagerId: user._id,
+          operationsLeadId: userOppsLd._id,
         },
       }
     );
@@ -63,6 +77,11 @@ const editProgram = async (req, res) => {
       lName: user.lName,
     };
 
+    const operationsLeadDetails = {
+      fName: userOppsLd.fName,
+      lName: userOppsLd.lName,
+    };
+
     res.status(200).json({
       message: 'Program modified successfully',
       _id: program._id,
@@ -70,6 +89,7 @@ const editProgram = async (req, res) => {
       shortForm,
       programManagerId,
       programManagerDetails,
+      operationsLeadDetails,
     });
   } catch (err) {
     debug(err.message);

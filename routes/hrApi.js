@@ -1,9 +1,9 @@
-// Filename : leave.js
+// Filename : hrApi.js
 const express = require('express');
 const { check } = require('express-validator/check');
 
 const router = express.Router();
-// Import leave controller
+// Import hr controller
 const hrController = require('../controller/hr/hrController');
 
 /**
@@ -46,7 +46,7 @@ router.post(
 );
 
 /**
- * @method - GET
+ * @method - POst
  * @description - Get public holidays.
  * @param - /getPublicHolidays
  */
@@ -66,6 +66,9 @@ router.post(
       .not()
       .isEmpty(),
     check('programManagerId', 'Please Enter a Valid Program manager Id')
+      .not()
+      .isEmpty(),
+    check('operationsLeadId', 'Please Enter a Valid Operations Lead Id')
       .not()
       .isEmpty(),
   ],
@@ -93,7 +96,7 @@ router.post(
 /**
  * @method - GET
  * @description - Get Programs.
- * @param - /agetPrograms
+ * @param - /getPrograms
  */
 router.get('/getPrograms', hrController.getPrograms);
 

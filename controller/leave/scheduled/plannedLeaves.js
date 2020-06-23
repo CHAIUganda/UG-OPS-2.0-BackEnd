@@ -66,7 +66,7 @@ Your Planned leave from ${arr[controller].startDate.toDateString()} to ${arr[con
           } else {
             leaveStart = moment(leaveStart);
             const diff = leaveStart.diff(CurrentDate, 'days') + 1;
-            // send invite in 3 2 1 months to expiry
+            // send  in startsIn days to expiry
 
             if (
               // prettier-ignore
@@ -80,7 +80,9 @@ Your Planned leave from ${arr[controller].startDate.toDateString()} to ${arr[con
               // email to staff
               const textUser = `Dear  ${user.fName}, 
   
+
 Your Planned leave from ${arr[controller].startDate.toDateString()} to ${arr[controller].endDate.toDateString()} will start in ${diff} days as of ${today.toDateString()}. This is to remind you apply for it.${footer}.
+
                                               `;
               Mailer(from, user.email, subject, textUser, '');
               recurseProcessLeave(controller + 1, arr);

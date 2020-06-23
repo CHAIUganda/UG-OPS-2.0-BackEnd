@@ -8,6 +8,19 @@ const getLoggedInUser = async (req, res) => {
   try {
     // request.user is getting fetched from Middleware after token authentication
     const user = await User.findById(req.user.id);
+    // const { email } = req.userContext.userinfo || req.email;
+    // console.log({ userInfo: req.userContext.userinfo, email });
+
+    // const user = await User.findOne({
+    //   email,
+    // });
+
+    if (!user) {
+      return res.status(503).json({
+        message: 'User doesnot exist on Ug opps',
+      });
+    }
+
     // dont return pwd and id
     user.password = undefined;
     let program;
@@ -36,7 +49,6 @@ const getLoggedInUser = async (req, res) => {
       title,
       birthDate,
       oNames,
-      email,
       type,
       level,
       team,
@@ -48,6 +60,7 @@ const getLoggedInUser = async (req, res) => {
       leaves,
       createdAt,
       supervisorEmail,
+      email,
     } = user;
 
     const unReadNotifications = user.notifications;

@@ -2,6 +2,8 @@
 require('dotenv').config();
 const express = require('express');
 const debug = require('debug')('server');
+const morgan = require('morgan');
+const fileUpload = require('express-fileupload');
 const cors = require('cors');
 const InitiateMongoServer = require('./config/db');
 const schedule = require('./helpers/schedule');
@@ -12,6 +14,8 @@ const authenticator = require('./middleware/authenticator'); // to be rplaced wi
 const auth = require('./routes/auth');
 const leaveApi = require('./routes/leaveApi');
 const hrApi = require('./routes/hrApi');
+const procurementApi = require('./routes/procurementApi');
+const financeApi = require('./routes/financeApi');
 
 // Initialise the app
 const app = express();
@@ -20,6 +24,16 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
+app.use(morgan('dev'));
+// enable files upload
+app.use(
+  fileUpload({
+    createParentPath: true,
+    limits: {
+      fileSize: 10 * 1024 * 1024 * 1024, // 10 MB max file(s) size
+    },
+  })
+);
 
 // Initiate Mongo Server
 InitiateMongoServer();
@@ -35,6 +49,8 @@ app.get('/', (req, res) => res.send('Welcome to UG-OPS 2 API'));
 app.use('/auth', auth);
 app.use('/leaveApi', authenticator, leaveApi);
 app.use('/hrApi', authenticator, hrApi);
+app.use('/procurementApi', authenticator, procurementApi);
+app.use('/financeApi', authenticator, financeApi);
 
 // Launch app to listen to specified port
 app.listen(port, () => {

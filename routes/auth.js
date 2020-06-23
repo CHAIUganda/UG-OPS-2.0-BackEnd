@@ -8,6 +8,7 @@ const authController = require('../controller/auth/authController');
 
 const router = express.Router();
 const authenticator = require('../middleware/authenticator');
+// const authenticationRequired = require('../middleware/oktaAuthenticator');
 
 /**
  * @method - POST
@@ -59,8 +60,7 @@ router.post(
   '/editUser',
   [
     // input validations
-    check('email', 'Please enter a valid email').isEmail(),
-    check('contractId', 'Please Provide a ContractId').not().isEmpty(),
+    check('staffId', 'Please enter a valid Staff ID').not().isEmpty(),
   ],
   authenticator,
   /* authenticator, */
@@ -80,7 +80,6 @@ router.post(
     check('notificationId', 'Please Provide a notificationId').not().isEmpty(),
   ],
   authenticator,
-  /* authenticator, */
   authController.handleNotifications
 );
 

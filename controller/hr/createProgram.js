@@ -16,7 +16,8 @@ const createProgram = async (req, res) => {
   const {
     name,
     shortForm,
-    programManagerId
+    programManagerId,
+    operationsLeadId
   } = req.body;
 
   try {
@@ -29,6 +30,14 @@ const createProgram = async (req, res) => {
       });
     }
 
+    const userOppsLd = await User.findOne({
+      _id: operationsLeadId,
+    });
+    if (!userOppsLd) {
+      return res.status(400).json({
+        message: 'Operations Lead does not Exist',
+      });
+    }
     const program = await Program.findOne({
       name,
     });
@@ -42,12 +51,18 @@ const createProgram = async (req, res) => {
       name,
       shortForm,
       programManagerId: user._id,
+      operationsLeadId: userOppsLd._id,
     });
 
     await programtoSave.save();
     const programManagerDetails = {
       fName: user.fName,
       lName: user.lName,
+    };
+
+    const operationsLeadDetails = {
+      fName: userOppsLd.fName,
+      lName: userOppsLd.lName,
     };
 
     res.status(201).json({
@@ -57,6 +72,7 @@ const createProgram = async (req, res) => {
       shortForm,
       programManagerId,
       programManagerDetails,
+      operationsLeadDetails,
     });
   } catch (err) {
     debug(err.message);

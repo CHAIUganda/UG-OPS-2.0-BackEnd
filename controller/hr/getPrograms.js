@@ -4,7 +4,6 @@ const User = require('../../model/User');
 
 const getPrograms = async (req, res) => {
   try {
-    // request.user is getting fetched from Middleware after token authentication
     const programs = await Program.find({});
     const combinedArray = [];
 

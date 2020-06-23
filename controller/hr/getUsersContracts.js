@@ -6,7 +6,6 @@ const User = require('../../model/User');
 
 const getUsersContracts = async (req, res) => {
   try {
-    // request.user is getting fetched from Middleware after token authentication
     const { expiryIn } = req.params;
     const user = await User.find({});
     user.password = undefined;
