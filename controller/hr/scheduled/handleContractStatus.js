@@ -23,16 +23,16 @@ const handleContractStatus = async () => {
       throw errorMessage;
     }
     // initialize emailing necessities
-    const subject = 'Uganda Operations Contracts';
     const from = 'UGOperations@clintonhealthaccess.org';
     const footer = `
-
-Regards,
-
+  
+With Regards,
+  
 Uganda Operations
 Clinton Health Access Initiative
-
-Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
+https://ugops.clintonhealthaccess.org
+  
+Disclaimer: This is an auto-generated mail, please do not reply to it.`;
     let programManagerId;
 
     const recurseProcessLeave = async (controller, arr) => {
@@ -99,6 +99,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
                       { $set: { contractStatus: 'Expired' } }
                     );
                     // email to HR
+                    const subject = 'Contract Expiry reminder';
                     // prettier-ignore
                     const textUser = `Dear  ${hr.fName}, 
         
@@ -146,6 +147,7 @@ ${fName} ${lName}'s Contract that ran from ${contractStartDate.toDateString()} t
                       { $set: { contractStatus: 'ACTIVE' } }
                     );
                     // email to HR
+                    const subject = 'Contract Activated';
                     // prettier-ignore
                     const textUser = `Dear  ${hr.fName}, 
         
