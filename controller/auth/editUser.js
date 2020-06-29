@@ -18,7 +18,6 @@ const editUser = async (req, res) => {
   let {
     fName,
     lName,
-    newEmail,
     bankAccounts,
     contractStartDate,
     contractEndDate,
@@ -43,6 +42,7 @@ const editUser = async (req, res) => {
     workPermitStartDate,
     workPermitEndDate,
     workPermitStatus,
+    active,
   } = req.body;
 
   try {
@@ -68,9 +68,6 @@ const editUser = async (req, res) => {
     if (admin == null) {
       admin = user.roles.admin;
     }
-    if (newEmail == null) {
-      newEmail = user.email;
-    }
     if (admin == null) {
       admin = user.roles.admin;
     }
@@ -79,6 +76,13 @@ const editUser = async (req, res) => {
     }
     if (admin == null) {
       admin = user.roles.admin;
+    }
+    if (active == null) {
+      if (user.active == null) {
+        active = true;
+      } else {
+        active = user.active;
+      }
     }
 
     if (deputyCountryDirector === true) {
@@ -251,10 +255,11 @@ const editUser = async (req, res) => {
           birthDate,
           programId,
           oNames,
-          email: newEmail,
+          email,
           type,
           level,
           team,
+          active,
         },
       }
     );
