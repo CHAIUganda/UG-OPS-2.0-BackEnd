@@ -3,7 +3,6 @@ const PublicHoliday = require('../../model/PublicHoliday');
 
 const getPublicHolidays = async (req, res) => {
   try {
-    // request.user is getting fetched from Middleware after token authentication
     const publicholiday = await PublicHoliday.find({});
     res.json(publicholiday);
   } catch (e) {

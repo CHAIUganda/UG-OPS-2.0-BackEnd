@@ -1,13 +1,11 @@
 const OktaJwtVerifier = require('@okta/jwt-verifier');
 
-const yourOktaDomain = '';
-
 const oktaJwtVerifier = new OktaJwtVerifier({
-  issuer: `https://${yourOktaDomain}/oauth2/default`,
-  clientId: '{clientId}',
+  issuer: `https://${process.env.OKTA_DOMAIN}/oauth2/default`,
+  clientId: process.env.CLIENT_ID,
   assertClaims: {
-    aud: 'api://default'
-  }
+    aud: 'api://default',
+  },
 });
 
 /**
@@ -16,8 +14,10 @@ const oktaJwtVerifier = new OktaJwtVerifier({
  * contents are attached to req.jwt
  */
 const authenticationRequired = (req, res, next) => {
-  const authHeader = req.headers.authorization || '';
+  // const authHeader = req.headers.authorization || '';
+  const authHeader = req.header('token');
   const match = authHeader.match(/Bearer (.+)/);
+  console.log({ match, authHeader });
 
   if (!match) {
     return res.status(401).end();
@@ -30,9 +30,11 @@ const authenticationRequired = (req, res, next) => {
     .verifyAccessToken(accessToken, expectedAudience)
     .then((jwt) => {
       req.jwt = jwt;
+      console.log({ message: 'verified', jwt });
       next();
     })
     .catch((err) => {
+      console.log({ error: err.message });
       res.status(401).send(err.message);
     });
 };

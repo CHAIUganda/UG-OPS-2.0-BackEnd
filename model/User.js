@@ -64,6 +64,7 @@ const UserSchema = mongoose.Schema({
     required: true,
   },
   leaves: [mongoose.Schema.Types.ObjectId],
+  procurements: [mongoose.Schema.Types.ObjectId],
   createdAt: {
     type: Date,
     default: Date.now(),
