@@ -57,7 +57,7 @@ const editUser = async (req, res) => {
       });
     }
     const contract = await Contract.findOne({
-      _userId: email,
+      _userId: user._id,
       contractStatus: 'ACTIVE',
     });
 
@@ -228,7 +228,7 @@ const editUser = async (req, res) => {
     // modify user
     await User.updateOne(
       {
-        _id: email,
+        _id: user._id,
       },
       {
         // eslint-disable-next-line max-len
