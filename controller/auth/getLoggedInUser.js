@@ -61,7 +61,6 @@ const getLoggedInUser = async (req, res) => {
       bankAccounts,
       nssfNumber,
       tinNumber,
-      admin,
       leaves,
       createdAt,
       supervisorEmail,
