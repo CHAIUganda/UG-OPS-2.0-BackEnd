@@ -15,9 +15,10 @@ const editUser = async (req, res) => {
     });
   }
   // eslint-disable-next-line object-curly-newline
-  const { email, workPermitId } = req.body;
+  const { staffId, workPermitId } = req.body;
   let {
     fName,
+    email,
     lName,
     bankAccounts,
     contractStartDate,
@@ -48,7 +49,7 @@ const editUser = async (req, res) => {
 
   try {
     const user = await User.findOne({
-      email,
+      _id: staffId,
     });
 
     if (!user) {
@@ -57,7 +58,7 @@ const editUser = async (req, res) => {
       });
     }
     const contract = await Contract.findOne({
-      _userId: user._id,
+      _userId: staffId,
       contractStatus: 'ACTIVE',
     });
 
@@ -69,6 +70,9 @@ const editUser = async (req, res) => {
     // check for what has not been modified
     if (admin == null) {
       admin = user.roles.admin;
+    }
+    if (email == null) {
+      email = user.email;
     }
     if (active == null) {
       if (user.active == null) {
@@ -228,7 +232,7 @@ const editUser = async (req, res) => {
     // modify user
     await User.updateOne(
       {
-        _id: user._id,
+        _id: staffId,
       },
       {
         // eslint-disable-next-line max-len
