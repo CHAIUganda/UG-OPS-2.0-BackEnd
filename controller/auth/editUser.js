@@ -68,15 +68,6 @@ const editUser = async (req, res) => {
     if (admin == null) {
       admin = user.roles.admin;
     }
-    if (admin == null) {
-      admin = user.roles.admin;
-    }
-    if (admin == null) {
-      admin = user.roles.admin;
-    }
-    if (admin == null) {
-      admin = user.roles.admin;
-    }
     if (active == null) {
       if (user.active == null) {
         active = true;

@@ -49,7 +49,6 @@ const getLoggedInUser = async (req, res) => {
       bankAccounts,
       nssfNumber,
       tinNumber,
-      admin,
       leaves,
       createdAt,
       supervisorEmail,
@@ -130,7 +129,6 @@ const getLoggedInUser = async (req, res) => {
     }
 
     const person = {
-      admin,
       leaves,
       createdAt,
       bankAccounts,
