@@ -26,6 +26,11 @@ const getLoggedInUser = async (req, res) => {
     let program;
     let programShortForm;
     const { programId } = user;
+    if (user.active === false) {
+      return res.status(400).json({
+        message: 'This account is not active any more.',
+      });
+    }
 
     const userProgram = await Program.findOne({
       _id: programId,
@@ -60,6 +65,7 @@ const getLoggedInUser = async (req, res) => {
       leaves,
       createdAt,
       supervisorEmail,
+      active,
       email,
     } = user;
 
@@ -137,7 +143,6 @@ const getLoggedInUser = async (req, res) => {
     }
 
     const person = {
-      admin,
       leaves,
       createdAt,
       bankAccounts,
@@ -160,6 +165,7 @@ const getLoggedInUser = async (req, res) => {
       type,
       level,
       team,
+      active,
       supervisorDetails,
       contractId,
       contractStartDate,

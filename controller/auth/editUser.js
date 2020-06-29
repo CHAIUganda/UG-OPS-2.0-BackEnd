@@ -44,6 +44,7 @@ const editUser = async (req, res) => {
     workPermitStartDate,
     workPermitEndDate,
     workPermitStatus,
+    active,
   } = req.body;
 
   try {
@@ -72,6 +73,13 @@ const editUser = async (req, res) => {
     }
     if (email == null) {
       email = user.email;
+    }
+    if (active == null) {
+      if (user.active == null) {
+        active = true;
+      } else {
+        active = user.active;
+      }
     }
 
     if (deputyCountryDirector === true) {
@@ -251,6 +259,7 @@ const editUser = async (req, res) => {
           type,
           level,
           team,
+          active,
         },
       }
     );

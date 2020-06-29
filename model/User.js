@@ -122,6 +122,10 @@ const UserSchema = mongoose.Schema({
       default: false,
     },
   },
+  active: {
+    type: Boolean,
+    default: true,
+  },
   notifications: [
     {
       title: String,
