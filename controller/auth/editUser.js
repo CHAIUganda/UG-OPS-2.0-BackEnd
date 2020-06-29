@@ -14,7 +14,8 @@ const editUser = async (req, res) => {
       message: errorToString(errors.array()),
     });
   }
-  const { contractId, email, workPermitId } = req.body;
+  // eslint-disable-next-line object-curly-newline
+  const { email, workPermitId } = req.body;
   let {
     fName,
     lName,
@@ -47,7 +48,7 @@ const editUser = async (req, res) => {
 
   try {
     const user = await User.findOne({
-      email,
+      _id: email,
     });
 
     if (!user) {
@@ -56,12 +57,13 @@ const editUser = async (req, res) => {
       });
     }
     const contract = await Contract.findOne({
-      _id: contractId,
+      _userId: email,
+      contractStatus: 'ACTIVE',
     });
 
     if (!contract) {
       return res.status(400).json({
-        message: 'Contract Doesnot Exist',
+        message: 'User Does not have an active contract',
       });
     }
     // check for what has not been modified
@@ -226,7 +228,7 @@ const editUser = async (req, res) => {
     // modify user
     await User.updateOne(
       {
-        email,
+        _id: email,
       },
       {
         // eslint-disable-next-line max-len
@@ -240,6 +242,9 @@ const editUser = async (req, res) => {
             hr,
             supervisor,
             countryDirector,
+            deputyCountryDirector,
+            procurementAdmin,
+            financeAdmin,
           },
           bankAccounts,
           title,
@@ -257,7 +262,7 @@ const editUser = async (req, res) => {
     // update contract
     await Contract.updateOne(
       {
-        _id: contractId,
+        _id: contract._id,
       },
       {
         // eslint-disable-next-line max-len
