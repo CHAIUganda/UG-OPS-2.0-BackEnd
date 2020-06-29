@@ -48,7 +48,7 @@ const editUser = async (req, res) => {
 
   try {
     const user = await User.findOne({
-      _id: email,
+      email,
     });
 
     if (!user) {
