@@ -7,7 +7,8 @@ const { check } = require('express-validator/check');
 const authController = require('../controller/auth/authController');
 
 const router = express.Router();
-const authenticator = require('../middleware/authenticator');
+// const authenticator = require('../middleware/authenticator');
+const authenticationRequired = require('../middleware/oktaAuthenticator');
 
 /**
  * @method - POST
@@ -31,10 +32,6 @@ router.post(
     check('birthDate', 'Please Enter a Valid BirthDate').not().isEmpty(),
     check('contractType', 'Please Enter a Valid Contract Type').not().isEmpty(),
     check('type', 'Please Specify the type of Staff').not().isEmpty(),
-    // check('level', 'Please Specify the Staff Level')
-    //   .not()
-    //   .isEmpty(),
-
     check('team', 'Please Specify the  Staff team').not().isEmpty(),
     check('programId', 'Please Specify the staff Program Id').not().isEmpty(),
     check(
@@ -46,7 +43,6 @@ router.post(
       min: 6,
     }),
   ],
-  /* authenticator, */
   authController.registerUser
 );
 
@@ -61,8 +57,7 @@ router.post(
     // input validations
     check('staffId', 'Please enter a valid Staff ID').not().isEmpty(),
   ],
-  authenticator,
-  /* authenticator, */
+  authenticationRequired,
   authController.editUser
 );
 
@@ -78,9 +73,7 @@ router.post(
     check('staffEmail', 'Please enter a valid email').isEmail(),
     check('notificationId', 'Please Provide a notificationId').not().isEmpty(),
   ],
-  authenticator,
-  /* authenticator, */
-  authController.handleNotifications
+  authenticationRequired
 );
 
 /**
@@ -106,7 +99,11 @@ router.post(
  * calls controller after checking inputs
  * @param - /auth/me
  */
-router.get('/getLoggedInUser', authenticator, authController.getLoggedInUser);
+router.get(
+  '/getLoggedInUser',
+  authenticationRequired,
+  authController.getLoggedInUser
+);
 
 /**
  * @method - GET
@@ -115,6 +112,6 @@ router.get('/getLoggedInUser', authenticator, authController.getLoggedInUser);
  * calls controller after checking inputs
  * @param - /auth/getUsers
  */
-router.get('/getUsers', authenticator, authController.getUsers);
+router.get('/getUsers', authenticationRequired, authController.getUsers);
 
 module.exports = router;
