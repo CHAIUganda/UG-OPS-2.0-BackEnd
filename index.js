@@ -45,7 +45,7 @@ const port = process.env.SERVER_PORT || 8080;
 app.get('/', (req, res) => res.send('Welcome to UG-OPS 2 API'));
 
 // Use Api routes in the App
-app.use('/auth', authenticationRequired, auth);
+app.use('/auth', auth);
 // app.use('/auth', auth);
 app.use('/leaveApi', authenticationRequired, leaveApi);
 app.use('/hrApi', authenticationRequired, hrApi);
