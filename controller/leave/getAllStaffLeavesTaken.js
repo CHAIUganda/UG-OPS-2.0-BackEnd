@@ -75,7 +75,7 @@ const getAllStaffLeavesTaken = async (req, res) => {
               if (endDateMonth === 0) {
                 accruedAnnualLeave = 0;
               } else {
-                accruedAnnualLeave = endDateMonth * 1.75;
+                accruedAnnualLeave = Math.trunc(endDateMonth * 1.75);
               }
             } else {
               accruedAnnualLeave = Math.trunc(monthOnContract * 1.75);

@@ -303,7 +303,7 @@ ${user.fName}  ${user.lName} is requesting for a ${daysDetails.totalDays} day${d
               if (endDateMonth === 0) {
                 accruedAnnualLeave = 0;
               } else {
-                accruedAnnualLeave = endDateMonth * 1.75;
+                accruedAnnualLeave = Math.trunc(endDateMonth * 1.75);
               }
             } else {
               accruedAnnualLeave = Math.trunc(monthOnContract * 1.75);
