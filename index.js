@@ -7,6 +7,7 @@ const fileUpload = require('express-fileupload');
 const cors = require('cors');
 const InitiateMongoServer = require('./config/db');
 const schedule = require('./helpers/schedule');
+const scheduleAnually = require('./helpers/scheduleAnually');
 const authenticationRequired = require('./middleware/oktaAuthenticator');
 // const authenticator = require('./middleware/authenticator'); // to be rplaced with Okta auth
 
@@ -59,3 +60,4 @@ app.listen(port, () => {
 });
 // schedule operations
 schedule.start();
+scheduleAnually.start();
