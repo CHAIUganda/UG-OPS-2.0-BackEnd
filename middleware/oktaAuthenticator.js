@@ -5,6 +5,7 @@ const oktaJwtVerifier = new OktaJwtVerifier({
   clientId: process.env.CLIENT_ID,
   assertClaims: {
     aud: 'api://default',
+    cid: process.env.CLIENT_ID,
   },
 });
 
