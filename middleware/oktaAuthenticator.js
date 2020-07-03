@@ -23,12 +23,16 @@ const authenticationRequired = (req, res, next) => {
   console.log();
 
   if (!match) {
+    console.log('if match is false');
     return res.status(401).end();
   }
   console.log('After match');
   const accessToken = match[1];
   const expectedAudience = 'api://default';
-
+  console.log(`Access Token :: ${accessToken}`);
+  console.log();
+  console.log(`expectedAudience :: ${expectedAudience}`);
+  console.log();
   return oktaJwtVerifier
     .verifyAccessToken(accessToken, expectedAudience)
     .then((jwt) => {
