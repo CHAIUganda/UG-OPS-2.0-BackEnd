@@ -17,7 +17,10 @@ const authenticationRequired = (req, res, next) => {
   // const authHeader = req.headers.authorization || '';
   const authHeader = req.header('token');
   const match = authHeader.match(/Bearer (.+)/);
-  console.log({ match, authHeader });
+  console.log(`Match :: ${match}`);
+  console.log();
+  console.log(`AuthHeader :: ${authHeader}`);
+  console.log();
 
   if (!match) {
     return res.status(401).end();
