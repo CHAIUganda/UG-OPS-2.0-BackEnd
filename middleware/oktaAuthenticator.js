@@ -25,7 +25,7 @@ const authenticationRequired = (req, res, next) => {
   if (!match) {
     return res.status(401).end();
   }
-
+  console.log('After match');
   const accessToken = match[1];
   const expectedAudience = 'api://default';
 
