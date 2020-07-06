@@ -1,7 +1,14 @@
 const OktaJwtVerifier = require('@okta/jwt-verifier');
 
 const oktaJwtVerifier = new OktaJwtVerifier({
+  clientId: process.env.CLIENT_ID,
   issuer: `https://${process.env.OKTA_DOMAIN}/oauth2/default`,
+  assertClaims: {
+    aud: 'api://default',
+  },
+  testing: {
+    disableHttpsCheck: true,
+  },
 });
 
 /**
@@ -11,38 +18,33 @@ const oktaJwtVerifier = new OktaJwtVerifier({
  */
 const authenticationRequired = (req, res, next) => {
   // const authHeader = req.headers.authorization || '';
-  console.log(`OKTA_DOMAIN :: ${process.env.OKTA_DOMAIN}`);
-  console.log();
-  console.log(`CLIENT_ID :: ${process.env.CLIENT_ID}`);
-  console.log();
   const authHeader = req.header('token');
   const match = authHeader.match(/Bearer (.+)/);
-  console.log(`Match :: ${match}`);
-  console.log();
-  console.log(`AuthHeader :: ${authHeader}`);
-  console.log();
-
   if (!match) {
-    console.log('if match is false');
-    return res.status(401).end();
+    return res
+      .status(401)
+      .json({
+        message: 'Bearer token not found',
+      })
+      .end();
   }
-  console.log('After match');
+
   const accessToken = match[1];
   const expectedAudience = 'api://default';
-  console.log(`Access Token :: ${accessToken}`);
-  console.log();
-  console.log(`expectedAudience :: ${expectedAudience}`);
-  console.log();
+
   return oktaJwtVerifier
     .verifyAccessToken(accessToken, expectedAudience)
     .then((jwt) => {
       req.jwt = jwt;
-      console.log({ message: 'verified', jwt });
+      // attach staffemail on the request to be used later
+      req.oktaMail = jwt.claims.sub;
       next();
     })
     .catch((err) => {
-      console.log({ error: err.message });
-      res.status(401).send(err.message);
+      console.log({ message: err.message });
+      res.status(401).json({
+        message: err.message,
+      });
     });
 };
 
