@@ -7,7 +7,6 @@ const handleSnoozedContractNotifications = async () => {
   try {
     const expiryIn = 31;
     const user = await User.find({});
-    user.password = undefined;
 
     const recurseProcessLeave = async (controller, arr) => {
       if (controller < arr.length) {

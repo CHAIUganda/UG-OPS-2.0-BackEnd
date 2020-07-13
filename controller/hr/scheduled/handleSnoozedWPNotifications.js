@@ -16,7 +16,6 @@ const handleSnoozedWPNotifications = async () => {
         },
       ],
     });
-    user.password = undefined;
 
     const recurseProcessLeave = async (controller, arr) => {
       if (controller < arr.length) {

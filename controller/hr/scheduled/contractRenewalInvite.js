@@ -14,7 +14,6 @@ const contractRenewalInvite = async () => {
     const expiryIn2 = 60;
     const expiryIn3 = 30;
     const user = await User.find({});
-    user.password = undefined;
     // check if HR exists in System
     const hr = await User.findOne({ 'roles.hr': true });
     if (!hr) {
