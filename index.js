@@ -50,6 +50,8 @@ app.use('/auth', auth);
 // app.use('/auth', auth);
 app.use('/leaveApi', authenticationRequired, leaveApi);
 app.use('/hrApi', authenticationRequired, hrApi);
+app.use('/procurementApi', authenticationRequired, procurementApi);
+app.use('/financeApi', authenticationRequired, financeApi);
 
 // Launch app to listen to specified port
 app.listen(port, () => {
