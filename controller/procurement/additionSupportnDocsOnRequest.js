@@ -1,7 +1,7 @@
 // const moment = require('moment-timezone');
 const debug = require('debug')('leave-controller');
 const moment = require('moment-timezone');
-const { validationResult } = require('express-validator/check');
+const { validationResult } = require('express-validator');
 const Procurement = require('../../model/Procurement');
 const errorToString = require('../../helpers/errorToString');
 
