@@ -23,7 +23,6 @@ const workPermitRenewalReminder = async () => {
         },
       ],
     });
-    user.password = undefined;
     // check if HR exists in System
     const hr = await User.findOne({ 'roles.hr': true });
     if (!hr) {

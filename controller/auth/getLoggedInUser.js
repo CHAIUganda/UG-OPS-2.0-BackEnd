@@ -19,7 +19,6 @@ const getLoggedInUser = async (req, res) => {
     }
 
     // dont return pwd and id
-    user.password = undefined;
     let program;
     let programShortForm;
     const { programId } = user;

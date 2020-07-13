@@ -15,15 +15,20 @@ const login = async (req, res) => {
     });
 
     return res.status(400).json({
-      message: msg
+      message: msg,
     });
   }
 
   const { email, password } = req.body;
   try {
     const user = await User.findOne({
-      email
+      email,
     });
+
+    // on reg use 2 lines below
+    // caputures pwd and encrpts it and stores crypt
+    // const salt = await bcrypt.genSalt(10);
+    // user.password = await bcrypt.hash(password, salt);
 
     let isMatch;
     if (user) {
@@ -32,7 +37,7 @@ const login = async (req, res) => {
 
     if (!user || !isMatch) {
       return res.status(400).json({
-        message: 'Invalid email or password'
+        message: 'Invalid email or password',
       });
     }
 
@@ -44,27 +49,27 @@ const login = async (req, res) => {
 
     const payload = {
       user: {
-        id: user.id
-      }
+        id: user.id,
+      },
     };
 
     jwt.sign(
       payload,
       process.env.JWT_SECRET,
       {
-        expiresIn: '1 day' //  values are in seconds, strings need timeunits i.e. "2 days", "10h", "7d"
+        expiresIn: '1 day', //  values are in seconds, strings need timeunits i.e. "2 days", "10h", "7d"
       },
       (err, token) => {
         if (err) throw err;
         res.status(200).json({
-          token
+          token,
         });
       }
     );
   } catch (e) {
     debug(e);
     res.status(500).json({
-      message: 'Server Error'
+      message: 'Server Error',
     });
   }
 };

@@ -10,7 +10,6 @@ const handleAnnualLeaveBF = async () => {
   try {
     const logger = log4js.getLogger('Timed');
     const user = await User.find({});
-    user.password = undefined;
     // initialize emailing necessities
     const from = 'UGOperations@clintonhealthaccess.org';
     const footer = `

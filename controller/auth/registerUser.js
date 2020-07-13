@@ -33,7 +33,6 @@ const registerUser = async (req, res) => {
     supervisorEmail,
     oNames,
     email,
-    password,
   } = req.body;
 
   let {
@@ -193,14 +192,11 @@ const registerUser = async (req, res) => {
       type,
       level,
       team,
-      password,
       annualLeaveBF,
       bankAccounts,
       nssfNumber,
       tinNumber,
     });
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
 
     // create user contract
     const contract = new Contract({

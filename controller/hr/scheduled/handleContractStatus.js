@@ -10,7 +10,6 @@ const handleContractStatus = async () => {
   try {
     const logger = log4js.getLogger('Timed');
     const user = await User.find({});
-    user.password = undefined;
     // check if HR exists in System
     const hr = await User.findOne({ 'roles.hr': true });
     if (!hr) {

@@ -8,7 +8,6 @@ const getUsersContracts = async (req, res) => {
   try {
     const { expiryIn } = req.params;
     const user = await User.find({});
-    user.password = undefined;
     const combinedArray = [];
     // check if HR exists in System
     const hr = await User.findOne({ 'roles.hr': true });
