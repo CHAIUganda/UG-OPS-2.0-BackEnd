@@ -8,7 +8,8 @@ const MONGOURI = process.env.MONGODB_URI;
 const InitiateMongoServer = async () => {
   try {
     await mongoose.connect(MONGOURI, {
-      useNewUrlParser: true
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
     });
     debug('Connected to DB !!');
   } catch (e) {

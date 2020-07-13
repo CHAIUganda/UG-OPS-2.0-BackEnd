@@ -1,7 +1,7 @@
 // Filename : auth.js
 
 const express = require('express');
-const { check } = require('express-validator/check');
+const { check } = require('express-validator');
 
 // Import auth controller
 const authController = require('../controller/auth/authController');

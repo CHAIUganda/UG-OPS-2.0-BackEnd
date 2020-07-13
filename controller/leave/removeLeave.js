@@ -1,4 +1,4 @@
-const { validationResult } = require('express-validator/check');
+const { validationResult } = require('express-validator');
 const debug = require('debug')('leave-controller');
 const errorToString = require('../../helpers/errorToString');
 const Leave = require('../../model/Leave');
@@ -7,7 +7,7 @@ const removeLeave = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
-      message: errorToString(errors.array())
+      message: errorToString(errors.array()),
     });
   }
 
@@ -18,22 +18,22 @@ const removeLeave = async (req, res) => {
 
   try {
     const holiday = await Leave.findOne({
-      _id: id
+      _id: id,
     });
     if (!holiday) {
       return res.status(400).json({
-        message: 'This holiday doesnot exist'
+        message: 'This holiday doesnot exist',
       });
     }
     // delete holiday
     holiday.remove();
     res.status(200).json({
-      message: 'Holiday removed successfully'
+      message: 'Holiday removed successfully',
     });
   } catch (err) {
     debug(err.message);
     res.status(500).json({
-      message: 'Error removing Public Holiday'
+      message: 'Error removing Public Holiday',
     });
   }
 };

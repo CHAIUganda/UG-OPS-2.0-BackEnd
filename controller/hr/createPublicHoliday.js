@@ -1,4 +1,4 @@
-const { validationResult } = require('express-validator/check');
+const { validationResult } = require('express-validator');
 const debug = require('debug')('leave-controller');
 const moment = require('moment');
 
@@ -9,7 +9,7 @@ const createPublicHoliday = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
-      message: errorToString(errors.array())
+      message: errorToString(errors.array()),
     });
   }
 
@@ -38,25 +38,25 @@ const createPublicHoliday = async (req, res) => {
       dbHol = new Date(dbHol);
       if (moment(postDate).isSame(dbHol)) {
         return res.status(400).json({
-          message: 'This holiday already exists'
+          message: 'This holiday already exists',
         });
       }
     });
 
     const holidaytoSave = new PublicHoliday({
       name,
-      date
+      date,
     });
 
     await holidaytoSave.save();
     res.status(201).json({
-      holidaytoSave
+      holidaytoSave,
     });
   } catch (err) {
     debug(err.message);
     console.log(err);
     res.status(500).json({
-      message: 'Error Creating Public Holiday'
+      message: 'Error Creating Public Holiday',
     });
   }
 };
