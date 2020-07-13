@@ -1,6 +1,6 @@
 // Filename : leaveApi.js
 const express = require('express');
-const { check } = require('express-validator/check');
+const { check } = require('express-validator');
 
 const router = express.Router();
 // Import leave controller

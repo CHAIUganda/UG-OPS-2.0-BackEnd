@@ -81,6 +81,11 @@ const UserSchema = mongoose.Schema({
     type: String,
     required: false,
   },
+  password: {
+    // pwd left for dev purposes using normal auth
+    type: String,
+    required: false,
+  },
   roles: {
     admin: {
       // To track is user is admin

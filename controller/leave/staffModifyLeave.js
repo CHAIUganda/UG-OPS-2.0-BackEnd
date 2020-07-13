@@ -1,4 +1,4 @@
-const { validationResult } = require('express-validator/check');
+const { validationResult } = require('express-validator');
 const debug = require('debug')('leave-controller');
 const moment = require('moment-timezone');
 const errorToString = require('../../helpers/errorToString');
