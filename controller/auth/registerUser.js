@@ -1,5 +1,4 @@
 const { validationResult } = require('express-validator/check');
-const bcrypt = require('bcryptjs');
 const debug = require('debug')('server');
 const log4js = require('log4js');
 const mongoose = require('mongoose');
