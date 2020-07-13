@@ -40,6 +40,7 @@ router.post(
     ).isEmail(),
     check('email', 'Please enter a valid email').isEmail(),
   ],
+  authenticationRequired,
   authController.registerUser
 );
 
