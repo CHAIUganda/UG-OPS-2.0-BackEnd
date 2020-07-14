@@ -5,8 +5,8 @@ const debug = require('debug')('server');
 const morgan = require('morgan');
 const fileUpload = require('express-fileupload');
 const cors = require('cors');
-// const fs = require('fs');
-// const https = require('https');
+const fs = require('fs');
+const https = require('https');
 const InitiateMongoServer = require('./config/db');
 const schedule = require('./helpers/schedule');
 const scheduleAnually = require('./helpers/scheduleAnually');
@@ -51,31 +51,31 @@ app.use('/auth', auth);
 app.use('/leaveApi', authenticationRequired, leaveApi);
 app.use('/hrApi', authenticationRequired, hrApi);
 
-// app.use((req, res, next) => {
-//   if (req.get('X-Forwarded-Proto') !== 'https') {
-//     res.redirect(`https://${req.get('Host')}${req.url}`);
-//   } else next();
-// });
-
 // Launch app to listen to specified port
-// https
-//   .createServer(
-//     {
-//       key: fs.readFileSync('/certs/privateKey.key'),
-//       cert: fs.readFileSync('/certs/certificate.crt'),
-//     },
-//     app
-//   )
-//   .listen(port, () => {
-//     debug(`Running UG-OPS 2 on port ${port}`);
-//     console.log(`Running UG-OPS 2 on port ${port}`);
-//   });
-
-// Launch app to listen to specified port
-app.listen(port, () => {
-  debug(`Running UG-OPS 2 on port ${port}`);
-  console.log(`Running UG-OPS 2 on port ${port}`);
+app.use((req, res, next) => {
+  if (req.get('X-Forwarded-Proto') !== 'https') {
+    res.redirect(`https://${req.get('Host')}${req.url}`);
+  } else next();
 });
+
+https
+  .createServer(
+    {
+      key: fs.readFileSync('/certs/privateKey.key'),
+      cert: fs.readFileSync('/certs/certificate.crt'),
+    },
+    app
+  )
+  .listen(port, () => {
+    debug(`Running UG-OPS 2 on port ${port}`);
+    console.log(`Running UG-OPS 2 on port ${port}`);
+  });
+
+// Launch app to listen to specified port
+// app.listen(port, () => {
+//   debug(`Running UG-OPS 2 on port ${port}`);
+//   console.log(`Running UG-OPS 2 on port ${port}`);
+// });
 // schedule operations
 schedule.start();
 scheduleAnually.start();
