@@ -7,7 +7,6 @@ const fileUpload = require('express-fileupload');
 const cors = require('cors');
 const fs = require('fs');
 const https = require('https');
-const http = require('http');
 const InitiateMongoServer = require('./config/db');
 const schedule = require('./helpers/schedule');
 const scheduleAnually = require('./helpers/scheduleAnually');
@@ -60,11 +59,6 @@ app.use((req, res, next) => {
   } else next();
 });
 
-http.createServer(app).listen(port, () => {
-  debug(`http Running UG-OPS 2 on port ${port}`);
-  console.log(`http Running UG-OPS 2 on port ${port}`);
-});
-
 https
   .createServer(
     {
@@ -74,8 +68,8 @@ https
     app
   )
   .listen(port, () => {
-    debug(`https Running UG-OPS 2 on port ${port}`);
-    console.log(`https Running UG-OPS 2 on port ${port}`);
+    debug(`Running UG-OPS 2 on port ${port}`);
+    console.log(`Running UG-OPS 2 on port ${port}`);
   });
 
 // Launch app to listen to specified port
@@ -83,7 +77,6 @@ https
 //   debug(`Running UG-OPS 2 on port ${port}`);
 //   console.log(`Running UG-OPS 2 on port ${port}`);
 // });
-
 // schedule operations
 schedule.start();
 scheduleAnually.start();
