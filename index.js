@@ -7,6 +7,7 @@ const fileUpload = require('express-fileupload');
 const cors = require('cors');
 const fs = require('fs');
 const https = require('https');
+const http = require('http');
 const InitiateMongoServer = require('./config/db');
 const schedule = require('./helpers/schedule');
 const scheduleAnually = require('./helpers/scheduleAnually');
@@ -53,8 +54,15 @@ app.use('/hrApi', authenticationRequired, hrApi);
 
 // Launch app to listen to specified port
 // redirect traffic to https
-app.get('*', (req, res) => {
-  res.redirect(`https://${req.headers.host}${req.url}`);
+app.use((req, res, next) => {
+  if (req.get('X-Forwarded-Proto') !== 'https') {
+    res.redirect(`https://${req.get('Host')}${req.url}`);
+  } else next();
+});
+
+http.createServer(app).listen(port, () => {
+  debug(`http Running UG-OPS 2 on port ${port}`);
+  console.log(`http Running UG-OPS 2 on port ${port}`);
 });
 
 https
@@ -66,8 +74,8 @@ https
     app
   )
   .listen(port, () => {
-    debug(`Running UG-OPS 2 on port ${port}`);
-    console.log(`Running UG-OPS 2 on port ${port}`);
+    debug(`https Running UG-OPS 2 on port ${port}`);
+    console.log(`https Running UG-OPS 2 on port ${port}`);
   });
 
 // Launch app to listen to specified port
@@ -75,6 +83,7 @@ https
 //   debug(`Running UG-OPS 2 on port ${port}`);
 //   console.log(`Running UG-OPS 2 on port ${port}`);
 // });
+
 // schedule operations
 schedule.start();
 scheduleAnually.start();
