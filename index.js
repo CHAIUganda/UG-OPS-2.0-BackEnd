@@ -5,8 +5,8 @@ const debug = require('debug')('server');
 const morgan = require('morgan');
 const fileUpload = require('express-fileupload');
 const cors = require('cors');
-const fs = require('fs');
-const https = require('https');
+// const fs = require('fs');
+// const https = require('https');
 const InitiateMongoServer = require('./config/db');
 const schedule = require('./helpers/schedule');
 const scheduleAnually = require('./helpers/scheduleAnually');
@@ -50,6 +50,12 @@ app.use('/auth', auth);
 // app.use('/auth', auth);
 app.use('/leaveApi', authenticationRequired, leaveApi);
 app.use('/hrApi', authenticationRequired, hrApi);
+
+// app.use((req, res, next) => {
+//   if (req.get('X-Forwarded-Proto') !== 'https') {
+//     res.redirect(`https://${req.get('Host')}${req.url}`);
+//   } else next();
+// });
 
 // Launch app to listen to specified port
 // https

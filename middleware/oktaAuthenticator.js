@@ -7,7 +7,7 @@ const oktaJwtVerifier = new OktaJwtVerifier({
     aud: 'api://default',
   },
   testing: {
-    disableHttpsCheck: true,
+    disableHttpsCheck: false,
   },
 });
 
