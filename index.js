@@ -52,10 +52,9 @@ app.use('/leaveApi', authenticationRequired, leaveApi);
 app.use('/hrApi', authenticationRequired, hrApi);
 
 // Launch app to listen to specified port
-app.use((req, res, next) => {
-  if (req.get('X-Forwarded-Proto') !== 'https') {
-    res.redirect(`https://${req.get('Host')}${req.url}`);
-  } else next();
+// redirect traffic to https
+app.get('*', (req, res) => {
+  res.redirect(`https://${req.headers.host}${req.url}`);
 });
 
 https
