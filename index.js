@@ -52,18 +52,24 @@ app.use('/leaveApi', authenticationRequired, leaveApi);
 app.use('/hrApi', authenticationRequired, hrApi);
 
 // Launch app to listen to specified port
-https
-  .createServer(
-    {
-      key: fs.readFileSync('/certs/privateKey.key'),
-      cert: fs.readFileSync('/certs/certificate.crt'),
-    },
-    app
-  )
-  .listen(port, () => {
-    debug(`Running UG-OPS 2 on port ${port}`);
-    console.log(`Running UG-OPS 2 on port ${port}`);
-  });
+// https
+//   .createServer(
+//     {
+//       key: fs.readFileSync('/certs/privateKey.key'),
+//       cert: fs.readFileSync('/certs/certificate.crt'),
+//     },
+//     app
+//   )
+//   .listen(port, () => {
+//     debug(`Running UG-OPS 2 on port ${port}`);
+//     console.log(`Running UG-OPS 2 on port ${port}`);
+//   });
+
+// Launch app to listen to specified port
+app.listen(port, () => {
+  debug(`Running UG-OPS 2 on port ${port}`);
+  console.log(`Running UG-OPS 2 on port ${port}`);
+});
 // schedule operations
 schedule.start();
 scheduleAnually.start();
