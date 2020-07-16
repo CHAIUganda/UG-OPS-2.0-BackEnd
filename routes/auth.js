@@ -7,7 +7,7 @@ const { check } = require('express-validator');
 const authController = require('../controller/auth/authController');
 
 const router = express.Router();
-// const authenticator = require('../middleware/authenticator');
+const authenticator = require('../middleware/authenticator');
 const authenticationRequired = require('../middleware/oktaAuthenticator');
 
 /**
@@ -87,7 +87,6 @@ router.post(
       min: 6,
     }),
   ],
-  authenticationRequired,
   authController.login
 );
 
@@ -111,6 +110,6 @@ router.get(
  * calls controller after checking inputs
  * @param - /auth/getUsers
  */
-router.get('/getUsers', authenticationRequired, authController.getUsers);
+router.get('/getUsers', authenticator, authController.getUsers);
 
 module.exports = router;
