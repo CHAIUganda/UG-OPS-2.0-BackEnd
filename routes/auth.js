@@ -87,6 +87,7 @@ router.post(
       min: 6,
     }),
   ],
+  authenticationRequired,
   authController.login
 );
 
