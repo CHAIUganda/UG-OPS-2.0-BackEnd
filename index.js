@@ -5,8 +5,8 @@ const debug = require('debug')('server');
 const morgan = require('morgan');
 const fileUpload = require('express-fileupload');
 const cors = require('cors');
-// const fs = require('fs');
-// const https = require('https');
+const fs = require('fs');
+const https = require('https');
 const InitiateMongoServer = require('./config/db');
 const schedule = require('./helpers/schedule');
 const scheduleAnually = require('./helpers/scheduleAnually');
@@ -52,30 +52,30 @@ app.use('/leaveApi', authenticationRequired, leaveApi);
 app.use('/hrApi', authenticationRequired, hrApi);
 
 // Launch app to listen to specified port
-// https
-//   .createServer(
-//     {
-//       key: fs.readFileSync(
-//         '/etc/letsencrypt/live/ugtest.clintonhealthaccess.org/privkey.pem',
-//         'utf8'
-//       ),
-//       cert: fs.readFileSync(
-//         '/etc/letsencrypt/live/ugtest.clintonhealthaccess.org/cert.pem',
-//         'utf8'
-//       ),
-//     },
-//     app
-//   )
-//   .listen(port, () => {
-//     debug(`Running UG-OPS 2 on port ${port}`);
-//     console.log(`Running UG-OPS 2 on port ${port}`);
-//   });
+https
+  .createServer(
+    {
+      key: fs.readFileSync(
+        '/etc/letsencrypt/live/ugtest.clintonhealthaccess.org/privkey.pem',
+        'utf8'
+      ),
+      cert: fs.readFileSync(
+        '/etc/letsencrypt/live/ugtest.clintonhealthaccess.org/cert.pem',
+        'utf8'
+      ),
+    },
+    app
+  )
+  .listen(port, () => {
+    debug(`Running UG-OPS 2 on port ${port}`);
+    console.log(`Running UG-OPS 2 on port ${port}`);
+  });
 
-// Launch app to listen to specified port
-app.listen(port, () => {
-  debug(`Running UG-OPS 2 on port ${port}`);
-  console.log(`Running UG-OPS 2 on port ${port}`);
-});
+// // Launch app to listen to specified port
+// app.listen(port, () => {
+//   debug(`Running UG-OPS 2 on port ${port}`);
+//   console.log(`Running UG-OPS 2 on port ${port}`);
+// });
 // schedule operations
 schedule.start();
 scheduleAnually.start();
