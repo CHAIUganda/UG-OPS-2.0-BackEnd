@@ -2,10 +2,7 @@ const OktaJwtVerifier = require('@okta/jwt-verifier');
 
 const oktaJwtVerifier = new OktaJwtVerifier({
   clientId: process.env.CLIENT_ID,
-  issuer: `https://${process.env.OKTA_DOMAIN}/api/v1/authorizationServers/default`,
-  assertClaims: {
-    aud: 'api://default',
-  },
+  issuer: `https://${process.env.OKTA_DOMAIN}`,
   testing: {
     disableHttpsCheck: false,
   },
