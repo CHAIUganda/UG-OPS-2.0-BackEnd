@@ -71,7 +71,8 @@ router.post(
     check('staffEmail', 'Please enter a valid email').isEmail(),
     check('notificationId', 'Please Provide a notificationId').not().isEmpty(),
   ],
-  authenticationRequired
+  authenticationRequired,
+  authController.handleNotifications
 );
 
 /**
