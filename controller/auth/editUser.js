@@ -1,4 +1,4 @@
-const { validationResult } = require('express-validator/check');
+const { validationResult } = require('express-validator');
 const debug = require('debug')('server');
 const mongoose = require('mongoose');
 const User = require('../../model/User');
@@ -14,11 +14,12 @@ const editUser = async (req, res) => {
       message: errorToString(errors.array()),
     });
   }
-  const { contractId, email, workPermitId } = req.body;
+  // eslint-disable-next-line object-curly-newline
+  const { staffId, workPermitId } = req.body;
   let {
     fName,
+    email,
     lName,
-    newEmail,
     bankAccounts,
     contractStartDate,
     contractEndDate,
@@ -37,14 +38,18 @@ const editUser = async (req, res) => {
     supervisor,
     admin,
     countryDirector,
+    deputyCountryDirector,
+    procurementAdmin,
+    financeAdmin,
     workPermitStartDate,
     workPermitEndDate,
     workPermitStatus,
+    active,
   } = req.body;
 
   try {
     const user = await User.findOne({
-      email,
+      _id: staffId,
     });
 
     if (!user) {
@@ -53,37 +58,113 @@ const editUser = async (req, res) => {
       });
     }
     const contract = await Contract.findOne({
-      _id: contractId,
+      _userId: staffId,
+      contractStatus: 'ACTIVE',
     });
 
     if (!contract) {
       return res.status(400).json({
-        message: 'Contract Doesnot Exist',
+        message: 'User Does not have an active contract',
       });
     }
     // check for what has not been modified
     if (admin == null) {
       admin = user.roles.admin;
     }
-    if (newEmail == null) {
-      newEmail = user.email;
+    if (email == null) {
+      email = user.email;
     }
-    if (admin == null) {
-      admin = user.roles.admin;
+    if (active == null) {
+      if (user.active == null) {
+        active = true;
+      } else {
+        active = user.active;
+      }
     }
-    if (admin == null) {
-      admin = user.roles.admin;
+
+    if (deputyCountryDirector === true) {
+      const deputyCountryDirectorrole = await User.findOne({
+        'roles.deputyCountryDirector': true,
+      });
+      // chk if that hr already exists and it is not the same user
+      if (
+        // eslint-disable-next-line operator-linebreak
+        deputyCountryDirectorrole &&
+        !deputyCountryDirectorrole._id.equals(user._id)
+      ) {
+        return res.status(400).json({
+          message: `${deputyCountryDirectorrole.fName} ${deputyCountryDirectorrole.lName} Already has the Deputy Country Director  role on the system. First edit that user removing the role. `,
+        });
+      }
+    } else if (deputyCountryDirector === false) {
+      deputyCountryDirector = false;
+    } else {
+      deputyCountryDirector = user.roles.deputyCountryDirector;
     }
-    if (admin == null) {
-      admin = user.roles.admin;
+
+    if (procurementAdmin === true) {
+      const procurementAdminrole = await User.findOne({
+        'roles.procurementAdmin': true,
+      });
+      // chk if that hr already exists and it is not the same user
+      if (procurementAdminrole && !procurementAdminrole._id.equals(user._id)) {
+        return res.status(400).json({
+          message: `${procurementAdminrole.fName} ${procurementAdminrole.lName} Already has the Procurement Admin role on the system. First edit that user removing the role. `,
+        });
+      }
+    } else if (procurementAdmin === false) {
+      procurementAdmin = false;
+    } else {
+      procurementAdmin = user.roles.procurementAdmin;
     }
-    if (hr == null) {
+
+    if (financeAdmin === true) {
+      const financeAdminrole = await User.findOne({
+        'roles.financeAdmin': true,
+      });
+      // chk if that hr already exists and it is not the same user
+      if (financeAdminrole && !financeAdminrole._id.equals(user._id)) {
+        return res.status(400).json({
+          message: `${financeAdminrole.fName} ${financeAdminrole.lName} Already has the Finance Admin role on the system. First edit that user removing the role. `,
+        });
+      }
+    } else if (financeAdmin === false) {
+      financeAdmin = false;
+    } else {
+      financeAdmin = user.roles.financeAdmin;
+    }
+
+    if (hr === true) {
+      const hrrole = await User.findOne({
+        'roles.hr': true,
+      });
+      // chk if that hr already exists and it is not the same user
+      if (hrrole && !hrrole._id.equals(user._id)) {
+        return res.status(400).json({
+          message: `${hrrole.fName} ${hrrole.lName} Already has the HR role on the system. First edit that user removing the role from them. `,
+        });
+      }
+    } else if (hr === false) {
+      hr = false;
+    } else {
       hr = user.roles.hr;
     }
     if (supervisor == null) {
       supervisor = user.roles.supervisor;
     }
-    if (countryDirector == null) {
+    if (countryDirector === true) {
+      const cdrole = await User.findOne({
+        'roles.countryDirector': true,
+      });
+      // chk if that cd already exists and it is not the same user
+      if (cdrole && !cdrole._id.equals(user._id)) {
+        return res.status(400).json({
+          message: `${cdrole.fName} ${cdrole.lName} Already has the Country Director role on the system. First edit that user removing the role. `,
+        });
+      }
+    } else if (countryDirector === false) {
+      countryDirector = false;
+    } else {
       countryDirector = user.roles.countryDirector;
     }
 
@@ -151,7 +232,7 @@ const editUser = async (req, res) => {
     // modify user
     await User.updateOne(
       {
-        email,
+        _id: staffId,
       },
       {
         // eslint-disable-next-line max-len
@@ -165,23 +246,27 @@ const editUser = async (req, res) => {
             hr,
             supervisor,
             countryDirector,
+            deputyCountryDirector,
+            procurementAdmin,
+            financeAdmin,
           },
           bankAccounts,
           title,
           birthDate,
           programId,
           oNames,
-          email: newEmail,
+          email,
           type,
           level,
           team,
+          active,
         },
       }
     );
     // update contract
     await Contract.updateOne(
       {
-        _id: contractId,
+        _id: contract._id,
       },
       {
         // eslint-disable-next-line max-len
@@ -254,6 +339,7 @@ const editUser = async (req, res) => {
       .json({ message: 'User details have been Modified successfully' });
   } catch (err) {
     debug(err.message);
+    console.log(err.message);
     res.status(500).json({ message: 'Error in Modifying User' });
   }
 };

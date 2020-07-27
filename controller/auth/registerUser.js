@@ -1,5 +1,4 @@
-const { validationResult } = require('express-validator/check');
-const bcrypt = require('bcryptjs');
+const { validationResult } = require('express-validator');
 const debug = require('debug')('server');
 const log4js = require('log4js');
 const mongoose = require('mongoose');
@@ -33,7 +32,6 @@ const registerUser = async (req, res) => {
     supervisorEmail,
     oNames,
     email,
-    password,
   } = req.body;
 
   let {
@@ -42,6 +40,9 @@ const registerUser = async (req, res) => {
     admin,
     programId,
     countryDirector,
+    deputyCountryDirector,
+    procurementAdmin,
+    financeAdmin,
     bankAccounts,
     nssfNumber,
     tinNumber,
@@ -67,14 +68,77 @@ const registerUser = async (req, res) => {
   if (!admin === true) {
     admin = false;
   }
+
+  if (!financeAdmin === true) {
+    financeAdmin = false;
+  } else {
+    const financeAdminrole = await User.findOne({
+      'roles.financeAdmin': true,
+    });
+
+    if (financeAdminrole) {
+      return res.status(400).json({
+        message: `${financeAdminrole.fName} ${financeAdminrole.lName} Already has the Finance Admin role on the system. First edit that user removing the role. `,
+      });
+    }
+  }
+
+  if (!procurementAdmin === true) {
+    procurementAdmin = false;
+  } else {
+    const procurementAdminrole = await User.findOne({
+      'roles.procurementAdmin': true,
+    });
+
+    if (procurementAdminrole) {
+      return res.status(400).json({
+        message: `${procurementAdminrole.fName} ${procurementAdminrole.lName} Already has the Procurement Admin role on the system. First edit that user removing the role. `,
+      });
+    }
+  }
+
+  if (!deputyCountryDirector === true) {
+    deputyCountryDirector = false;
+  } else {
+    const deputyCountryDirectorrole = await User.findOne({
+      'roles.deputyCountryDirector': true,
+    });
+
+    if (deputyCountryDirectorrole) {
+      return res.status(400).json({
+        message: `${deputyCountryDirectorrole.fName} ${deputyCountryDirectorrole.lName} Already has the Deputy Country Director  role on the system. First edit that user removing the role. `,
+      });
+    }
+  }
+
   if (!hr === true) {
     hr = false;
+  } else {
+    const hrrole = await User.findOne({
+      'roles.hr': true,
+    });
+
+    if (hrrole) {
+      return res.status(400).json({
+        message: `${hrrole.fName} ${hrrole.lName} Already has the HR role on the system. First edit that user removing the role. `,
+      });
+    }
   }
   if (!supervisor === true) {
     supervisor = false;
   }
   if (!countryDirector === true) {
     countryDirector = false;
+  } else {
+    const cd = await User.findOne({
+      'roles.countryDirector': true,
+    });
+
+    if (cd) {
+      return res.status(400).json({
+        message: `${cd.fName} ${cd.lName} Already has the Country Director role on the system. First edit that user removing the role. `,
+      });
+    }
   }
   try {
     // Annual leave brought forward is 0 when staff  is created.
@@ -92,15 +156,7 @@ const registerUser = async (req, res) => {
         message: 'User Already Exists',
       });
     }
-    const cd = await User.findOne({
-      'roles.countryDirector': true,
-    });
 
-    if (cd) {
-      return res.status(400).json({
-        message: 'A User with a Country Director Role Already Exists',
-      });
-    }
     if (mongoose.Types.ObjectId.isValid(programId)) {
       const program = await Program.findOne({
         _id: programId,
@@ -123,6 +179,9 @@ const registerUser = async (req, res) => {
         hr,
         supervisor,
         countryDirector,
+        deputyCountryDirector,
+        procurementAdmin,
+        financeAdmin,
       },
       title,
       birthDate,
@@ -132,14 +191,11 @@ const registerUser = async (req, res) => {
       type,
       level,
       team,
-      password,
       annualLeaveBF,
       bankAccounts,
       nssfNumber,
       tinNumber,
     });
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
 
     // create user contract
     const contract = new Contract({

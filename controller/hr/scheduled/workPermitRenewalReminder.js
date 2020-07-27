@@ -5,6 +5,7 @@ const WorkPermit = require('../../../model/WorkPermit');
 const Program = require('../../../model/Program');
 const User = require('../../../model/User');
 const Mailer = require('../../../helpers/Mailer');
+const storeNotification = require('../../../helpers/storeNotification');
 
 const workPermitRenewalReminder = async () => {
   try {
@@ -22,7 +23,6 @@ const workPermitRenewalReminder = async () => {
         },
       ],
     });
-    user.password = undefined;
     // check if HR exists in System
     const hr = await User.findOne({ 'roles.hr': true });
     if (!hr) {
@@ -34,17 +34,29 @@ const workPermitRenewalReminder = async () => {
       };
       throw errorMessage;
     }
+    // check if CD exists in System
+    const cd = await User.findOne({ 'roles.countryDirector': true });
+    if (!cd) {
+      logger.error('CD not found in the system, Please Register the CD');
+      console.log('CD not found in the system, Please Register the CD');
+      const errorMessage = {
+        code: 404,
+        message: 'CD not found in the system, Please Register the CD',
+      };
+      throw errorMessage;
+    }
     // initialize emailing necessities
-    const subject = 'Uganda Operations WorkPermits';
+    const subject = 'Work Permit Expiry reminder';
     const from = 'UGOperations@clintonhealthaccess.org';
     const footer = `
-
-Regards,
-
+  
+With Regards,
+  
 Uganda Operations
 Clinton Health Access Initiative
-
-Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
+https://ugops.clintonhealthaccess.org
+  
+Disclaimer: This is an auto-generated mail, please do not reply to it.`;
     let programManagerId;
 
     const recurseProcessLeave = async (controller, arr) => {
@@ -107,25 +119,60 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
                   // prettier-ignore
                   const textUser = `Hello  ${hr.fName}, 
         
-${fName} ${lName}'s Work Permit will expiry in ${diff} days as of ${today.toDateString()}. This is a remainder to start its renewal process."${footer}.
+${fName} ${lName}'s Work Permit will expiry in ${diff} days as of ${today.toDateString()}. This is a reminder to start the work permit renewal process."${footer}.
                                                     `;
-                  const cc = `${programMngr.email},${supervisor.email}`;
+                  // ${dcd.email} to be cced later
+                  const cc = `${cd.email}`;
                   Mailer(from, hr.email, subject, textUser, cc);
+                  // save notification on user obj
+                  const notificationTitle = `${fName} ${lName}'s WorkPermit will expiry in ${diff} days`;
+                  const notificationType = '/hr/WorkPermitsExpiry';
+                  const refType = 'Work Permits';
+                  const refId = workPermit._id;
+                  // prettier-ignore
+                  // eslint-disable-next-line max-len
+                  const notificationMessage = `${fName} ${lName}'s Work Permit will expiry in ${diff} days, this is a notification to initiate the work permit renewal process.`;
+                  await storeNotification(
+                    supervisor,
+                    notificationTitle,
+                    notificationMessage,
+                    null,
+                    refType,
+                    refId
+                  );
+                  await storeNotification(
+                    hr,
+                    notificationTitle,
+                    notificationMessage,
+                    notificationType,
+                    refType,
+                    refId
+                  );
+                  await storeNotification(
+                    programMngr,
+                    notificationTitle,
+                    notificationMessage,
+                    null,
+                    refType,
+                    refId
+                  );
+
                   recurseProcessLeave(controller + 1, arr);
                 } else {
                   recurseProcessLeave(controller + 1, arr);
                 }
-
-                recurseProcessLeave(controller + 1, arr);
               }
             }
           }
         } else {
           recurseProcessLeave(controller + 1, arr);
         }
+      } else {
+        console.log('out of loop');
       }
     };
     await recurseProcessLeave(0, user);
+    console.log('finished');
   } catch (e) {
     debug(e.message);
     console.log(e.message);

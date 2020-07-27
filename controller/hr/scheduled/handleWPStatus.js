@@ -19,7 +19,6 @@ const handleWPStatus = async () => {
         },
       ],
     });
-    user.password = undefined;
     // check if HR exists in System
     const hr = await User.findOne({ 'roles.hr': true });
     if (!hr) {
@@ -32,16 +31,16 @@ const handleWPStatus = async () => {
       throw errorMessage;
     }
     // initialize emailing necessities
-    const subject = 'Uganda Operations Contracts';
     const from = 'UGOperations@clintonhealthaccess.org';
     const footer = `
-
-Regards,
-
+  
+With Regards,
+  
 Uganda Operations
 Clinton Health Access Initiative
-
-Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
+https://ugops.clintonhealthaccess.org
+  
+Disclaimer: This is an auto-generated mail, please do not reply to it.`;
     let programManagerId;
 
     const recurseProcessLeave = async (controller, arr) => {
@@ -108,8 +107,9 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
                       { $set: { workPermitStatus: 'Expired' } }
                     );
                     // email to HR
+                    const subject = 'Work Permit Expiry reminder';
                     // prettier-ignore
-                    const textUser = `Hello  ${hr.fName}, 
+                    const textUser = `Dear  ${hr.fName}, 
         
 ${fName} ${lName}'s Work Permit that ran from ${workPermitStartDate.toDateString()} to  ${workPermitEndDate.toDateString()} has expired today. ${footer}.
                                                     `;
@@ -119,8 +119,6 @@ ${fName} ${lName}'s Work Permit that ran from ${workPermitStartDate.toDateString
                   } else {
                     recurseProcessLeave(controller + 1, arr);
                   }
-
-                  recurseProcessLeave(controller + 1, arr);
                 }
               } else if (workPermit.workPermitStatus === 'Pending') {
                 workPermitStartDate = workPermit.workPermitStartDate;
@@ -157,8 +155,9 @@ ${fName} ${lName}'s Work Permit that ran from ${workPermitStartDate.toDateString
                       { $set: { workPermitStatus: 'ACTIVE' } }
                     );
                     // email to HR
+                    const subject = 'Work Permit Activated';
                     // prettier-ignore
-                    const textUser = `Hello  ${hr.fName}, 
+                    const textUser = `Dear  ${hr.fName}, 
         
 ${fName} ${lName}'s WorkPermit that rans from ${workPermitStartDate.toDateString()} to  ${workPermitEndDate.toDateString()} has been activated today. ${footer}.
                                                     `;
@@ -168,8 +167,6 @@ ${fName} ${lName}'s WorkPermit that rans from ${workPermitStartDate.toDateString
                   } else {
                     recurseProcessLeave(controller + 1, arr);
                   }
-
-                  recurseProcessLeave(controller + 1, arr);
                 }
               } else {
                 recurseProcessLeave(controller + 1, arr);

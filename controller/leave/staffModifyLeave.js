@@ -1,4 +1,4 @@
-const { validationResult } = require('express-validator/check');
+const { validationResult } = require('express-validator');
 const debug = require('debug')('leave-controller');
 const moment = require('moment-timezone');
 const errorToString = require('../../helpers/errorToString');
@@ -8,7 +8,9 @@ const Mailer = require('../../helpers/Mailer');
 const getLeavesTaken = require('./getLeavesTaken');
 const getLeaveDaysNo = require('./getLeaveDaysNo');
 const PublicHoliday = require('../../model/PublicHoliday');
+const Program = require('../../model/Program');
 const Contract = require('../../model/Contract');
+const storeNotification = require('../../helpers/storeNotification');
 
 const staffModifyLeave = async (req, res) => {
   const errors = validationResult(req);
@@ -32,6 +34,8 @@ const staffModifyLeave = async (req, res) => {
   }
 
   try {
+    let refType;
+    let refId;
     // set timezone to kampala
     let CurrentDate = moment().tz('Africa/Kampala').format();
     CurrentDate = new Date(CurrentDate);
@@ -57,7 +61,9 @@ const staffModifyLeave = async (req, res) => {
       accruedAnnualLeave = 0;
     } else {
       // compute accrued days fromstart of contract
-      const leaveEndDate = moment(CurrentDate);
+      // current date since not leave enddate provided here
+      const endDateMonth = endDate.getMonth();
+      const leaveEndDate = moment(endDate);
       const contractStartDate = moment(contract.contractStartDate);
       let monthOnContract = leaveEndDate.diff(contractStartDate, 'months');
       monthOnContract = Math.trunc(monthOnContract);
@@ -65,8 +71,17 @@ const staffModifyLeave = async (req, res) => {
       if (monthOnContract === 0) {
         accruedAnnualLeave = 0;
       } else {
-        // accruedAnnualLeave = currentMonth * 1.75;
-        accruedAnnualLeave = Math.trunc(monthOnContract * 1.75);
+        // acrue anual leave basing calender yr if current yr diff frm contract start yr
+        // eslint-disable-next-line no-lonely-if
+        if (moment(CurrentDate).isAfter(contractStartDate, 'year')) {
+          if (endDateMonth === 0) {
+            accruedAnnualLeave = 0;
+          } else {
+            accruedAnnualLeave = Math.trunc(endDateMonth * 1.75);
+          }
+        } else {
+          accruedAnnualLeave = Math.trunc(monthOnContract * 1.75);
+        }
       }
     }
     // check if HR exists in System
@@ -96,22 +111,42 @@ const staffModifyLeave = async (req, res) => {
     if (type == null) {
       type = leave.type;
     }
-    const subject = 'Uganda Operations Leaves';
     const from = 'UGOperations@clintonhealthaccess.org';
     const footer = `
-
-Regards,
-
+  
+With Regards,
+  
 Uganda Operations
 Clinton Health Access Initiative
-
-Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
+https://ugops.clintonhealthaccess.org
+  
+Disclaimer: This is an auto-generated mail, please do not reply to it.`;
 
     // set old leave values
     const oldStartDate = leave.startDate;
     const oldEndDate = leave.endDate;
     const oldComment = leave.comment;
     const oldType = leave.type;
+    const publicHolidays = await PublicHoliday.find({});
+    const daysDetails = getLeaveDaysNo(startDate, endDate, publicHolidays);
+    const leaveDetails = await getLeavesTaken(user);
+
+    const { programId } = user;
+    let program;
+    let programShortForm;
+
+    const userProgram = await Program.findOne({
+      _id: programId,
+    });
+
+    if (!userProgram) {
+      program = null;
+      programShortForm = null;
+      // eslint-disable-next-line no-else-return
+    } else {
+      program = userProgram.name;
+      programShortForm = userProgram.shortForm;
+    }
 
     // if leave is taken by staff notify the HR and Supervisor.
     // handle leave here
@@ -159,7 +194,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
           });
         }
 
-        // work on re approval
+        // work on re approval if leave is outside of intial approved period
         if (
           // eslint-disable-next-line operator-linebreak
           moment(startDate).isAfter(oldEndDate) ||
@@ -170,14 +205,6 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
           // eslint-disable-next-line operator-linebreak
           moment(endDate).isAfter(oldEndDate)
         ) {
-          const publicHolidays = await PublicHoliday.find({});
-          const daysDetails = getLeaveDaysNo(
-            startDate,
-            endDate,
-            publicHolidays
-          );
-          const leaveDetails = await getLeavesTaken(user);
-
           const { annualLeaveBF } = user;
 
           const {
@@ -207,7 +234,8 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
             const totalPaternity = paternityLeaveTaken + daysDetails.totalDays;
             if (paternity < totalPaternity) {
               return res.status(400).json({
-                message: 'You Dont have enough Paternity Leave days',
+                message:
+                  'You Dont have enough Paternity Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
                 paternityLeaveTaken,
                 daysRequested: daysDetails.totalDays,
                 totalPaternity,
@@ -226,7 +254,8 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
             const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalHome;
             if (chk1) {
               return res.status(400).json({
-                message: 'You Dont have enough Annual Leave days',
+                message:
+                  'You Dont have enough Annual Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
                 annualLeaveTaken,
                 homeLeaveTaken,
                 daysRequested: daysDetails.totalDays,
@@ -243,7 +272,8 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
             const totalMaternity = maternityLeaveTaken + daysDetails.totalDays;
             if (maternity < totalMaternity) {
               return res.status(400).json({
-                message: 'You Dont have enough Maternity Leave days',
+                message:
+                  'You Dont have enough Maternity Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
                 maternityLeaveTaken,
                 daysRequested: daysDetails.totalDays,
                 totalMaternity,
@@ -254,7 +284,8 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
             const totalSick = sickLeaveTaken + daysDetails.totalDays;
             if (sick < totalSick) {
               return res.status(400).json({
-                message: 'You Dont have enough Sick Leave days',
+                message:
+                  'You Dont have enough Sick Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
                 sickLeaveTaken,
                 daysRequested: daysDetails.totalDays,
                 totalSick,
@@ -265,7 +296,8 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
             const totalUnpaid = unPaidLeaveTaken + daysDetails.totalDays;
             if (unpaid < totalUnpaid) {
               return res.status(400).json({
-                message: 'You Dont have enough Unpaid Leave days',
+                message:
+                  'You Dont have enough Unpaid Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
                 unPaidLeaveTaken,
                 daysRequested: daysDetails.totalDays,
                 totalUnpaid,
@@ -276,7 +308,8 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
             const totalStudy = studyLeaveTaken + daysDetails.totalDays;
             if (study < totalStudy) {
               return res.status(400).json({
-                message: 'You Dont have enough Study Leave days',
+                message:
+                  'You Dont have enough Study Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
                 studyLeaveTaken,
                 daysRequested: daysDetails.totalDays,
                 totalStudy,
@@ -290,7 +323,8 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
             const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalAnnual;
             if (chk1) {
               return res.status(400).json({
-                message: 'You Dont have enough Annual Leave days',
+                message:
+                  'You Dont have enough Annual Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
                 annualLeaveTaken,
                 homeLeaveTaken,
                 daysRequested: daysDetails.totalDays,
@@ -332,14 +366,55 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
           };
           leave.modificationDetails.modLeaves.push(modLeaves);
           await leave.save();
-          // prettier-ignore
-          const textSupervisor = `Hello  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} is requesting to modify their leave. To be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
+          const subject = 'Request for approved leave modification';
+          // prettier-ignore
+          const textSupervisor = `Dear  ${supervisor.fName}, 
+
+${user.fName} ${user.lName} has modified their Leave and is now requesting for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}
                                       `;
           Mailer(from, supervisor.email, subject, textSupervisor, '');
+          const supervisornotificationTitle = `${user.fName}  ${user.lName} has modified their leave request.`;
+          const supervisornotificationType = '/hr/SuperviseLeave';
+          refType = 'Leaves';
+          refId = leave._id;
+          // prettier-ignore
+          // eslint-disable-next-line max-len
+          const supervisornotificationMessage = `${user.fName} ${user.lName} has modified their Leave and is now requesting for ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}`;
+          // eslint-disable-next-line max-len
+          await storeNotification(
+            supervisor,
+            supervisornotificationTitle,
+            supervisornotificationMessage,
+            supervisornotificationType,
+            refType,
+            refId
+          );
+          const leaveRemade = {
+            _id: leave._id,
+            startDate,
+            endDate,
+            type,
+            staff: {
+              email: user.email,
+              fName: user.fName,
+              lName: user.lName,
+            },
+            supervisorEmail: user.supervisorEmail,
+            comment,
+            status: 'Pending Supervisor',
+            programId,
+            program,
+            programShortForm,
+            leaveDays: daysDetails.leaveDays,
+            daysTaken: daysDetails.totalDays,
+            weekendDays: daysDetails.weekendDays,
+            publicHolidays: daysDetails.holidayDays,
+          };
+
           res.status(200).json({
             message: 'Leave Modification Request has been sent successfully.',
+            leave: leaveRemade,
           });
         } else {
           // leave is still in approved time
@@ -380,36 +455,70 @@ ${user.fName}  ${user.lName} is requesting to modify their leave. To be off from
             };
             leave.modificationDetails.modLeaves.push(modLeaves);
             await leave.save();
-
-
-            // sends mail to cd supervisor HR and notification about status
-            // prettier-ignore
-            // email to HR
-            // prettier-ignore
-            const text = `Hello  ${hr.fName}, 
-
-${user.fName}  ${user.lName} has modified their HomeLeave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
-                         `;
-            Mailer(from, hr.email, subject, text, '');
-
+            // sends mail to cd supervisor and notification about status
+            const subject = 'Approved leave modification';
             // email to CD
             // prettier-ignore
-            const textCd = `Hello  ${cd.fName}, 
+            const textCd = `Dear  ${cd.fName}, 
 
-${user.fName}  ${user.lName} has modified their HomeLeave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
-                         `;
+${user.fName} ${user.lName} has modified their leave, will now be off for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}
+                                     `;
             Mailer(from, cd.email, subject, textCd, '');
+            // save notification on user obj
+            const cdnotificationTitle = `${user.fName}  ${user.lName} has modified their Home Leave`;
+            const cdnotificationType = null;
+            refType = 'Leaves';
+            refId = leave._id;
+            // prettier-ignore
+            // eslint-disable-next-line max-len
+            const cdnotificationMessage = `${user.fName} ${user.lName} has modified their leave, will now be off for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}`;
+            // eslint-disable-next-line max-len
+            await storeNotification(cd, cdnotificationTitle, cdnotificationMessage, cdnotificationType, refType, refId);
+
 
             // email to Supervisor
             // prettier-ignore
-            const textSupervisor = `Hello  ${supervisor.fName}, 
+            const textSupervisor = `Dear  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} has modified their HomeLeave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
-                         `;
+${user.fName} ${user.lName} has modified their leave, will now be off for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}
+                                     `;
             Mailer(from, supervisor.email, subject, textSupervisor, '');
+            // save notification on user obj
+            const supervisornotificationTitle = `${user.fName}  ${user.lName} has modified their Home Leave`;
+            const supervisornotificationType = null;
+            refType = 'Leaves';
+            refId = leave._id;
+            // prettier-ignore
+            // eslint-disable-next-line max-len
+            const supervisornotificationMessage = `${user.fName} ${user.lName} has modified their leave, will now be off for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}`;
+            // eslint-disable-next-line max-len
+            await storeNotification(supervisor, supervisornotificationTitle, supervisornotificationMessage, supervisornotificationType, refType, refId);
+
+            const leaveRemade = {
+              _id: leave._id,
+              startDate,
+              endDate,
+              type,
+              staff: {
+                email: user.email,
+                fName: user.fName,
+                lName: user.lName,
+              },
+              supervisorEmail: user.supervisorEmail,
+              comment,
+              status: leave.status,
+              programId,
+              program,
+              programShortForm,
+              leaveDays: daysDetails.leaveDays,
+              daysTaken: daysDetails.totalDays,
+              weekendDays: daysDetails.weekendDays,
+              publicHolidays: daysDetails.holidayDays,
+            };
 
             res.status(200).json({
-              message: 'Leave has been taken Modified successfully.'
+              message: 'Leave has been Modified successfully.',
+              leave: leaveRemade
             });
           } else {
           // Leave not home
@@ -436,26 +545,51 @@ ${user.fName}  ${user.lName} has modified their HomeLeave, now to be off from ${
             leave.modificationDetails.modLeaves.push(modLeaves);
             await leave.save();
 
-            // sends mail to cd supervisor HR and notification about status
-            // prettier-ignore
-            // email to HR
-            // prettier-ignore
-            const text = `Hello  ${hr.fName}, 
-
-${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
-                         `;
-            Mailer(from, hr.email, subject, text, '');
-
+            // sends mail to supervisor and notification about status
             // email to Supervisor
+            const subject = 'Approved leave modification';
             // prettier-ignore
-            const textSupervisor = `Hello  ${supervisor.fName}, 
+            const textSupervisor = `Dear  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} has modified their Leave, now to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
+${user.fName} ${user.lName} has modified their leave, will now be off for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}
                          `;
             Mailer(from, supervisor.email, subject, textSupervisor, '');
+            // save notification on user obj
+            const supervisornotificationTitle = `${user.fName}  ${user.lName} has modified their Home Leave`;
+            const supervisornotificationType = null;
+            refType = 'Leaves';
+            refId = leave._id;
+            // prettier-ignore
+            // eslint-disable-next-line max-len
+            const supervisornotificationMessage = `${user.fName} ${user.lName} has modified their leave, will now be off for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}`;
+            // eslint-disable-next-line max-len
+            await storeNotification(supervisor, supervisornotificationTitle, supervisornotificationMessage, supervisornotificationType, refType, refId);
+
+            const leaveRemade = {
+              _id: leave._id,
+              startDate,
+              endDate,
+              type,
+              staff: {
+                email: user.email,
+                fName: user.fName,
+                lName: user.lName,
+              },
+              supervisorEmail: user.supervisorEmail,
+              comment,
+              status: leave.status,
+              programId,
+              program,
+              programShortForm,
+              leaveDays: daysDetails.leaveDays,
+              daysTaken: daysDetails.totalDays,
+              weekendDays: daysDetails.weekendDays,
+              publicHolidays: daysDetails.holidayDays,
+            };
 
             res.status(200).json({
-              message: 'Leave has been taken Modified successfully.'
+              message: 'Leave has been Modified successfully.',
+              leave: leaveRemade
             });
           }
         }
@@ -481,33 +615,69 @@ ${user.fName}  ${user.lName} has modified their Leave, now to be off from ${star
             { $set: { status: 'Not Taken', comment } }
           );
           // sends mail to cd supervisor HR and notification about status
-          // prettier-ignore
-          // email to HR
-          // prettier-ignore
-          const text = `Hello  ${hr.fName}, 
-
-${user.fName}  ${user.lName} Decided not to take their HomeLeave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
-                         `;
-          Mailer(from, hr.email, subject, text, '');
-
+          const subject = 'Approved leave cancellation';
           // email to CD
           // prettier-ignore
-          const textCd = `Hello  ${cd.fName}, 
+          const textCd = `Dear  ${cd.fName}, 
 
-${user.fName}  ${user.lName} Decided not to take their HomeLeave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
-                         `;
+${user.fName}  ${user.lName} has decided not to take their ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}
+          `;
           Mailer(from, cd.email, subject, textCd, '');
+          // save notification on user obj
+          const cdnotificationTitle = `${user.fName}  ${user.lName} has decided not to take their HomeLeave`;
+          const cdnotificationType = null;
+          refType = 'Leaves';
+          refId = leave._id;
+          // prettier-ignore
+          // eslint-disable-next-line max-len
+          const cdnotificationMessage = `${user.fName}  ${user.lName} has decided not to take their ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}`;
+          // eslint-disable-next-line max-len
+          await storeNotification(cd, cdnotificationTitle, cdnotificationMessage, cdnotificationType, refType, refId);
+
 
           // email to Supervisor
           // prettier-ignore
-          const textSupervisor = `Hello  ${supervisor.fName}, 
+          const textSupervisor = `Dear  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} Decided not to take their HomeLeave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
-                         `;
+${user.fName}  ${user.lName} has decided not to take their ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}
+          `;
           Mailer(from, supervisor.email, subject, textSupervisor, '');
+          // save notification on user obj
+          const supervisornotificationTitle = `${user.fName}  ${user.lName} has decided not to take their HomeLeave`;
+          const supervisornotificationType = null;
+          refType = 'Leaves';
+          refId = leave._id;
+          // prettier-ignore
+          // eslint-disable-next-line max-len
+          const supervisornotificationMessage = `${user.fName}  ${user.lName} has decided not to take their ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}`;
+          // eslint-disable-next-line max-len
+          await storeNotification(supervisor, supervisornotificationTitle, supervisornotificationMessage, supervisornotificationType, refType, refId);
+
+          const leaveRemade = {
+            _id: leave._id,
+            startDate: leave.startDate,
+            endDate: leave.endDate,
+            type,
+            staff: {
+              email: user.email,
+              fName: user.fName,
+              lName: user.lName,
+            },
+            supervisorEmail: user.supervisorEmail,
+            comment,
+            status: 'Not Taken',
+            programId,
+            program,
+            programShortForm,
+            leaveDays: daysDetails.leaveDays,
+            daysTaken: daysDetails.totalDays,
+            weekendDays: daysDetails.weekendDays,
+            publicHolidays: daysDetails.holidayDays,
+          };
 
           res.status(200).json({
-            message: 'Leave has been Cancelled'
+            message: 'Leave has been Cancelled',
+            leave: leaveRemade
           });
         } else {
           // Leave not home
@@ -519,25 +689,51 @@ ${user.fName}  ${user.lName} Decided not to take their HomeLeave from ${leave.st
             },
             { $set: { status: 'Not Taken', comment } }
           );
-          // sends mail to supervisor  HR and notification about status
-          // prettier-ignore
-          // email to HR
-          // prettier-ignore
-          const text = `Hello  ${hr.fName}, 
-
-${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
-                         `;
-          Mailer(from, hr.email, subject, text, '');
+          // sends mail to supervisor and notification about status
+          const subject = 'Approved leave cancellation';
           // email to Supervisor
           // prettier-ignore
-          const textSupervisor = `Hello  ${supervisor.fName}, 
+          const textSupervisor = `Dear  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
+${user.fName}  ${user.lName} has decided not to take their ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}
                          `;
           Mailer(from, supervisor.email, subject, textSupervisor, '');
+          // save notification on user obj
+          const supervisornotificationTitle = `${user.fName}  ${user.lName} has decided not to take their Leave`;
+          const supervisornotificationType = null;
+          refType = 'Leaves';
+          refId = leave._id;
+          // prettier-ignore
+          // eslint-disable-next-line max-len
+          const supervisornotificationMessage = `${user.fName}  ${user.lName} has decided not to take their ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}`;
+          // eslint-disable-next-line max-len
+          await storeNotification(supervisor, supervisornotificationTitle, supervisornotificationMessage, supervisornotificationType, refType, refId);
+
+          const leaveRemade = {
+            _id: leave._id,
+            startDate: leave.startDate,
+            endDate: leave.endDate,
+            type,
+            staff: {
+              email: user.email,
+              fName: user.fName,
+              lName: user.lName,
+            },
+            supervisorEmail: user.supervisorEmail,
+            comment,
+            status: 'Not Taken',
+            programId,
+            program,
+            programShortForm,
+            leaveDays: daysDetails.leaveDays,
+            daysTaken: daysDetails.totalDays,
+            weekendDays: daysDetails.weekendDays,
+            publicHolidays: daysDetails.holidayDays,
+          };
 
           res.status(200).json({
-            message: 'Leave has been Cancelled'
+            message: 'Leave has been Cancelled',
+            leave: leaveRemade
           });
         }
       } else {
@@ -575,9 +771,6 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
 
         // chk if staff is an expat or tcn to allow cd notication
         // prettier-ignore
-        const publicHolidays = await PublicHoliday.find({});
-        const daysDetails = getLeaveDaysNo(startDate, endDate, publicHolidays);
-        const leaveDetails = await getLeavesTaken(user);
 
         const { annualLeaveBF } = user;
 
@@ -608,7 +801,8 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
           const totalPaternity = paternityLeaveTaken + daysDetails.totalDays;
           if (paternity < totalPaternity) {
             return res.status(400).json({
-              message: 'You Dont have enough Paternity Leave days',
+              message:
+                'You Dont have enough Paternity Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               paternityLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalPaternity,
@@ -627,7 +821,8 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
           const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalHome;
           if (chk1) {
             return res.status(400).json({
-              message: 'You Dont have enough Annual Leave days',
+              message:
+                'You Dont have enough Annual Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               annualLeaveTaken,
               homeLeaveTaken,
               daysRequested: daysDetails.totalDays,
@@ -644,7 +839,8 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
           const totalMaternity = maternityLeaveTaken + daysDetails.totalDays;
           if (maternity < totalMaternity) {
             return res.status(400).json({
-              message: 'You Dont have enough Maternity Leave days',
+              message:
+                'You Dont have enough Maternity Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               maternityLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalMaternity,
@@ -655,7 +851,8 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
           const totalSick = sickLeaveTaken + daysDetails.totalDays;
           if (sick < totalSick) {
             return res.status(400).json({
-              message: 'You Dont have enough Sick Leave days',
+              message:
+                'You Dont have enough Sick Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               sickLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalSick,
@@ -666,7 +863,8 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
           const totalUnpaid = unPaidLeaveTaken + daysDetails.totalDays;
           if (unpaid < totalUnpaid) {
             return res.status(400).json({
-              message: 'You Dont have enough Unpaid Leave days',
+              message:
+                'You Dont have enough Unpaid Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               unPaidLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalUnpaid,
@@ -677,7 +875,8 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
           const totalStudy = studyLeaveTaken + daysDetails.totalDays;
           if (study < totalStudy) {
             return res.status(400).json({
-              message: 'You Dont have enough Study Leave days',
+              message:
+                'You Dont have enough Study Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               studyLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalStudy,
@@ -691,7 +890,8 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
           const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalAnnual;
           if (chk1) {
             return res.status(400).json({
-              message: 'You Dont have enough Annual Leave days',
+              message:
+                'You Dont have enough Annual Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               annualLeaveTaken,
               homeLeaveTaken,
               daysRequested: daysDetails.totalDays,
@@ -740,16 +940,56 @@ ${user.fName}  ${user.lName} Decided not to take their Leave from ${leave.startD
               },
             }
           );
+          const subject = 'Taken leave modification';
           // prettier-ignore
-          const textSupervisor = `Hello  ${supervisor.fName}, 
+          const textSupervisor = `Dear  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} is requesting to modify their Taken leave. New Dates are ${startDate.toDateString()} to ${endDate.toDateString()}. Please Confirm. ${footer}.
+${user.fName}  ${user.lName} is requesting to modify their taken leave. New details are a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}. Please Confirm. ${footer}
                                       `;
           const cc = `${cd.email},${hr.email}`;
           Mailer(from, supervisor.email, subject, textSupervisor, cc);
+          // save notification on user obj
+          const supervisornotificationTitle = `${user.fName}  ${user.lName} is requesting to modify their Taken Home leave.`;
+          const supervisornotificationType = '/hr/SuperviseLeave';
+          refType = 'Leaves';
+          refId = leave._id;
+          // prettier-ignore
+          // eslint-disable-next-line max-len
+          const supervisornotificationMessage = `${user.fName}  ${user.lName} is requesting to modify their taken leave. New details are a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}. Please Confirm.`;
+          // eslint-disable-next-line max-len
+          await storeNotification(
+            supervisor,
+            supervisornotificationTitle,
+            supervisornotificationMessage,
+            supervisornotificationType,
+            refType,
+            refId
+          );
+          const leaveRemade = {
+            _id: leave._id,
+            startDate: leave.startDate,
+            endDate: leave.endDate,
+            type,
+            staff: {
+              email: user.email,
+              fName: user.fName,
+              lName: user.lName,
+            },
+            supervisorEmail: user.supervisorEmail,
+            comment,
+            status: 'Pending Change',
+            programId,
+            program,
+            programShortForm,
+            leaveDays: daysDetails.leaveDays,
+            daysTaken: daysDetails.totalDays,
+            weekendDays: daysDetails.weekendDays,
+            publicHolidays: daysDetails.holidayDays,
+          };
 
           res.status(200).json({
             message: 'Leave Modification request sent successfully.',
+            leave: leaveRemade,
           });
         } else {
           // Leave not home
@@ -778,16 +1018,56 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken leave. New Date
               },
             }
           );
+          const subject = 'Taken leave modification';
           // prettier-ignore
-          const textSupervisor = `Hello  ${supervisor.fName}, 
+          const textSupervisor = `Dear  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} is requesting to modify their Taken leave. New Dates are ${startDate.toDateString()} to ${endDate.toDateString()}. Please Confirm. ${footer}.
+${user.fName}  ${user.lName} is requesting to modify their taken leave. New details are a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}. Please Confirm. ${footer}
                                       `;
           const cc = `${hr.email}`;
           Mailer(from, supervisor.email, subject, textSupervisor, cc);
+          // save notification on user obj
+          const supervisornotificationTitle = `${user.fName}  ${user.lName} is requesting to modify their taken leave.`;
+          const supervisornotificationType = '/hr/SuperviseLeave';
+          refType = 'Leaves';
+          refId = leave._id;
+          // prettier-ignore
+          // eslint-disable-next-line max-len
+          const supervisornotificationMessage = `${user.fName}  ${user.lName} is requesting to modify their taken leave. New details are a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}. Please Confirm.`;
+          // eslint-disable-next-line max-len
+          await storeNotification(
+            supervisor,
+            supervisornotificationTitle,
+            supervisornotificationMessage,
+            supervisornotificationType,
+            refType,
+            refId
+          );
+          const leaveRemade = {
+            _id: leave._id,
+            startDate: leave.startDate,
+            endDate: leave.endDate,
+            type,
+            staff: {
+              email: user.email,
+              fName: user.fName,
+              lName: user.lName,
+            },
+            supervisorEmail: user.supervisorEmail,
+            comment,
+            status: 'Pending Change',
+            programId,
+            program,
+            programShortForm,
+            leaveDays: daysDetails.leaveDays,
+            daysTaken: daysDetails.totalDays,
+            weekendDays: daysDetails.weekendDays,
+            publicHolidays: daysDetails.holidayDays,
+          };
 
           res.status(200).json({
             message: 'Leave Modification request sent successfully.',
+            leave: leaveRemade,
           });
         }
       } else if (action === 'cancelLeave') {
@@ -800,18 +1080,57 @@ ${user.fName}  ${user.lName} is requesting to modify their Taken leave. New Date
           },
           { $set: { status: 'Pending Not Taken', comment } }
         );
-        // sends mail to cd supervisor HR and notification about status
-        // prettier-ignore
+        // sends mail to supervisor and notification about status
+        const subject = 'Taken leave cancellation';
         // email to Supervisor
         // prettier-ignore
-        const textSupervisor = `Hello  ${supervisor.fName}, 
+        const textSupervisor = `Dear  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} is requesting to Cancel their Taken leave Which was from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}. This is pending your approval${footer}.
+${user.fName} ${user.lName} is requesting to cancel their taken leave which was a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}. This is pending your approval${footer}
                          `;
         Mailer(from, supervisor.email, subject, textSupervisor, '');
+        // save notification on user obj
+        const supervisornotificationTitle = `${user.fName}  ${user.lName} is requesting to cancel their taken leave.`;
+        const supervisornotificationType = '/hr/SuperviseLeave';
+        refType = 'Leaves';
+        refId = leave._id;
+        // prettier-ignore
+        // eslint-disable-next-line max-len
+        const supervisornotificationMessage = `${user.fName} ${user.lName} is requesting to cancel their taken leave which was a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}. This is pending your approval`;
+        // eslint-disable-next-line max-len
+        await storeNotification(
+          supervisor,
+          supervisornotificationTitle,
+          supervisornotificationMessage,
+          supervisornotificationType,
+          refType,
+          refId
+        );
 
+        const leaveRemade = {
+          _id: leave._id,
+          startDate: leave.startDate,
+          endDate: leave.endDate,
+          type,
+          staff: {
+            email: user.email,
+            fName: user.fName,
+            lName: user.lName,
+          },
+          supervisorEmail: user.supervisorEmail,
+          comment,
+          status: 'Pending Not Taken',
+          programId,
+          program,
+          programShortForm,
+          leaveDays: daysDetails.leaveDays,
+          daysTaken: daysDetails.totalDays,
+          weekendDays: daysDetails.weekendDays,
+          publicHolidays: daysDetails.holidayDays,
+        };
         res.status(200).json({
           message: 'Cancellation Pending Supervisor Approval',
+          leave: leaveRemade,
         });
       } else {
         return res.status(400).json({
@@ -855,10 +1174,6 @@ ${user.fName}  ${user.lName} is requesting to Cancel their Taken leave Which was
           });
         }
         // chk if staff is an expat or tcn to allow cd notication
-        // prettier-ignore
-        const publicHolidays = await PublicHoliday.find({});
-        const daysDetails = getLeaveDaysNo(startDate, endDate, publicHolidays);
-        const leaveDetails = await getLeavesTaken(user);
 
         const { annualLeaveBF } = user;
 
@@ -889,7 +1204,8 @@ ${user.fName}  ${user.lName} is requesting to Cancel their Taken leave Which was
           const totalPaternity = paternityLeaveTaken + daysDetails.totalDays;
           if (paternity < totalPaternity) {
             return res.status(400).json({
-              message: 'You Dont have enough Paternity Leave days',
+              message:
+                'You Dont have enough Paternity Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               paternityLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalPaternity,
@@ -908,7 +1224,8 @@ ${user.fName}  ${user.lName} is requesting to Cancel their Taken leave Which was
           const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalHome;
           if (chk1) {
             return res.status(400).json({
-              message: 'You Dont have enough Annual Leave days',
+              message:
+                'You Dont have enough Annual Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               annualLeaveTaken,
               homeLeaveTaken,
               daysRequested: daysDetails.totalDays,
@@ -925,7 +1242,8 @@ ${user.fName}  ${user.lName} is requesting to Cancel their Taken leave Which was
           const totalMaternity = maternityLeaveTaken + daysDetails.totalDays;
           if (maternity < totalMaternity) {
             return res.status(400).json({
-              message: 'You Dont have enough Maternity Leave days',
+              message:
+                'You Dont have enough Maternity Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               maternityLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalMaternity,
@@ -936,7 +1254,8 @@ ${user.fName}  ${user.lName} is requesting to Cancel their Taken leave Which was
           const totalSick = sickLeaveTaken + daysDetails.totalDays;
           if (sick < totalSick) {
             return res.status(400).json({
-              message: 'You Dont have enough Sick Leave days',
+              message:
+                'You Dont have enough Sick Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               sickLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalSick,
@@ -947,7 +1266,8 @@ ${user.fName}  ${user.lName} is requesting to Cancel their Taken leave Which was
           const totalUnpaid = unPaidLeaveTaken + daysDetails.totalDays;
           if (unpaid < totalUnpaid) {
             return res.status(400).json({
-              message: 'You Dont have enough Unpaid Leave days',
+              message:
+                'You Dont have enough Unpaid Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               unPaidLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalUnpaid,
@@ -958,7 +1278,8 @@ ${user.fName}  ${user.lName} is requesting to Cancel their Taken leave Which was
           const totalStudy = studyLeaveTaken + daysDetails.totalDays;
           if (study < totalStudy) {
             return res.status(400).json({
-              message: 'You Dont have enough Study Leave days',
+              message:
+                'You Dont have enough Study Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               studyLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalStudy,
@@ -972,7 +1293,8 @@ ${user.fName}  ${user.lName} is requesting to Cancel their Taken leave Which was
           const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalAnnual;
           if (chk1) {
             return res.status(400).json({
-              message: 'You Dont have enough Annual Leave days',
+              message:
+                'You Dont have enough Annual Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               annualLeaveTaken,
               homeLeaveTaken,
               daysRequested: daysDetails.totalDays,
@@ -1009,19 +1331,57 @@ ${user.fName}  ${user.lName} is requesting to Cancel their Taken leave Which was
         };
         leave.modificationDetails.modLeaves.push(modLeaves);
         await leave.save();
-
-        // prettier-ignore
-
+        const subject = 'Leave request modification';
         // email to Supervisor
         // prettier-ignore
-        const textSupervisor = `Hello  ${supervisor.fName}, 
+        const textSupervisor = `Dear  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} has modified their Leave request, now asking to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
+${user.fName}  ${user.lName} has modified their leave request and is now requesting for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}
                          `;
         Mailer(from, supervisor.email, subject, textSupervisor, '');
+        // save notification on user obj
+        const supervisornotificationTitle = `${user.fName}  ${user.lName} has modified their Leave request`;
+        const supervisornotificationType = '/hr/SuperviseLeave';
+        refType = 'Leaves';
+        refId = leave._id;
+        // prettier-ignore
+        // eslint-disable-next-line max-len
+        const supervisornotificationMessage = `${user.fName}  ${user.lName} has modified their leave request and is now requesting for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}`;
+        // eslint-disable-next-line max-len
+        await storeNotification(
+          supervisor,
+          supervisornotificationTitle,
+          supervisornotificationMessage,
+          supervisornotificationType,
+          refType,
+          refId
+        );
+
+        const leaveRemade = {
+          _id: leave._id,
+          startDate,
+          endDate,
+          type,
+          staff: {
+            email: user.email,
+            fName: user.fName,
+            lName: user.lName,
+          },
+          supervisorEmail: user.supervisorEmail,
+          comment,
+          status: leave.status,
+          programId,
+          program,
+          programShortForm,
+          leaveDays: daysDetails.leaveDays,
+          daysTaken: daysDetails.totalDays,
+          weekendDays: daysDetails.weekendDays,
+          publicHolidays: daysDetails.holidayDays,
+        };
 
         res.status(200).json({
           message: 'Leave has been Modified successfully.',
+          leave: leaveRemade,
         });
       } else if (action === 'cancelLeave') {
         // prettier-ignore
@@ -1033,16 +1393,58 @@ ${user.fName}  ${user.lName} has modified their Leave request, now asking to be 
           },
           { $set: { status: 'Cancelled', comment } }
         );
+        const subject = 'Leave request cancellation';
         // email to Supervisor
         // prettier-ignore
-        const textSupervisor = `Hello  ${supervisor.fName}, 
+        const textSupervisor = `Dear  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
+${user.fName} ${user.lName} has decided to cancel their leave request of a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}
                          `;
         Mailer(from, supervisor.email, subject, textSupervisor, '');
 
+        // save notification on user obj
+        const supervisornotificationTitle = `${user.fName}  ${user.lName} has Decided to cancel their Leave request`;
+        const supervisornotificationType = null;
+        refType = 'Leaves';
+        refId = leave._id;
+        // prettier-ignore
+        // eslint-disable-next-line max-len
+        const supervisornotificationMessage = `${user.fName} ${user.lName} has decided to cancel their leave request of a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}`;
+        // eslint-disable-next-line max-len
+        await storeNotification(
+          supervisor,
+          supervisornotificationTitle,
+          supervisornotificationMessage,
+          supervisornotificationType,
+          refType,
+          refId
+        );
+
+        const leaveRemade = {
+          _id: leave._id,
+          startDate: leave.startDate,
+          endDate: leave.endDate,
+          type,
+          staff: {
+            email: user.email,
+            fName: user.fName,
+            lName: user.lName,
+          },
+          supervisorEmail: user.supervisorEmail,
+          comment,
+          status: 'Cancelled',
+          programId,
+          program,
+          programShortForm,
+          leaveDays: daysDetails.leaveDays,
+          daysTaken: daysDetails.totalDays,
+          weekendDays: daysDetails.weekendDays,
+          publicHolidays: daysDetails.holidayDays,
+        };
+
         res.status(200).json({
-          message: 'Leave has been Cancelled',
+          message: 'Leave has been Cancelled successfully.',
+          leave: leaveRemade,
         });
       } else {
         return res.status(400).json({
@@ -1092,10 +1494,6 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
           });
         }
         // chk if staff is an expat or tcn to allow cd notication
-        // prettier-ignore
-        const publicHolidays = await PublicHoliday.find({});
-        const daysDetails = getLeaveDaysNo(startDate, endDate, publicHolidays);
-        const leaveDetails = await getLeavesTaken(user);
 
         const { annualLeaveBF } = user;
 
@@ -1126,7 +1524,8 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
           const totalPaternity = paternityLeaveTaken + daysDetails.totalDays;
           if (paternity < totalPaternity) {
             return res.status(400).json({
-              message: 'You Dont have enough Paternity Leave days',
+              message:
+                'You Dont have enough Paternity Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               paternityLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalPaternity,
@@ -1145,7 +1544,8 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
           const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalHome;
           if (chk1) {
             return res.status(400).json({
-              message: 'You Dont have enough Annual Leave days',
+              message:
+                'You Dont have enough Annual Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               annualLeaveTaken,
               homeLeaveTaken,
               daysRequested: daysDetails.totalDays,
@@ -1162,7 +1562,8 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
           const totalMaternity = maternityLeaveTaken + daysDetails.totalDays;
           if (maternity < totalMaternity) {
             return res.status(400).json({
-              message: 'You Dont have enough Maternity Leave days',
+              message:
+                'You Dont have enough Maternity Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               maternityLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalMaternity,
@@ -1173,7 +1574,8 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
           const totalSick = sickLeaveTaken + daysDetails.totalDays;
           if (sick < totalSick) {
             return res.status(400).json({
-              message: 'You Dont have enough Sick Leave days',
+              message:
+                'You Dont have enough Sick Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               sickLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalSick,
@@ -1184,7 +1586,8 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
           const totalUnpaid = unPaidLeaveTaken + daysDetails.totalDays;
           if (unpaid < totalUnpaid) {
             return res.status(400).json({
-              message: 'You Dont have enough Unpaid Leave days',
+              message:
+                'You Dont have enough Unpaid Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               unPaidLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalUnpaid,
@@ -1195,7 +1598,8 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
           const totalStudy = studyLeaveTaken + daysDetails.totalDays;
           if (study < totalStudy) {
             return res.status(400).json({
-              message: 'You Dont have enough Study Leave days',
+              message:
+                'You Dont have enough Study Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               studyLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalStudy,
@@ -1209,7 +1613,8 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
           const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalAnnual;
           if (chk1) {
             return res.status(400).json({
-              message: 'You Dont have enough Annual Leave days',
+              message:
+                'You Dont have enough Annual Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               annualLeaveTaken,
               homeLeaveTaken,
               daysRequested: daysDetails.totalDays,
@@ -1247,17 +1652,57 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
         };
         leave.modificationDetails.modLeaves.push(modLeaves);
         await leave.save();
-
+        const subject = 'Leave request modification';
+        // email to Supervisor
         // prettier-ignore
-        const textSupervisor = `Hello  ${supervisor.fName}, 
-  
-  ${user.fName}  ${user.lName} has modified their Home Leave request, now asking to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
+        const textSupervisor = `Dear  ${supervisor.fName}, 
+
+${user.fName}  ${user.lName} has modified their leave request and is now requesting for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}
                          `;
-        const cc = `${cd.email},${hr.email}`;
+        const cc = `${cd.email}`;
         Mailer(from, supervisor.email, subject, textSupervisor, cc);
+        // save notification on user obj
+        const supervisornotificationTitle = `${user.fName}  ${user.lName} has modified their Leave request`;
+        const supervisornotificationType = '/hr/SuperviseLeave';
+        refType = 'Leaves';
+        refId = leave._id;
+        // prettier-ignore
+        // eslint-disable-next-line max-len
+        const supervisornotificationMessage = `${user.fName}  ${user.lName} has modified their leave request and is now requesting for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}`;
+        // eslint-disable-next-line max-len
+        await storeNotification(
+          supervisor,
+          supervisornotificationTitle,
+          supervisornotificationMessage,
+          supervisornotificationType,
+          refType,
+          refId
+        );
+        const leaveRemade = {
+          _id: leave._id,
+          startDate,
+          endDate,
+          type,
+          staff: {
+            email: user.email,
+            fName: user.fName,
+            lName: user.lName,
+          },
+          supervisorEmail: user.supervisorEmail,
+          comment,
+          status: 'Pending Supervisor',
+          programId,
+          program,
+          programShortForm,
+          leaveDays: daysDetails.leaveDays,
+          daysTaken: daysDetails.totalDays,
+          weekendDays: daysDetails.weekendDays,
+          publicHolidays: daysDetails.holidayDays,
+        };
 
         res.status(200).json({
           message: 'Leave has modified successfully.',
+          leave: leaveRemade,
         });
       } else if (action === 'cancelLeave') {
         // prettier-ignore
@@ -1269,15 +1714,59 @@ ${user.fName}  ${user.lName} Decided to cancel their Leave request from ${leave.
           { $set: { status: 'Cancelled', comment } }
         );
         // email to Supervisor cc CD
+        const subject = 'Leave request cancellation';
+        // email to Supervisor
         // prettier-ignore
-        const textSupervisor = `Hello  ${supervisor.fName}, 
-  
-  ${user.fName}  ${user.lName} Decided to cancel their Home Leave request from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()}${footer}.
-                               `;
-        const cc = `${cd.email},${hr.email}`;
+        const textSupervisor = `Dear  ${supervisor.fName}, 
+
+${user.fName} ${user.lName} has decided to cancel their leave request of a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}
+                         `;
+        const cc = `${cd.email}`;
         Mailer(from, supervisor.email, subject, textSupervisor, cc);
+
+        // save notification on user obj
+        const supervisornotificationTitle = `${user.fName}  ${user.lName} has decided to cancel their Leave request`;
+        const supervisornotificationType = null;
+        refType = 'Leaves';
+        refId = leave._id;
+        // prettier-ignore
+        // eslint-disable-next-line max-len
+        const supervisornotificationMessage = `${user.fName} ${user.lName} has decided to cancel their leave request of a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}`;
+        // eslint-disable-next-line max-len
+        await storeNotification(
+          supervisor,
+          supervisornotificationTitle,
+          supervisornotificationMessage,
+          supervisornotificationType,
+          refType,
+          refId
+        );
+
+        const leaveRemade = {
+          _id: leave._id,
+          startDate: leave.startDate,
+          endDate: leave.endDate,
+          type,
+          staff: {
+            email: user.email,
+            fName: user.fName,
+            lName: user.lName,
+          },
+          supervisorEmail: user.supervisorEmail,
+          comment,
+          status: 'Cancelled',
+          programId,
+          program,
+          programShortForm,
+          leaveDays: daysDetails.leaveDays,
+          daysTaken: daysDetails.totalDays,
+          weekendDays: daysDetails.weekendDays,
+          publicHolidays: daysDetails.holidayDays,
+        };
+
         res.status(200).json({
-          message: 'Leave has been Cancelled',
+          message: 'Leave has been Cancelled successfully.',
+          leave: leaveRemade,
         });
       } else {
         return res.status(400).json({

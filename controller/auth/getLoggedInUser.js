@@ -7,12 +7,26 @@ const WorkPermit = require('../../model/WorkPermit');
 const getLoggedInUser = async (req, res) => {
   try {
     // request.user is getting fetched from Middleware after token authentication
-    const user = await User.findById(req.user.id);
+    const { oktaMail } = req;
+    const user = await User.findOne({
+      email: oktaMail,
+    });
+
+    if (!user) {
+      return res.status(503).json({
+        message: 'User doesnot exist on Ug opps',
+      });
+    }
+
     // dont return pwd and id
-    user.password = undefined;
     let program;
     let programShortForm;
     const { programId } = user;
+    if (user.active === false) {
+      return res.status(400).json({
+        message: 'This account is not active any more.',
+      });
+    }
 
     const userProgram = await Program.findOne({
       _id: programId,
@@ -36,7 +50,6 @@ const getLoggedInUser = async (req, res) => {
       title,
       birthDate,
       oNames,
-      email,
       type,
       level,
       team,
@@ -44,12 +57,18 @@ const getLoggedInUser = async (req, res) => {
       bankAccounts,
       nssfNumber,
       tinNumber,
-      admin,
       leaves,
       createdAt,
       supervisorEmail,
-      notifications,
+      active,
+      email,
     } = user;
+
+    const unReadNotifications = user.notifications;
+
+    const notifications = unReadNotifications.filter(
+      (notification) => notification.status === 'unRead'
+    );
 
     const userSupervisor = await User.findOne({
       email: supervisorEmail,
@@ -119,7 +138,6 @@ const getLoggedInUser = async (req, res) => {
     }
 
     const person = {
-      admin,
       leaves,
       createdAt,
       bankAccounts,
@@ -142,6 +160,7 @@ const getLoggedInUser = async (req, res) => {
       type,
       level,
       team,
+      active,
       supervisorDetails,
       contractId,
       contractStartDate,

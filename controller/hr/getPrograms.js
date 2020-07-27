@@ -11,7 +11,33 @@ const getPrograms = async (req, res) => {
     const recurseProcessLeave = async (controller, arr) => {
       if (controller < arr.length) {
         // eslint-disable-next-line object-curly-newline
-        const { _id, name, programManagerId, shortForm } = arr[controller];
+        const {
+          _id,
+          name,
+          programManagerId,
+          operationsLeadId,
+          shortForm,
+        } = arr[controller];
+
+        const userOppsLd = await User.findOne({
+          _id: operationsLeadId,
+        });
+        let operationsLeadDetails;
+        if (!userOppsLd) {
+          operationsLeadDetails = {
+            _id: null,
+            fName: null,
+            lName: null,
+            email: null,
+          };
+        } else {
+          operationsLeadDetails = {
+            _id: userOppsLd._id,
+            fName: userOppsLd.fName,
+            lName: userOppsLd.lName,
+            email: userOppsLd.email,
+          };
+        }
 
         const user = await User.findOne({
           _id: programManagerId,
@@ -19,7 +45,7 @@ const getPrograms = async (req, res) => {
         let programManagerDetails;
         if (!user) {
           programManagerDetails = {
-            Supervisor_id: null,
+            _id: null,
             fName: null,
             lName: null,
             email: null,
@@ -39,6 +65,7 @@ const getPrograms = async (req, res) => {
           shortForm,
           programManagerId,
           programManagerDetails,
+          operationsLeadDetails,
         };
 
         combinedArray.push(programRemade);

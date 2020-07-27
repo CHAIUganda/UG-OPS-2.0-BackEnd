@@ -1,6 +1,6 @@
 // Filename : leave.js
 const express = require('express');
-const { check } = require('express-validator/check');
+const { check } = require('express-validator');
 
 const router = express.Router();
 // Import leave controller
@@ -155,4 +155,44 @@ router.post(
   hrController.handleWPNotifications
 );
 
+/**
+ * @method - POST
+ * @description - addStaffNewContract
+ * @param - /addStaffNewContract
+ */
+router.post(
+  '/addStaffNewContract',
+  [
+    // input validations
+    check('staffEmail', 'Please enter a valid email').isEmail(),
+    check('contractStartDate', 'Please Enter a Valid Contract Start Date')
+      .not()
+      .isEmpty(),
+    check('contractEndDate', 'Please Enter a Valid Contract End Date')
+      .not()
+      .isEmpty(),
+    check('contractType', 'Please Enter a Valid Contract Type').not().isEmpty(),
+  ],
+  hrController.addStaffNewContract
+);
+
+/**
+ * @method - POST
+ * @description - addStaffNewWP
+ * @param - /addStaffNewWP
+ */
+router.post(
+  '/addStaffNewWP',
+  [
+    // input validations
+    check('staffEmail', 'Please enter a valid email').isEmail(),
+    check('workPermitStartDate', 'Please Enter a Valid WorkPermit Start Date')
+      .not()
+      .isEmpty(),
+    check('workPermitEndDate', 'Please Enter a Valid WorkPermit End Date')
+      .not()
+      .isEmpty(),
+  ],
+  hrController.addStaffNewWP
+);
 module.exports = router;

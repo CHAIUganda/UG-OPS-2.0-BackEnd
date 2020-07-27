@@ -23,10 +23,6 @@ const UserSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  password: {
-    type: String,
-    required: true,
-  },
   title: {
     type: String,
     required: true,
@@ -84,6 +80,11 @@ const UserSchema = mongoose.Schema({
     type: String,
     required: false,
   },
+  password: {
+    // pwd left for dev purposes using normal auth
+    type: String,
+    required: false,
+  },
   roles: {
     admin: {
       // To track is user is admin
@@ -107,6 +108,23 @@ const UserSchema = mongoose.Schema({
       type: Boolean,
       default: false,
     },
+    deputyCountryDirector: {
+      type: Boolean,
+      default: false,
+    },
+    procurementAdmin: {
+      type: Boolean,
+      default: false,
+    },
+    financeAdmin: {
+      // To track is user is CD
+      type: Boolean,
+      default: false,
+    },
+  },
+  active: {
+    type: Boolean,
+    default: true,
   },
   notifications: [
     {
@@ -115,6 +133,8 @@ const UserSchema = mongoose.Schema({
       status: String,
       createDate: Date,
       linkTo: String,
+      refType: String,
+      refId: mongoose.Schema.Types.ObjectId,
     },
   ],
 });

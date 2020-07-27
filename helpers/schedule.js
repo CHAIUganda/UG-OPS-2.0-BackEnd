@@ -1,6 +1,7 @@
 const { CronJob } = require('cron');
 const log4js = require('log4js');
 const takeLeaves = require('../controller/leave/scheduled/takeLeaves');
+const plannedLeaves = require('../controller/leave/scheduled/plannedLeaves');
 const birthDays = require('../controller/hr/scheduled/birthDays');
 const contractRenewalInvite = require('../controller/hr/scheduled/contractRenewalInvite');
 const workPermitRenewalReminder = require('../controller/hr/scheduled/workPermitRenewalReminder');
@@ -16,12 +17,17 @@ log4js.configure({
 // const logger = log4js.getLogger('Timed');
 
 const schedule = new CronJob(
-  '0 31 07 * * *',
+  '0 55 11 * * *',
   () => {
     console.log('Checking for birthdays and Ripe leaves');
     // contains auto scheduled jobs to be done by system
     // changes status of leaves to taken if he startdate comes
     takeLeaves();
+
+    // changes status of planned leaves to Not Takens startdate comes and staff not applied
+    // notify staff about their planned leaves
+    plannedLeaves();
+
     // checks for contracts about to expire and sends invites to concerned personnel
     contractRenewalInvite();
     // checks for Workpermits about toexpire and sends invites to concerned personnel

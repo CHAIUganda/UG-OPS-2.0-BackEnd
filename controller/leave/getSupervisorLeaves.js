@@ -32,6 +32,7 @@ const getSupervisorLeaves = async (req, res) => {
       query = { supervisorEmail: staffEmail, status };
     }
     const leaves = await Leave.find(query);
+    const { notifications } = user;
     const combinedArraySupervisor = [];
     const recurseProcessLeave = async (controller, arr) => {
       if (controller < arr.length) {
@@ -67,6 +68,11 @@ const getSupervisorLeaves = async (req, res) => {
           LeaveprogramShortForm = userProgram.shortForm;
         }
         const Leavestatus = arr[controller].status;
+        const notificationDetails = notifications.filter(
+          // prettier-ignore
+          // eslint-disable-next-line eqeqeq
+          (notification) => notification.refId.equals(_id) && notification.refType === 'Leaves' && notification.linkTo === '/hr/SuperviseLeave' && notification.status === 'unRead'
+        );
 
         const leaveRemade = {
           staff,
@@ -86,6 +92,7 @@ const getSupervisorLeaves = async (req, res) => {
           daysTaken: daysDetails.totalDays,
           weekendDays: daysDetails.weekendDays,
           publicHolidays: daysDetails.holidayDays,
+          notificationDetails,
         };
 
         combinedArraySupervisor.push(leaveRemade);

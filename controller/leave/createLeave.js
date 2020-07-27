@@ -1,4 +1,4 @@
-const { validationResult } = require('express-validator/check');
+const { validationResult } = require('express-validator');
 // const moment = require('moment-timezone');
 const debug = require('debug')('leave-controller');
 const moment = require('moment-timezone');
@@ -33,6 +33,9 @@ const createLeave = async (req, res) => {
   if (comment == null) {
     comment = '';
   }
+  // set timezone to kampala
+  let CurrentDate = moment().tz('Africa/Kampala').format();
+  CurrentDate = new Date(CurrentDate);
 
   try {
     const user = await User.findOne({
@@ -92,12 +95,48 @@ const createLeave = async (req, res) => {
       programShortForm = userProgram.shortForm;
     }
     if (status === 'Pending Supervisor' || status === 'Planned') {
+      if (status === 'Planned') {
+        // prettier-ignore
+        if (moment(CurrentDate).isAfter(startDate)) {
+          return res.status(400).json({
+            message:
+                  'You cannot Plan for a date in the past',
+            CurrentDate,
+            startDate
+          });
+        }
+        if (moment(CurrentDate).isSame(startDate)) {
+          return res.status(400).json({
+            message: 'You cannot Plan for a date that already started',
+            CurrentDate,
+            startDate,
+          });
+        }
+
+        if (moment(CurrentDate).isAfter(endDate)) {
+          return res.status(400).json({
+            message: 'You cannot Plan for a date in the past',
+            CurrentDate,
+            endDate,
+          });
+        }
+
+        if (moment(CurrentDate).isSame(endDate)) {
+          return res.status(400).json({
+            message: 'Sorry you, cannot Plan for a leave in the past',
+            CurrentDate,
+            endDate,
+          });
+        }
+      }
+
       const publicHolidays = await PublicHoliday.find({});
       const daysDetails = getLeaveDaysNo(startDate, endDate, publicHolidays);
       // set timezone to kampala
       // const CurrentDate = moment().tz('Africa/Kampala').format();
       endDate = new Date(endDate);
       startDate = new Date(startDate);
+      const endDateMonth = endDate.getMonth();
       if (moment(startDate).isAfter(endDate)) {
         return res.status(400).json({
           message: 'Start Date cannot be after End date',
@@ -115,8 +154,17 @@ const createLeave = async (req, res) => {
       if (monthOnContract === 0) {
         accruedAnnualLeave = 0;
       } else {
-        // accruedAnnualLeave = currentMonth * 1.75;
-        accruedAnnualLeave = Math.trunc(monthOnContract * 1.75);
+        // acrue anual leave basing calender yr if current yr diff frm contract start yr
+        // eslint-disable-next-line no-lonely-if
+        if (moment(CurrentDate).isAfter(contractStartDate, 'year')) {
+          if (endDateMonth === 0) {
+            accruedAnnualLeave = 0;
+          } else {
+            accruedAnnualLeave = Math.trunc(endDateMonth * 1.75);
+          }
+        } else {
+          accruedAnnualLeave = Math.trunc(monthOnContract * 1.75);
+        }
       }
       const { annualLeaveBF } = user;
       const leaveDetails = await getLeavesTaken(user);
@@ -148,7 +196,8 @@ const createLeave = async (req, res) => {
         const totalPaternity = paternityLeaveTaken + daysDetails.totalDays;
         if (paternity < totalPaternity) {
           return res.status(400).json({
-            message: 'You Dont have enough Paternity Leave days',
+            message:
+              'You Dont have enough Paternity Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
             paternityLeaveTaken,
             daysRequested: daysDetails.totalDays,
             totalPaternity,
@@ -167,7 +216,8 @@ const createLeave = async (req, res) => {
         const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalHome;
         if (chk1) {
           return res.status(400).json({
-            message: 'You Dont have enough Annual Leave days',
+            message:
+              'You Dont have enough Annual Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
             annualLeaveTaken,
             homeLeaveTaken,
             daysRequested: daysDetails.totalDays,
@@ -184,7 +234,8 @@ const createLeave = async (req, res) => {
         const totalMaternity = maternityLeaveTaken + daysDetails.totalDays;
         if (maternity < totalMaternity) {
           return res.status(400).json({
-            message: 'You Dont have enough Maternity Leave days',
+            message:
+              'You Dont have enough Maternity Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
             maternityLeaveTaken,
             daysRequested: daysDetails.totalDays,
             totalMaternity,
@@ -195,7 +246,8 @@ const createLeave = async (req, res) => {
         const totalSick = sickLeaveTaken + daysDetails.totalDays;
         if (sick < totalSick) {
           return res.status(400).json({
-            message: 'You Dont have enough Sick Leave days',
+            message:
+              'You Dont have enough Sick Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
             sickLeaveTaken,
             daysRequested: daysDetails.totalDays,
             totalSick,
@@ -206,7 +258,8 @@ const createLeave = async (req, res) => {
         const totalUnpaid = unPaidLeaveTaken + daysDetails.totalDays;
         if (unpaid < totalUnpaid) {
           return res.status(400).json({
-            message: 'You Dont have enough Unpaid Leave days',
+            message:
+              'You Dont have enough Unpaid Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
             unPaidLeaveTaken,
             daysRequested: daysDetails.totalDays,
             totalUnpaid,
@@ -217,7 +270,8 @@ const createLeave = async (req, res) => {
         const totalStudy = studyLeaveTaken + daysDetails.totalDays;
         if (study < totalStudy) {
           return res.status(400).json({
-            message: 'You Dont have enough Study Leave days',
+            message:
+              'You Dont have enough Study Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
             studyLeaveTaken,
             daysRequested: daysDetails.totalDays,
             totalStudy,
@@ -231,7 +285,8 @@ const createLeave = async (req, res) => {
         const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalAnnual;
         if (chk1) {
           return res.status(400).json({
-            message: 'You Dont have enough Annual Leave days',
+            message:
+              'You Dont have enough Annual Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
             annualLeaveTaken,
             homeLeaveTaken,
             daysRequested: daysDetails.totalDays,
@@ -245,16 +300,17 @@ const createLeave = async (req, res) => {
         });
       }
 
-      const subject = 'Uganda Operations Leaves';
+      const subject = 'Request for leave';
       const from = 'UGOperations@clintonhealthaccess.org';
       const footer = `
   
-Regards,
+With Regards,
   
 Uganda Operations
 Clinton Health Access Initiative
+https://ugops.clintonhealthaccess.org
   
-Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
+Disclaimer: This is an auto-generated mail, please do not reply to it.`;
 
       // checks if user has enough leaves days happen here basing on what has been computed
       const { supervisorEmail } = user;
@@ -282,23 +338,27 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
       await leaveRemade.save();
       // mail supervisor
       // prettier-ignore
-      const textSupervisor = `Hello  ${supervisor.fName}, 
+      const textSupervisor = `Dear  ${supervisor.fName}, 
 
-${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
+${user.fName}  ${user.lName} is requesting for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}.${footer}
                                       `;
       if (status === 'Pending Supervisor') {
         Mailer(from, supervisor.email, subject, textSupervisor, '');
         // save notification on user obj
         const notificationTitle = `${user.fName}  ${user.lName} is requesting to be off`;
-        const notificationType = 'Leave';
+        const notificationType = '/hr/SuperviseLeave';
+        const refType = 'Leaves';
+        const refId = leaveRemade._id;
         // prettier-ignore
         // eslint-disable-next-line max-len
-        const notificationMessage = `${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateString()} to ${endDate.toDateString()}`;
+        const notificationMessage = `${user.fName}  ${user.lName} is requesting for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}.`;
         await storeNotification(
           supervisor,
           notificationTitle,
           notificationMessage,
-          notificationType
+          notificationType,
+          refType,
+          refId
         );
       }
       const leave = {

@@ -52,7 +52,7 @@ const getStaffLeaves = async (req, res) => {
         });
       }
     }
-
+    const { notifications } = user;
     const leaves = await Leave.find(query);
     const combinedArray = [];
     const recurseProcessLeave = async (controller, arr) => {
@@ -89,6 +89,10 @@ const getStaffLeaves = async (req, res) => {
           LeaveprogramShortForm = userProgram.shortForm;
         }
         const Leavestatus = arr[controller].status;
+        const notificationDetails = notifications.filter(
+          // prettier-ignore
+          (notification) => notification.refId.equals(_id) && notification.refType === 'Leaves' && notification.linkTo === '/hr/Apply4Leave' && notification.status === 'unRead'
+        );
 
         const leaveRemade = {
           staff,
@@ -108,6 +112,7 @@ const getStaffLeaves = async (req, res) => {
           daysTaken: daysDetails.totalDays,
           weekendDays: daysDetails.weekendDays,
           publicHolidays: daysDetails.holidayDays,
+          notificationDetails,
         };
 
         combinedArray.push(leaveRemade);

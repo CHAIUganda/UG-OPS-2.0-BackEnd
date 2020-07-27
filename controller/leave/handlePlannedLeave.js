@@ -1,4 +1,4 @@
-const { validationResult } = require('express-validator/check');
+const { validationResult } = require('express-validator');
 const debug = require('debug')('leave-controller');
 const moment = require('moment-timezone');
 const errorToString = require('../../helpers/errorToString');
@@ -10,6 +10,7 @@ const PublicHoliday = require('../../model/PublicHoliday');
 const Contract = require('../../model/Contract');
 const Program = require('../../model/Program');
 const getLeavesTaken = require('./getLeavesTaken');
+const storeNotification = require('../../helpers/storeNotification');
 
 const handlePlannedLeave = async (req, res) => {
   const errors = validationResult(req);
@@ -76,16 +77,17 @@ const handlePlannedLeave = async (req, res) => {
     CurrentDate = new Date(CurrentDate);
     endDate = new Date(endDate);
     startDate = new Date(startDate);
-    const subject = 'Uganda Operations Leaves';
+    const subject = 'Request for leave';
     const from = 'UGOperations@clintonhealthaccess.org';
     const footer = `
-
-Regards,
-
+  
+With Regards,
+  
 Uganda Operations
 Clinton Health Access Initiative
-
-Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
+https://ugops.clintonhealthaccess.org
+  
+Disclaimer: This is an auto-generated mail, please do not reply to it.`;
 
     // handle leave here
     if (moment(startDate).isAfter(endDate)) {
@@ -159,11 +161,28 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
         );
         // mail supervisor
         // prettier-ignore
-        const textSupervisor = `Hello  ${supervisor.fName}, 
-  
-${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateString()} to ${endDate.toDateString()}${footer}.
-                                        `;
+        const textSupervisor = `Dear  ${supervisor.fName}, 
+
+${user.fName}  ${user.lName} is requesting for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}.${footer}
+                                      `;
         Mailer(from, supervisor.email, subject, textSupervisor, '');
+
+        // save notification on user obj
+        const notificationTitle = `${user.fName}  ${user.lName} is requesting to be off`;
+        const notificationType = '/hr/SuperviseLeave';
+        const refType = 'Leaves';
+        const refId = leaveToTake._id;
+        // prettier-ignore
+        // eslint-disable-next-line max-len
+        const notificationMessage = `${user.fName}  ${user.lName} is requesting for a ${daysDetails.totalDays} day${daysDetails.totalDays === 1 ? '' : 's'} ${type} leave from ${startDate.toDateString()} to ${endDate.toDateString()}.`;
+        await storeNotification(
+          supervisor,
+          notificationTitle,
+          notificationMessage,
+          notificationType,
+          refType,
+          refId
+        );
         // eslint-disable-next-line object-curly-newline
         const leave = {
           startDate,
@@ -268,6 +287,8 @@ ${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateStri
           accruedAnnualLeave = 0;
         } else {
           // compute accrued days fromstart of contract
+          // current date since not leave enddate provided here
+          const endDateMonth = CurrentDate.getMonth();
           const leaveEndDate = moment(CurrentDate);
           const contractStartDate = moment(contract.contractStartDate);
           let monthOnContract = leaveEndDate.diff(contractStartDate, 'months');
@@ -276,8 +297,17 @@ ${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateStri
           if (monthOnContract === 0) {
             accruedAnnualLeave = 0;
           } else {
-            // accruedAnnualLeave = currentMonth * 1.75;
-            accruedAnnualLeave = Math.trunc(monthOnContract * 1.75);
+            // acrue anual leave basing calender yr if current yr diff frm contract start yr
+            // eslint-disable-next-line no-lonely-if
+            if (moment(CurrentDate).isAfter(contractStartDate, 'year')) {
+              if (endDateMonth === 0) {
+                accruedAnnualLeave = 0;
+              } else {
+                accruedAnnualLeave = Math.trunc(endDateMonth * 1.75);
+              }
+            } else {
+              accruedAnnualLeave = Math.trunc(monthOnContract * 1.75);
+            }
           }
         }
         const { annualLeaveBF } = user;
@@ -309,7 +339,8 @@ ${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateStri
           const totalPaternity = paternityLeaveTaken + daysDetails.totalDays;
           if (paternity < totalPaternity) {
             return res.status(400).json({
-              message: 'You Dont have enough Paternity Leave days',
+              message:
+                'You Dont have enough Paternity Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               paternityLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalPaternity,
@@ -328,7 +359,8 @@ ${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateStri
           const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalHome;
           if (chk1) {
             return res.status(400).json({
-              message: 'You Dont have enough Annual Leave days',
+              message:
+                'You Dont have enough Annual Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               annualLeaveTaken,
               homeLeaveTaken,
               daysRequested: daysDetails.totalDays,
@@ -345,7 +377,8 @@ ${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateStri
           const totalMaternity = maternityLeaveTaken + daysDetails.totalDays;
           if (maternity < totalMaternity) {
             return res.status(400).json({
-              message: 'You Dont have enough Maternity Leave days',
+              message:
+                'You Dont have enough Maternity Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               maternityLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalMaternity,
@@ -356,7 +389,8 @@ ${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateStri
           const totalSick = sickLeaveTaken + daysDetails.totalDays;
           if (sick < totalSick) {
             return res.status(400).json({
-              message: 'You Dont have enough Sick Leave days',
+              message:
+                'You Dont have enough Sick Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               sickLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalSick,
@@ -367,7 +401,8 @@ ${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateStri
           const totalUnpaid = unPaidLeaveTaken + daysDetails.totalDays;
           if (unpaid < totalUnpaid) {
             return res.status(400).json({
-              message: 'You Dont have enough Unpaid Leave days',
+              message:
+                'You Dont have enough Unpaid Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               unPaidLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalUnpaid,
@@ -378,7 +413,8 @@ ${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateStri
           const totalStudy = studyLeaveTaken + daysDetails.totalDays;
           if (study < totalStudy) {
             return res.status(400).json({
-              message: 'You Dont have enough Study Leave days',
+              message:
+                'You Dont have enough Study Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               studyLeaveTaken,
               daysRequested: daysDetails.totalDays,
               totalStudy,
@@ -392,7 +428,8 @@ ${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateStri
           const chk1 = totalAcruedAnualLeavePlusAnualLeaveBF < totalAnnual;
           if (chk1) {
             return res.status(400).json({
-              message: 'You Dont have enough Annual Leave days',
+              message:
+                'You Dont have enough Annual Leave days. Please check your Planned leaves to ensure your days are not tied up in planning.',
               annualLeaveTaken,
               homeLeaveTaken,
               daysRequested: daysDetails.totalDays,
@@ -421,8 +458,31 @@ ${user.fName}  ${user.lName} is requesting to be off from ${startDate.toDateStri
             },
           }
         );
+        const leaveRemade = {
+          _id: leaveToTake._id,
+          startDate,
+          endDate,
+          type,
+          staff: {
+            email: user.email,
+            fName: user.fName,
+            lName: user.lName,
+          },
+          supervisorEmail: user.supervisorEmail,
+          comment,
+          status: leaveToTake.status,
+          programId,
+          program: Leaveprogram,
+          programShortForm: LeaveprogramShortForm,
+          leaveDays: daysDetails.leaveDays,
+          daysTaken: daysDetails.totalDays,
+          weekendDays: daysDetails.weekendDays,
+          publicHolidays: daysDetails.holidayDays,
+        };
+
         res.status(200).json({
           message: 'Leave has been Modified successfully.',
+          leave: leaveRemade,
         });
       } else {
         return res.status(400).json({
