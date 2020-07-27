@@ -31,6 +31,8 @@ const getLoggedInUser = async (req, res) => {
     const userProgram = await Program.findOne({
       _id: programId,
     });
+    let operationsLead = false;
+    let programManager = false;
 
     if (!userProgram) {
       program = null;
@@ -39,6 +41,12 @@ const getLoggedInUser = async (req, res) => {
     } else {
       program = userProgram.name;
       programShortForm = userProgram.shortForm;
+      if (user._id.equals(userProgram.programManagerId)) {
+        programManager = true;
+      }
+      if (user._id.equals(userProgram.operationsLeadId)) {
+        operationsLead = true;
+      }
     }
 
     const {
@@ -46,7 +54,6 @@ const getLoggedInUser = async (req, res) => {
       fName,
       lName,
       gender,
-      roles,
       title,
       birthDate,
       oNames,
@@ -63,6 +70,30 @@ const getLoggedInUser = async (req, res) => {
       active,
       email,
     } = user;
+
+    const {
+      admin,
+      ordinary,
+      hr,
+      supervisor,
+      countryDirector,
+      deputyCountryDirector,
+      procurementAdmin,
+      financeAdmin,
+    } = user.roles;
+
+    const roles = {
+      admin,
+      ordinary,
+      hr,
+      supervisor,
+      countryDirector,
+      deputyCountryDirector,
+      procurementAdmin,
+      financeAdmin,
+      programManager,
+      operationsLead,
+    };
 
     const unReadNotifications = user.notifications;
 
