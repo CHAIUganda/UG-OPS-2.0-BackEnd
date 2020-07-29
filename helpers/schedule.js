@@ -5,8 +5,10 @@ const plannedLeaves = require('../controller/leave/scheduled/plannedLeaves');
 const birthDays = require('../controller/hr/scheduled/birthDays');
 const contractRenewalInvite = require('../controller/hr/scheduled/contractRenewalInvite');
 const workPermitRenewalReminder = require('../controller/hr/scheduled/workPermitRenewalReminder');
-const handleContractStatus = require('../controller/hr/scheduled/handleContractStatus');
-const handleWPStatus = require('../controller/hr/scheduled/handleWPStatus');
+const ExpireContractStatus = require('../controller/hr/scheduled/ExpireContractStatus');
+const ActivateContractStatus = require('../controller/hr/scheduled/ActivateContractStatus');
+const ExpireWPStatus = require('../controller/hr/scheduled/ExpireWPStatus');
+const ActivateWPStatus = require('../controller/hr/scheduled/ActivateWPStatus');
 const handleSnoozedContractNotifications = require('../controller/hr/scheduled/handleSnoozedContractNotifications');
 const handleSnoozedWPNotifications = require('../controller/hr/scheduled/handleSnoozedWPNotifications');
 
@@ -35,9 +37,11 @@ const schedule = new CronJob(
     // sends BD wishes on people's BDS
     birthDays();
     // activates or deactivates contract when date comes
-    handleContractStatus();
+    ExpireContractStatus();
+    ActivateContractStatus();
     // activates or deactivates WorkPermits when date comes
-    handleWPStatus();
+    ExpireWPStatus();
+    ActivateWPStatus();
 
     // un snoozes snoozed contract notifications after 32 days
     handleSnoozedContractNotifications();
