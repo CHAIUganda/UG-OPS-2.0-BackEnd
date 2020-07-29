@@ -3,18 +3,9 @@
 const mongoose = require('mongoose');
 
 const ProcurementSchema = mongoose.Schema({
-  pId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: false,
-  },
-  gId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: false,
-  },
-  objectCode: {
-    type: String,
-    required: false,
-  },
+  pId: [mongoose.Schema.Types.ObjectId],
+  gId: [mongoose.Schema.Types.ObjectId],
+  objectiveId: [mongoose.Schema.Types.ObjectId],
   staffId: {
     type: mongoose.Schema.Types.ObjectId,
     required: false,

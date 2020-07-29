@@ -19,6 +19,7 @@ const ProjectSchema = mongoose.Schema({
     type: String,
     required: false,
   },
+  objectives: [mongoose.Schema.Types.ObjectId],
 });
 
 // export model Project with ProjectSchema

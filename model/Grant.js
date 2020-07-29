@@ -19,6 +19,7 @@ const GrantSchema = mongoose.Schema({
     type: String,
     required: false,
   },
+  projects: [mongoose.Schema.Types.ObjectId],
 });
 
 // export model Grant with GrantSchema

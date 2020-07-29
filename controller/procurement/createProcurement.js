@@ -21,7 +21,7 @@ const createProcurement = async (req, res) => {
   const {
     pId,
     gId,
-    objectCode,
+    objectiveId,
     staffId,
     category,
     descOfOther,
@@ -87,7 +87,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
     const procurementRemade = new Procurement({
       pId,
       gId,
-      objectCode,
+      objectiveId,
       staffId,
       category,
       descOfOther,
@@ -135,7 +135,7 @@ ${user.fName}  ${user.lName} has sent in a Procurement Request. Please Login int
       _id: procurementRemade._id,
       pId,
       gId,
-      objectCode,
+      objectiveId,
       staffId,
       category,
       descOfOther,

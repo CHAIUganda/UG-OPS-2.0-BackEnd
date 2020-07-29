@@ -6,96 +6,96 @@ const LeaveSchema = mongoose.Schema({
   startDate: {
     // datetime format new Date("2016-05-22T10:05:44")
     type: Date,
-    required: true
+    required: true,
     // default: Date.now()
   },
   endDate: {
     // datetime formatnew Date("2016-05-22T10:05:44")
     type: Date,
-    required: true
+    required: true,
   },
   type: {
     // STUDY, ANNUAL ..... HOME
     type: String,
-    required: true
+    required: true,
   },
   staff: {
     email: {
       type: String,
-      required: true
+      required: true,
     },
     fName: {
       type: String,
-      required: true
+      required: true,
     },
     lName: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   supervisorEmail: {
     type: String,
-    required: true
+    required: true,
   },
   status: {
     // can be planned, pending, cancelled, rejected approved taken nottaken
     type: String,
     required: true,
-    text: true
+    text: true,
   },
   comment: {
     // Comments/Description   optional on application
     type: String,
-    required: false
+    required: false,
   },
   programId: {
     // operations  Vaccines etc
     type: mongoose.Schema.Types.ObjectId,
-    required: false
+    required: false,
   },
 
   rejectionReason: {
     // optional reason why supervisor o countyDirector rejeccted
     type: String,
-    required: false
+    required: false,
   },
   isModfied: {
     // To track is leave has been modified
     type: Boolean,
-    default: false
+    default: false,
   },
   takenPending: {
     startDate: {
       // datetime format new Date("2016-05-22T10:05:44")
       type: Date,
-      required: false
+      required: false,
       // default: Date.now()
     },
     endDate: {
       // datetime formatnew Date("2016-05-22T10:05:44")
       type: Date,
-      required: false
+      required: false,
     },
     comment: {
       // Comments/Description   optional on application
       type: String,
-      required: false
+      required: false,
     },
     type: {
       // Comments/Description   optional on application
       type: String,
-      required: false
+      required: false,
     },
     rejectionReason: {
       // optional reason why supervisor o countyDirector rejeccted
       type: String,
-      required: false
+      required: false,
     },
     status: {
       // optional reason why supervisor o countyDirector rejeccted
       type: String,
-      required: false
-    }
+      required: false,
+    },
   },
   modificationDetails: {
     modLeaves: [
@@ -103,10 +103,10 @@ const LeaveSchema = mongoose.Schema({
         startDate: Date,
         endDate: Date,
         comment: String,
-        typ: String
-      }
-    ]
-  }
+        typ: String,
+      },
+    ],
+  },
 });
 
 // export model leave with LeaveSchema

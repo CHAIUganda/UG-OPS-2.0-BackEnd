@@ -19,6 +19,11 @@ const ObjectiveSchema = mongoose.Schema({
     type: String,
     required: false,
   },
+  projectId: {
+    // project the objective belogs to
+    type: mongoose.Schema.Types.ObjectId,
+    required: false,
+  },
 });
 
 // export model Objective with ObjectiveSchema

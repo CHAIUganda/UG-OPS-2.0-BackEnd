@@ -23,7 +23,7 @@ router.post(
     check('gId', 'Please Enter a Grant where the request belongs')
       .not()
       .isEmpty(),
-    check('objectCode', 'Please Enter the ObjectCode').not().isEmpty(),
+    check('objectiveId', 'Please Enter the objectiveCode').not().isEmpty(),
     check('staffId', 'Please Enter the staff requesting').not().isEmpty(),
     check('category', 'Please Enter the category of the request')
       .not()
