@@ -21,7 +21,6 @@ const ProgramSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     required: false,
   },
-  projects: [mongoose.Schema.Types.ObjectId],
 });
 
 // export model Program with ProgramSchema

@@ -1,7 +1,9 @@
 const { validationResult } = require('express-validator');
+const mongoose = require('mongoose');
 const debug = require('debug')('leave-controller');
 const errorToString = require('../../helpers/errorToString');
 const Objective = require('../../model/Objective');
+const Program = require('../../model/Program');
 
 const editObjective = async (req, res) => {
   const errors = validationResult(req);
@@ -17,7 +19,7 @@ const editObjective = async (req, res) => {
 
   // prettier-ignore
   // eslint-disable-next-line object-curly-newline
-  let { objectiveCode, status, name, description } = req.body;
+  let { objectiveCode, status, programId } = req.body;
 
   try {
     const objective = await Objective.findOne({
@@ -35,11 +37,27 @@ const editObjective = async (req, res) => {
     if (status == null) {
       status = objective.status;
     }
-    if (name == null) {
-      name = objective.name;
+    if (programId == null) {
+      programId = objective.programId;
     }
-    if (description == null) {
-      description = objective.description;
+    let objectiveProgram;
+    let objectiveProgramShortForm;
+    if (mongoose.Types.ObjectId.isValid(programId)) {
+      const program = await Program.findOne({
+        _id: programId,
+      });
+      if (!program) {
+        programId = null;
+        objectiveProgram = null;
+        objectiveProgramShortForm = null;
+      } else {
+        objectiveProgram = program.name;
+        objectiveProgramShortForm = program.shortForm;
+      }
+    } else {
+      programId = null;
+      objectiveProgram = null;
+      objectiveProgramShortForm = null;
     }
 
     // modify Objective
@@ -52,8 +70,7 @@ const editObjective = async (req, res) => {
         $set: {
           objectiveCode,
           status,
-          name,
-          description,
+          programId,
         },
       }
     );
@@ -63,8 +80,9 @@ const editObjective = async (req, res) => {
       _id: objective._id,
       objectiveCode,
       status,
-      name,
-      description,
+      programId,
+      program: objectiveProgram,
+      programShortForm: objectiveProgramShortForm,
     });
   } catch (err) {
     debug(err.message);

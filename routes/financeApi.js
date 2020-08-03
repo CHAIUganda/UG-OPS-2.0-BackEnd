@@ -15,6 +15,7 @@ router.post(
   '/createGrant',
   [
     check('gId', 'Please Enter a Valid GID for the Grant').not().isEmpty(),
+    check('programId', 'Please Specify the Program Id').not().isEmpty(),
     check('status', 'Please Enter a status for the Grant').not().isEmpty(),
   ],
   financeController.createGrant
@@ -41,7 +42,7 @@ router.post(
  * @description - getGrants.
  * @param - /getGrants
  */
-router.get('/getGrants/:status', financeController.getGrants);
+router.get('/getGrants/:programId/:status', financeController.getGrants);
 
 /**
  * @method - POST
@@ -52,6 +53,7 @@ router.post(
   '/createProject',
   [
     check('pId', 'Please Enter a Valid PID for the project').not().isEmpty(),
+    check('programId', 'Please Specify the Program Id').not().isEmpty(),
     check('status', 'Please Enter a status for the Project').not().isEmpty(),
   ],
   financeController.createProject
@@ -78,7 +80,7 @@ router.post(
  * @description - getProject.
  * @param - /getProjects
  */
-router.get('/getProjects/:status', financeController.getProjects);
+router.get('/getProjects/:programId/:status', financeController.getProjects);
 
 /**
  * @method - POST
@@ -91,6 +93,7 @@ router.post(
     check('objectiveCode', 'Please Enter a Valid Objective Code')
       .not()
       .isEmpty(),
+    check('programId', 'Please Specify the Program Id').not().isEmpty(),
     check('status', 'Please Enter a status for the Objective').not().isEmpty(),
   ],
   financeController.createObjective
@@ -117,7 +120,10 @@ router.post(
  * @description - getObjectives.
  * @param - /getObjectives
  */
-router.get('/getObjectives/:status', financeController.getObjectives);
+router.get(
+  '/getObjectives/:programId/:status',
+  financeController.getObjectives
+);
 
 /**
  * @method - POST
@@ -135,7 +141,7 @@ router.post(
     check('useDecsription', 'Please Enter the account use description')
       .not()
       .isEmpty(),
-    check('status', 'Please a status for the Account').not().isEmpty(),
+    check('status', 'Please enter a status for the Account').not().isEmpty(),
     check(
       'costedWorkPlans',
       'Please a state if the AccountCode is tobe included on CWPs'

@@ -3,15 +3,7 @@
 const mongoose = require('mongoose');
 
 const ObjectiveSchema = mongoose.Schema({
-  name: {
-    type: String,
-    required: false,
-  },
   objectiveCode: {
-    type: String,
-    required: false,
-  },
-  desciption: {
     type: String,
     required: false,
   },
@@ -19,8 +11,8 @@ const ObjectiveSchema = mongoose.Schema({
     type: String,
     required: false,
   },
-  projectId: {
-    // project the objective belogs to
+  programId: {
+    // operations  Vaccines etc
     type: mongoose.Schema.Types.ObjectId,
     required: false,
   },

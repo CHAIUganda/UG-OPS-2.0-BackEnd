@@ -3,15 +3,7 @@
 const mongoose = require('mongoose');
 
 const ProjectSchema = mongoose.Schema({
-  name: {
-    type: String,
-    required: false,
-  },
   pId: {
-    type: String,
-    required: false,
-  },
-  desciption: {
     type: String,
     required: false,
   },
@@ -19,7 +11,11 @@ const ProjectSchema = mongoose.Schema({
     type: String,
     required: false,
   },
-  objectives: [mongoose.Schema.Types.ObjectId],
+  programId: {
+    // operations  Vaccines etc
+    type: mongoose.Schema.Types.ObjectId,
+    required: false,
+  },
 });
 
 // export model Project with ProjectSchema

@@ -1,7 +1,9 @@
 const { validationResult } = require('express-validator');
+const mongoose = require('mongoose');
 const debug = require('debug')('leave-controller');
 const errorToString = require('../../helpers/errorToString');
 const Project = require('../../model/Project');
+const Program = require('../../model/Program');
 
 const editProject = async (req, res) => {
   const errors = validationResult(req);
@@ -17,7 +19,7 @@ const editProject = async (req, res) => {
 
   // prettier-ignore
   // eslint-disable-next-line object-curly-newline
-  let { pId, status, name, description } = req.body;
+  let { pId, status, programId } = req.body;
   try {
     const project = await Project.findOne({
       _id: id,
@@ -34,11 +36,27 @@ const editProject = async (req, res) => {
     if (status == null) {
       status = project.status;
     }
-    if (name == null) {
-      name = project.name;
+    if (programId == null) {
+      programId = project.programId;
     }
-    if (description == null) {
-      description = project.description;
+    let projectProgram;
+    let projectProgramShortForm;
+    if (mongoose.Types.ObjectId.isValid(programId)) {
+      const program = await Program.findOne({
+        _id: programId,
+      });
+      if (!program) {
+        programId = null;
+        projectProgram = null;
+        projectProgramShortForm = null;
+      } else {
+        projectProgram = program.name;
+        projectProgramShortForm = program.shortForm;
+      }
+    } else {
+      programId = null;
+      projectProgram = null;
+      projectProgramShortForm = null;
     }
 
     // modify Project
@@ -51,8 +69,7 @@ const editProject = async (req, res) => {
         $set: {
           pId,
           status,
-          name,
-          description,
+          programId,
         },
       }
     );
@@ -62,8 +79,9 @@ const editProject = async (req, res) => {
       _id: project._id,
       pId,
       status,
-      name,
-      description,
+      programId,
+      program: projectProgram,
+      programShortForm: projectProgramShortForm,
     });
   } catch (err) {
     debug(err.message);

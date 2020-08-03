@@ -1,7 +1,9 @@
 const { validationResult } = require('express-validator');
+const mongoose = require('mongoose');
 const debug = require('debug')('leave-controller');
 const errorToString = require('../../helpers/errorToString');
 const Grant = require('../../model/Grant');
+const Program = require('../../model/Program');
 
 const createGrant = async (req, res) => {
   const errors = validationResult(req);
@@ -15,9 +17,8 @@ const createGrant = async (req, res) => {
   const {
     gId,
     status,
-    name,
-    description
   } = req.body;
+  let { programId } = req.body;
 
   try {
     const grant = await Grant.findOne({
@@ -28,12 +29,29 @@ const createGrant = async (req, res) => {
         message: 'This Grant already exists in the system',
       });
     }
-
+    let Grantprogram;
+    let GrantprogramShortForm;
+    if (mongoose.Types.ObjectId.isValid(programId)) {
+      const program = await Program.findOne({
+        _id: programId,
+      });
+      if (!program) {
+        programId = null;
+        Grantprogram = null;
+        GrantprogramShortForm = null;
+      } else {
+        Grantprogram = program.name;
+        GrantprogramShortForm = program.shortForm;
+      }
+    } else {
+      programId = null;
+      Grantprogram = null;
+      GrantprogramShortForm = null;
+    }
     const granttoSave = new Grant({
       gId,
       status,
-      name,
-      description,
+      programId,
     });
 
     await granttoSave.save();
@@ -42,9 +60,10 @@ const createGrant = async (req, res) => {
       message: 'Grant Created Successfully.',
       _id: granttoSave._id,
       gId,
+      programId,
       status,
-      name,
-      description,
+      program: Grantprogram,
+      programShortForm: GrantprogramShortForm,
     });
   } catch (err) {
     debug(err.message);

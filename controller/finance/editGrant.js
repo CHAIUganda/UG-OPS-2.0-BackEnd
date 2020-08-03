@@ -1,7 +1,9 @@
 const { validationResult } = require('express-validator');
+const mongoose = require('mongoose');
 const debug = require('debug')('leave-controller');
 const errorToString = require('../../helpers/errorToString');
 const Grant = require('../../model/Grant');
+const Program = require('../../model/Program');
 
 const editGrant = async (req, res) => {
   const errors = validationResult(req);
@@ -17,7 +19,7 @@ const editGrant = async (req, res) => {
 
   // prettier-ignore
   // eslint-disable-next-line object-curly-newline
-  let { gId, status, name, description } = req.body;
+  let { gId, status, programId } = req.body;
 
   try {
     const grant = await Grant.findOne({
@@ -34,11 +36,27 @@ const editGrant = async (req, res) => {
     if (status == null) {
       status = grant.status;
     }
-    if (name == null) {
-      name = grant.name;
+    if (programId == null) {
+      programId = grant.programId;
     }
-    if (description == null) {
-      description = grant.description;
+    let Grantprogram;
+    let GrantprogramShortForm;
+    if (mongoose.Types.ObjectId.isValid(programId)) {
+      const program = await Program.findOne({
+        _id: programId,
+      });
+      if (!program) {
+        programId = null;
+        Grantprogram = null;
+        GrantprogramShortForm = null;
+      } else {
+        Grantprogram = program.name;
+        GrantprogramShortForm = program.shortForm;
+      }
+    } else {
+      programId = null;
+      Grantprogram = null;
+      GrantprogramShortForm = null;
     }
 
     // modify Grant
@@ -51,8 +69,7 @@ const editGrant = async (req, res) => {
         $set: {
           gId,
           status,
-          name,
-          description,
+          programId,
         },
       }
     );
@@ -62,8 +79,9 @@ const editGrant = async (req, res) => {
       _id: grant._id,
       gId,
       status,
-      name,
-      description,
+      programId,
+      program: Grantprogram,
+      programShortForm: GrantprogramShortForm,
     });
   } catch (err) {
     debug(err.message);

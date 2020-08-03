@@ -1,7 +1,9 @@
 const { validationResult } = require('express-validator');
+const mongoose = require('mongoose');
 const debug = require('debug')('leave-controller');
 const errorToString = require('../../helpers/errorToString');
 const Project = require('../../model/Project');
+const Program = require('../../model/Program');
 
 const createProject = async (req, res) => {
   const errors = validationResult(req);
@@ -15,9 +17,8 @@ const createProject = async (req, res) => {
   const {
     pId,
     status,
-    name,
-    description
   } = req.body;
+  let { programId } = req.body;
 
   try {
     const project = await Project.findOne({
@@ -28,12 +29,30 @@ const createProject = async (req, res) => {
         message: 'This Project already exists in the system',
       });
     }
+    let projectProgram;
+    let projectProgramShortForm;
+    if (mongoose.Types.ObjectId.isValid(programId)) {
+      const program = await Program.findOne({
+        _id: programId,
+      });
+      if (!program) {
+        programId = null;
+        projectProgram = null;
+        projectProgramShortForm = null;
+      } else {
+        projectProgram = program.name;
+        projectProgramShortForm = program.shortForm;
+      }
+    } else {
+      programId = null;
+      projectProgram = null;
+      projectProgramShortForm = null;
+    }
 
     const projecttoSave = new Project({
       pId,
       status,
-      name,
-      description,
+      programId,
     });
 
     await projecttoSave.save();
@@ -42,9 +61,10 @@ const createProject = async (req, res) => {
       message: 'Project Created Successfully.',
       _id: projecttoSave._id,
       pId,
+      programId,
       status,
-      name,
-      description,
+      program: projectProgram,
+      programShortForm: projectProgramShortForm,
     });
   } catch (err) {
     debug(err.message);
