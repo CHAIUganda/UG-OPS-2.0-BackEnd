@@ -17,8 +17,8 @@ const createAccount = async (req, res) => {
     financialGrouping,
     description,
     useDecsription,
-    status,
   } = req.body;
+  const status = 'Active';
 
   let { costedWorkPlans, quickBooks, usedInCountry } = req.body;
 

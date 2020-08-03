@@ -16,7 +16,6 @@ router.post(
   [
     check('gId', 'Please Enter a Valid GID for the Grant').not().isEmpty(),
     check('programId', 'Please Specify the Program Id').not().isEmpty(),
-    check('status', 'Please Enter a status for the Grant').not().isEmpty(),
   ],
   financeController.createGrant
 );
@@ -54,7 +53,6 @@ router.post(
   [
     check('pId', 'Please Enter a Valid PID for the project').not().isEmpty(),
     check('programId', 'Please Specify the Program Id').not().isEmpty(),
-    check('status', 'Please Enter a status for the Project').not().isEmpty(),
   ],
   financeController.createProject
 );
@@ -141,7 +139,6 @@ router.post(
     check('useDecsription', 'Please Enter the account use description')
       .not()
       .isEmpty(),
-    check('status', 'Please enter a status for the Account').not().isEmpty(),
     check(
       'costedWorkPlans',
       'Please a state if the AccountCode is tobe included on CWPs'

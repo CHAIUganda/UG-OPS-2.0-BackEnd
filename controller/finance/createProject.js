@@ -16,8 +16,8 @@ const createProject = async (req, res) => {
   // prettier-ignore
   const {
     pId,
-    status,
   } = req.body;
+  const status = 'Active';
   let { programId } = req.body;
 
   try {

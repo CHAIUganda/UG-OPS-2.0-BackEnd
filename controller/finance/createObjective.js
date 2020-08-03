@@ -16,8 +16,8 @@ const createObjective = async (req, res) => {
   // prettier-ignore
   const {
     objectiveCode,
-    status,
   } = req.body;
+  const status = 'Active';
 
   let { programId } = req.body;
 

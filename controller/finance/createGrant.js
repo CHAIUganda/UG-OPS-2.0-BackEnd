@@ -16,10 +16,9 @@ const createGrant = async (req, res) => {
   // prettier-ignore
   const {
     gId,
-    status,
   } = req.body;
   let { programId } = req.body;
-
+  const status = 'Active';
   try {
     const grant = await Grant.findOne({
       gId,
