@@ -61,6 +61,12 @@ const ProcurementSchema = mongoose.Schema({
           required: false,
         },
       },
+      additionalSupportnDocs: [
+        {
+          name: String,
+          path: String,
+        },
+      ],
     },
     carHire: {
       item: [
@@ -104,6 +110,12 @@ const ProcurementSchema = mongoose.Schema({
         type: String,
         required: false,
       },
+      additionalSupportnDocs: [
+        {
+          name: String,
+          path: String,
+        },
+      ],
     },
     stationary: {
       item: [
@@ -129,6 +141,12 @@ const ProcurementSchema = mongoose.Schema({
         type: String,
         required: false,
       },
+      additionalSupportnDocs: [
+        {
+          name: String,
+          path: String,
+        },
+      ],
     },
     conferenceFacilities: {
       meetingDuraton: {
@@ -160,6 +178,12 @@ const ProcurementSchema = mongoose.Schema({
         type: String,
         required: false,
       },
+      additionalSupportnDocs: [
+        {
+          name: String,
+          path: String,
+        },
+      ],
     },
     accomodation: {
       guestNames: [String],
@@ -195,6 +219,12 @@ const ProcurementSchema = mongoose.Schema({
           required: false,
         },
       },
+      additionalSupportnDocs: [
+        {
+          name: String,
+          path: String,
+        },
+      ],
     },
     dataCollectors: {
       dateOfOrientation: {
@@ -218,6 +248,12 @@ const ProcurementSchema = mongoose.Schema({
         type: String,
         required: false,
       },
+      additionalSupportnDocs: [
+        {
+          name: String,
+          path: String,
+        },
+      ],
     },
     computerAndAccessories: {
       item: [
@@ -247,6 +283,12 @@ const ProcurementSchema = mongoose.Schema({
           required: false,
         },
       },
+      additionalSupportnDocs: [
+        {
+          name: String,
+          path: String,
+        },
+      ],
     },
     medicalEquipment: {
       item: [
@@ -264,6 +306,12 @@ const ProcurementSchema = mongoose.Schema({
         type: String,
         required: false,
       },
+      additionalSupportnDocs: [
+        {
+          name: String,
+          path: String,
+        },
+      ],
     },
     other: {
       item: [
@@ -293,104 +341,59 @@ const ProcurementSchema = mongoose.Schema({
           required: false,
         },
       },
+      additionalSupportnDocs: [
+        {
+          name: String,
+          path: String,
+        },
+      ],
     },
   },
-  additionalSupportnDocs: [
+  response: [
     {
-      name: String,
-      desc: String,
-      path: String,
+      requires3Quote: Boolean,
+      recommendedVendor: mongoose.Schema.Types.ObjectId,
+      recommendedVendorJustification: String,
+      quotations: {
+        quote1: {
+          vendor: mongoose.Schema.Types.ObjectId,
+          price: String,
+          available: String,
+          dates: String,
+          quoteFile: {
+            name: String,
+            path: String,
+          },
+        },
+        quote2: {
+          vendor: mongoose.Schema.Types.ObjectId,
+          price: String,
+          available: String,
+          dates: String,
+          quoteFile: {
+            name: String,
+            path: String,
+          },
+        },
+        quote3: {
+          vendor: mongoose.Schema.Types.ObjectId,
+          price: String,
+          available: String,
+          dates: String,
+          quoteFile: {
+            name: String,
+            path: String,
+          },
+        },
+      },
+      choosenQuote: {
+        // can be quote1 quote2 quote3
+        quoteNumber: String,
+        // comment required if choose diff from recommended
+        comment: String,
+      },
     },
   ],
-  response: {
-    requires3Quote: {
-      type: Boolean,
-      default: false,
-    },
-    recommendedVendor: {
-      // quote1
-      type: String,
-      required: false,
-    },
-    recommendedVendorJustification: {
-      type: String,
-      required: false,
-    },
-    quotations: {
-      quote1: {
-        vendor: {
-          type: mongoose.Schema.Types.ObjectId,
-          required: false,
-        },
-        price: {
-          type: String,
-          required: false,
-        },
-        available: {
-          type: String,
-          required: false,
-        },
-        dates: {
-          type: String,
-          required: false,
-        },
-      },
-      quote2: {
-        vendor: {
-          type: mongoose.Schema.Types.ObjectId,
-          required: false,
-        },
-        price: {
-          type: String,
-          required: false,
-        },
-        available: {
-          type: String,
-          required: false,
-        },
-        dates: {
-          type: String,
-          required: false,
-        },
-      },
-      quote3: {
-        vendor: {
-          type: mongoose.Schema.Types.ObjectId,
-          required: false,
-        },
-        price: {
-          type: String,
-          required: false,
-        },
-        available: {
-          type: String,
-          required: false,
-        },
-        dates: {
-          type: String,
-          required: false,
-        },
-      },
-    },
-    quoteFiles: [
-      {
-        name: String,
-        path: String,
-      },
-    ],
-    choosenQuote: {
-      quoteNumber: {
-        // can be quote1 quote2 quote3
-        type: String,
-        required: false,
-      },
-      comment: {
-        // comment required if choose diff from recommended
-        type: String,
-        required: false,
-      },
-    },
-  },
   localPurchaseOrder: {
     reference: {
       type: String,

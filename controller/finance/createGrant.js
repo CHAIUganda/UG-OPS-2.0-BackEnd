@@ -20,14 +20,6 @@ const createGrant = async (req, res) => {
   let { programId } = req.body;
   const status = 'Active';
   try {
-    const grant = await Grant.findOne({
-      gId,
-    });
-    if (grant) {
-      return res.status(400).json({
-        message: 'This Grant already exists in the system',
-      });
-    }
     let Grantprogram;
     let GrantprogramShortForm;
     if (mongoose.Types.ObjectId.isValid(programId)) {
@@ -47,25 +39,48 @@ const createGrant = async (req, res) => {
       Grantprogram = null;
       GrantprogramShortForm = null;
     }
-    const granttoSave = new Grant({
-      gId,
-      status,
-      programId,
-    });
 
-    await granttoSave.save();
+    const gIds = [];
+    const recurseProcessLeave = async (controller, arr) => {
+      if (controller < arr.length) {
+        // eslint-disable-next-line object-curly-newline
+        const grant = await Grant.findOne({
+          gId: arr[controller],
+        });
+        if (grant) {
+          recurseProcessLeave(controller + 1, arr);
+        } else {
+          const granttoSave = new Grant({
+            gId: arr[controller],
+            status,
+            programId,
+          });
 
-    res.status(201).json({
-      message: 'Grant Created Successfully.',
-      _id: granttoSave._id,
-      gId,
-      programId,
-      status,
-      program: Grantprogram,
-      programShortForm: GrantprogramShortForm,
-    });
+          await granttoSave.save();
+
+          const grantRemade = {
+            _id: granttoSave._id,
+            gId: arr[controller],
+            status,
+            programId,
+            program: Grantprogram,
+            programShortForm: GrantprogramShortForm,
+          };
+
+          gIds.push(grantRemade);
+          recurseProcessLeave(controller + 1, arr);
+        }
+      } else {
+        res.status(201).json({
+          message: 'Created Successfully.',
+          gIds,
+        });
+      }
+    };
+    await recurseProcessLeave(0, gId);
   } catch (err) {
     debug(err.message);
+    console.log(err.message);
     res.status(500).json({
       message: 'Error Creating Grant',
     });

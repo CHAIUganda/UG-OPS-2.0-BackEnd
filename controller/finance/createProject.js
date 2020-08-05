@@ -21,14 +21,6 @@ const createProject = async (req, res) => {
   let { programId } = req.body;
 
   try {
-    const project = await Project.findOne({
-      pId,
-    });
-    if (project) {
-      return res.status(400).json({
-        message: 'This Project already exists in the system',
-      });
-    }
     let projectProgram;
     let projectProgramShortForm;
     if (mongoose.Types.ObjectId.isValid(programId)) {
@@ -49,23 +41,44 @@ const createProject = async (req, res) => {
       projectProgramShortForm = null;
     }
 
-    const projecttoSave = new Project({
-      pId,
-      status,
-      programId,
-    });
+    const pIds = [];
+    const recurseProcessLeave = async (controller, arr) => {
+      if (controller < arr.length) {
+        // eslint-disable-next-line object-curly-newline
+        const project = await Project.findOne({
+          pId: arr[controller],
+        });
+        if (project) {
+          recurseProcessLeave(controller + 1, arr);
+        } else {
+          const projecttoSave = new Project({
+            pId: arr[controller],
+            status,
+            programId,
+          });
 
-    await projecttoSave.save();
+          await projecttoSave.save();
 
-    res.status(201).json({
-      message: 'Project Created Successfully.',
-      _id: projecttoSave._id,
-      pId,
-      programId,
-      status,
-      program: projectProgram,
-      programShortForm: projectProgramShortForm,
-    });
+          const projectRemade = {
+            _id: projecttoSave._id,
+            pId: arr[controller],
+            status,
+            programId,
+            program: projectProgram,
+            programShortForm: projectProgramShortForm,
+          };
+
+          pIds.push(projectRemade);
+          recurseProcessLeave(controller + 1, arr);
+        }
+      } else {
+        res.status(201).json({
+          message: 'Created Successfully.',
+          pIds,
+        });
+      }
+    };
+    await recurseProcessLeave(0, pId);
   } catch (err) {
     debug(err.message);
     res.status(500).json({

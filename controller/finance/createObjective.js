@@ -22,14 +22,6 @@ const createObjective = async (req, res) => {
   let { programId } = req.body;
 
   try {
-    const objective = await Objective.findOne({
-      objectiveCode,
-    });
-    if (objective) {
-      return res.status(400).json({
-        message: 'This Objective already exists in the system',
-      });
-    }
     let objectiveProgram;
     let objectiveProgramShortForm;
     if (mongoose.Types.ObjectId.isValid(programId)) {
@@ -50,23 +42,44 @@ const createObjective = async (req, res) => {
       objectiveProgramShortForm = null;
     }
 
-    const objectivetoSave = new Objective({
-      objectiveCode,
-      programId,
-      status,
-    });
+    const objectiveCodes = [];
+    const recurseProcessLeave = async (controller, arr) => {
+      if (controller < arr.length) {
+        // eslint-disable-next-line object-curly-newline
+        const objective = await Objective.findOne({
+          objectiveCode: arr[controller],
+        });
+        if (objective) {
+          recurseProcessLeave(controller + 1, arr);
+        } else {
+          const objectivetoSave = new Objective({
+            objectiveCode: arr[controller],
+            status,
+            programId,
+          });
 
-    await objectivetoSave.save();
+          await objectivetoSave.save();
 
-    res.status(201).json({
-      message: 'Objective Created Successfully.',
-      _id: objectivetoSave._id,
-      objectiveCode,
-      programId,
-      status,
-      program: objectiveProgram,
-      programShortForm: objectiveProgramShortForm,
-    });
+          const objectiveRemade = {
+            _id: objectivetoSave._id,
+            pId: arr[controller],
+            status,
+            programId,
+            program: objectiveProgram,
+            programShortForm: objectiveProgramShortForm,
+          };
+
+          objectiveCodes.push(objectiveRemade);
+          recurseProcessLeave(controller + 1, arr);
+        }
+      } else {
+        res.status(201).json({
+          message: 'Created Successfully.',
+          objectiveCodes,
+        });
+      }
+    };
+    await recurseProcessLeave(0, objectiveCode);
   } catch (err) {
     debug(err.message);
     res.status(500).json({

@@ -92,7 +92,6 @@ router.post(
       .not()
       .isEmpty(),
     check('programId', 'Please Specify the Program Id').not().isEmpty(),
-    check('status', 'Please Enter a status for the Objective').not().isEmpty(),
   ],
   financeController.createObjective
 );
