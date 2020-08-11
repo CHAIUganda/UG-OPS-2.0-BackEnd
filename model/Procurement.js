@@ -12,7 +12,7 @@ const ProcurementSchema = mongoose.Schema({
   },
   category: [String],
   descOfOther: {
-    // if categories include other then decs needed.
+    // if categories include other then decs of other needed.
     type: String,
     required: false,
   },
@@ -32,331 +32,249 @@ const ProcurementSchema = mongoose.Schema({
   },
   keyActivitiesAsPerWp: [String],
   specifications: {
-    printingArtAndDesign: {
-      item: [
-        {
-          quantityToPrint: String,
-          description: String,
-          moreDetailsIfdesignNeeded: String,
-          sampleNeed: Boolean,
-          colourNeeded: String,
-          typeOfBinding: String,
-          typeOfPaper: String,
-          paperSize: String,
+    printingArtAndDesign: [
+      {
+        quantityToPrint: Number,
+        description: String,
+        moreDetailsIfdesignNeeded: String,
+        sampleNeed: Boolean,
+        colourNeeded: String,
+        typeOfBinding: String,
+        typeOfPaper: String,
+        paperSize: String,
+        accountCode: String,
+        datesNeeded: {
+          from: Date,
+          to: Date,
         },
-      ],
-      accountCode: {
-        type: String,
-        required: false,
+        status: String,
+        rejectionReason: String,
+        isModfied: Boolean,
+        additionalSupportnDocs: [
+          {
+            name: String,
+            path: String,
+          },
+        ],
       },
-      datesNeeded: {
-        from: {
+    ],
+
+    carHire: [
+      {
+        typeOfCar: String,
+        numberOfCars: Number,
+        districtsToVisit: [String],
+        durationOfTrip: {
+          daysNo: Number,
+          nightsNo: Number,
+        },
+        pickUpTime: String,
+        pickUpLocation: String,
+        accountCode: String,
+        datesNeeded: {
           // datetime format  2020-05-18
-          type: Date,
-          required: false,
+          from: Date,
+          to: Date,
         },
-        to: {
+        status: String,
+        rejectionReason: String,
+        isModfied: Boolean,
+        additionalSupportnDocs: [
+          {
+            name: String,
+            path: String,
+          },
+        ],
+      },
+    ],
+    stationary: [
+      {
+        name: String,
+        desc: String,
+        quantity: String,
+        accountCode: String,
+        datesNeeded: {
           // datetime format  2020-05-18
-          type: Date,
-          required: false,
+          from: Date,
+          to: Date,
         },
+        status: String,
+        rejectionReason: String,
+        isModfied: Boolean,
+        additionalSupportnDocs: [
+          {
+            name: String,
+            path: String,
+          },
+        ],
       },
-      additionalSupportnDocs: [
-        {
-          name: String,
-          path: String,
-        },
-      ],
-    },
-    carHire: {
-      item: [
-        {
-          typeOfCar: String,
-          numberOfCars: String,
-        },
-      ],
-      districtsToVisit: [String],
-      durationOfTrip: {
-        daysNo: {
-          type: Number,
-          required: false,
-        },
-        nightsNo: {
-          type: Number,
-          required: false,
-        },
-      },
-      pickUpTime: {
-        type: String,
-        required: false,
-      },
-      datesNeeded: {
-        from: {
+    ],
+
+    conferenceFacilities: [
+      {
+        meetingDuraton: String,
+        numberOfParticipants: Number,
+        amenitiesRequired: [String],
+        locationOfMeeting: String,
+        accountCode: String,
+        datesNeeded: {
           // datetime format  2020-05-18
-          type: Date,
-          required: false,
+          from: Date,
+          to: Date,
         },
-        to: {
+        status: String,
+        rejectionReason: String,
+        isModfied: Boolean,
+        additionalSupportnDocs: [
+          {
+            name: String,
+            path: String,
+          },
+        ],
+      },
+    ],
+
+    accomodation: [
+      {
+        guestNames: [String],
+        servicesRequired: [String],
+        transport: {
+          transportRequired: Boolean,
           // datetime format  2020-05-18
-          type: Date,
-          required: false,
+          from: Date,
+          to: Date,
         },
-      },
-      pickUpLocation: {
-        type: String,
-        default: false,
-      },
-      accountCode: {
-        type: String,
-        required: false,
-      },
-      additionalSupportnDocs: [
-        {
-          name: String,
-          path: String,
-        },
-      ],
-    },
-    stationary: {
-      item: [
-        {
-          name: String,
-          desc: String,
-          quantity: String,
-        },
-      ],
-      datesNeeded: {
-        from: {
+        meetingDuraton: String,
+        numberOfParticipants: Number,
+        amenitiesRequired: [String],
+        locationOfMeeting: String,
+        accountCode: String,
+        datesNeeded: {
           // datetime format  2020-05-18
-          type: Date,
-          required: false,
+          from: Date,
+          to: Date,
         },
-        to: {
+        status: String,
+        rejectionReason: String,
+        isModfied: Boolean,
+        additionalSupportnDocs: [
+          {
+            name: String,
+            path: String,
+          },
+        ],
+      },
+    ],
+
+    dataCollectors: [
+      {
+        numberOfICsRequired: Number,
+        districtsToVisit: [String],
+        dateOfOrientation: Date,
+        venueOfOrientation: String,
+        specialInstructions: String,
+        accountCode: String,
+        datesNeeded: {
           // datetime format  2020-05-18
-          type: Date,
-          required: false,
+          from: Date,
+          to: Date,
         },
+        status: String,
+        rejectionReason: String,
+        isModfied: Boolean,
+        additionalSupportnDocs: [
+          {
+            name: String,
+            path: String,
+          },
+        ],
       },
-      accountCode: {
-        type: String,
-        required: false,
-      },
-      additionalSupportnDocs: [
-        {
-          name: String,
-          path: String,
-        },
-      ],
-    },
-    conferenceFacilities: {
-      meetingDuraton: {
-        type: String,
-        required: false,
-      },
-      numberOfParticipants: {
-        type: Number,
-        required: false,
-      },
-      datesNeeded: {
-        from: {
+    ],
+
+    computerAndAccessories: [
+      {
+        name: String,
+        descOfSpecs: String,
+        quantity: String,
+        specialInstructions: String,
+        accountCode: String,
+        datesNeeded: {
           // datetime format  2020-05-18
-          type: Date,
-          required: false,
+          from: Date,
+          to: Date,
         },
-        to: {
+        status: String,
+        rejectionReason: String,
+        isModfied: Boolean,
+        additionalSupportnDocs: [
+          {
+            name: String,
+            path: String,
+          },
+        ],
+      },
+    ],
+
+    medicalEquipment: [
+      {
+        equipmentType: String,
+        itemSpecs: String,
+        quantity: String,
+        specialInstructions: String,
+        accountCode: String,
+        datesNeeded: {
           // datetime format  2020-05-18
-          type: Date,
-          required: false,
+          from: Date,
+          to: Date,
         },
+        status: String,
+        rejectionReason: String,
+        isModfied: Boolean,
+        additionalSupportnDocs: [
+          {
+            name: String,
+            path: String,
+          },
+        ],
       },
-      amenitiesRequired: [String],
-      locationOfMeeting: {
-        type: String,
-        required: false,
-      },
-      accountCode: {
-        type: String,
-        required: false,
-      },
-      additionalSupportnDocs: [
-        {
-          name: String,
-          path: String,
-        },
-      ],
-    },
-    accomodation: {
-      guestNames: [String],
-      servicesRequired: [String],
-      transport: {
-        transportRequired: {
-          // if true from and to needed
-          type: Boolean,
-          default: false,
-        },
-        from: {
-          type: String,
-          required: false,
-        },
-        to: {
-          type: String,
-          required: false,
-        },
-      },
-      accountCode: {
-        type: String,
-        required: false,
-      },
-      datesNeeded: {
-        from: {
+    ],
+
+    other: [
+      {
+        name: String,
+        itemSpecs: String,
+        quantity: String,
+        specialInstructions: String,
+        accountCode: String,
+        datesNeeded: {
           // datetime format  2020-05-18
-          type: Date,
-          required: false,
+          from: Date,
+          to: Date,
         },
-        to: {
-          // datetime format  2020-05-18
-          type: Date,
-          required: false,
-        },
+        status: String,
+        rejectionReason: String,
+        isModfied: Boolean,
+        additionalSupportnDocs: [
+          {
+            name: String,
+            path: String,
+          },
+        ],
       },
-      additionalSupportnDocs: [
-        {
-          name: String,
-          path: String,
-        },
-      ],
-    },
-    dataCollectors: {
-      dateOfOrientation: {
-        type: Date,
-        required: false,
-      },
-      numberOfICsRequired: {
-        type: Number,
-        required: false,
-      },
-      districtsToVisit: [String],
-      venueOfOrientation: {
-        type: String,
-        required: false,
-      },
-      specialInstructions: {
-        type: String,
-        required: false,
-      },
-      accountCode: {
-        type: String,
-        required: false,
-      },
-      additionalSupportnDocs: [
-        {
-          name: String,
-          path: String,
-        },
-      ],
-    },
-    computerAndAccessories: {
-      item: [
-        {
-          name: String,
-          descOfSpecs: String,
-          quantity: String,
-        },
-      ],
-      specialInstructions: {
-        type: String,
-        required: false,
-      },
-      accountCode: {
-        type: String,
-        required: false,
-      },
-      datesNeeded: {
-        from: {
-          // datetime format  2020-05-18
-          type: Date,
-          required: false,
-        },
-        to: {
-          // datetime format  2020-05-18
-          type: Date,
-          required: false,
-        },
-      },
-      additionalSupportnDocs: [
-        {
-          name: String,
-          path: String,
-        },
-      ],
-    },
-    medicalEquipment: {
-      item: [
-        {
-          equipmentType: String,
-          itemSpecs: String,
-          quantity: String,
-        },
-      ],
-      specialInstructions: {
-        type: String,
-        required: false,
-      },
-      accountCode: {
-        type: String,
-        required: false,
-      },
-      additionalSupportnDocs: [
-        {
-          name: String,
-          path: String,
-        },
-      ],
-    },
-    other: {
-      item: [
-        {
-          name: String,
-          itemSpecs: String,
-          quantity: String,
-        },
-      ],
-      specialInstructions: {
-        type: String,
-        required: false,
-      },
-      accountCode: {
-        type: String,
-        required: false,
-      },
-      datesNeeded: {
-        from: {
-          // datetime format  2020-05-18
-          type: Date,
-          required: false,
-        },
-        to: {
-          // datetime format  2020-05-18
-          type: Date,
-          required: false,
-        },
-      },
-      additionalSupportnDocs: [
-        {
-          name: String,
-          path: String,
-        },
-      ],
-    },
+    ],
   },
   response: [
     {
+      category: [String],
+      itemIds: [mongoose.Schema.Types.ObjectId],
       requires3Quote: Boolean,
-      recommendedVendor: mongoose.Schema.Types.ObjectId,
+      // string for now  mongoose.Schema.Types.ObjectId
+      recommendedVendor: String,
       recommendedVendorJustification: String,
       quotations: {
         quote1: {
-          vendor: mongoose.Schema.Types.ObjectId,
+          // string for now  mongoose.Schema.Types.ObjectId
+          vendor: String,
           price: String,
           available: String,
           dates: String,
@@ -366,7 +284,7 @@ const ProcurementSchema = mongoose.Schema({
           },
         },
         quote2: {
-          vendor: mongoose.Schema.Types.ObjectId,
+          vendor: String,
           price: String,
           available: String,
           dates: String,
@@ -376,7 +294,7 @@ const ProcurementSchema = mongoose.Schema({
           },
         },
         quote3: {
-          vendor: mongoose.Schema.Types.ObjectId,
+          vendor: String,
           price: String,
           available: String,
           dates: String,
@@ -479,19 +397,6 @@ const ProcurementSchema = mongoose.Schema({
         comments: String,
       },
     ],
-  },
-  status: {
-    type: String,
-    required: true,
-    text: true,
-  },
-  rejectionReason: {
-    type: String,
-    required: false,
-  },
-  isModfied: {
-    type: Boolean,
-    default: false,
   },
   createDate: {
     type: Date,

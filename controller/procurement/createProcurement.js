@@ -32,7 +32,6 @@ const createProcurement = async (req, res) => {
   } = req.body;
   // Pending Procurement Response, Pending Requestor Response, Pending LPO
   // LPO Pending Program Manager, LPO Pending Country Leadership, Approved
-  const status = 'Pending Procurement Response';
   // set timezone to kampala
   let CurrentDate = moment().tz('Africa/Kampala').format();
   CurrentDate = new Date(CurrentDate);
@@ -95,7 +94,6 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
       keyObjAsPerWp,
       keyActivitiesAsPerWp,
       specifications,
-      status,
       createDate: CurrentDate,
     });
     // procurement id saved on staff collection
@@ -110,7 +108,7 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
     // prettier-ignore
     const textProcurementAdmin = `Hello  ${procurementAdmin.fName}, 
 
-${user.fName}  ${user.lName} has sent in a Procurement Request. Please Login into Ugopps to respond to the request.${footer}.
+${user.fName}  ${user.lName} has sent in a Procurement Request. Please Login into Ugops to view more information about the request.${footer}.
                                       `;
 
     Mailer(from, procurementAdmin.email, subject, textProcurementAdmin, '');
@@ -133,22 +131,21 @@ ${user.fName}  ${user.lName} has sent in a Procurement Request. Please Login int
 
     const procurement = {
       _id: procurementRemade._id,
-      pId,
-      gId,
-      objectiveId,
-      staffId,
-      category,
-      descOfOther,
-      priceRange,
-      keyObjAsPerWp,
-      keyActivitiesAsPerWp,
-      specifications,
+      pId: procurementRemade.pId,
+      gId: procurementRemade.gId,
+      objectiveId: procurementRemade.objectiveId,
+      staffId: procurementRemade.staffId,
+      category: procurementRemade.category,
+      descOfOther: procurementRemade.descOfOther,
+      priceRange: procurementRemade.priceRange,
+      keyObjAsPerWp: procurementRemade.keyObjAsPerWp,
+      keyActivitiesAsPerWp: procurementRemade.keyActivitiesAsPerWp,
+      specifications: procurementRemade.specifications,
       staff: {
         email: user.email,
         fName: user.fName,
         lName: user.lName,
       },
-      status,
       programId,
       program,
       programShortForm,

@@ -57,4 +57,19 @@ router.post(
   procurementController.additionSupportnDocsOnRequest
 );
 
+/**
+ * @method - POST
+ * @description - Create a procurement response
+ * @param - /procurementResponse
+ */
+router.post(
+  '/procurementResponse',
+  [
+    // input validations date validation pending
+    check('procurementId', 'Please enter the procurement Id').not().isEmpty(),
+    check('response', 'Please enter a Response').not().isEmpty(),
+  ],
+  procurementController.procurementResponse
+);
+
 module.exports = router;
