@@ -119,6 +119,8 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
         // success
 
         // change procurement details
+        // chkProcurement.response.push(response);
+        // await chkProcurement.save();
         await Procurement.updateOne(
           {
             _id: procurementId,
@@ -153,7 +155,9 @@ The procurement Team has responded to your request. Please Login into Ugops to v
           refType,
           refId
         );
-
+        const updatedProcurement = await Procurement.findOne({
+          _id: procurementId,
+        });
         const {
           pId,
           gId,
@@ -165,10 +169,10 @@ The procurement Team has responded to your request. Please Login into Ugops to v
           keyObjAsPerWp,
           keyActivitiesAsPerWp,
           specifications,
-        } = chkProcurement;
+        } = updatedProcurement;
 
         const procurement = {
-          _id: chkProcurement._id,
+          _id: updatedProcurement._id,
           pId,
           gId,
           objectCode,
@@ -179,7 +183,7 @@ The procurement Team has responded to your request. Please Login into Ugops to v
           keyObjAsPerWp,
           keyActivitiesAsPerWp,
           specifications,
-          response,
+          response: updatedProcurement.response,
           staff: {
             email: requestor.email,
             fName: requestor.fName,

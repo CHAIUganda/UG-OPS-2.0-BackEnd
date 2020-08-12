@@ -49,7 +49,7 @@ const updateItemStatus = async (procurementId, category, ItemId, status) => {
       {
         // eslint-disable-next-line max-len
         $set: {
-          'specifications.stationary.$.status': status,
+          'specifications.stationery.$.status': status,
         },
       }
     );
