@@ -87,7 +87,7 @@ const ProcurementSchema = mongoose.Schema({
         ],
       },
     ],
-    stationary: [
+    stationery: [
       {
         name: String,
         desc: String,

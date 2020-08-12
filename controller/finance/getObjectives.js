@@ -24,7 +24,7 @@ const getObjectives = async (req, res) => {
     const recurseProcessLeave = async (controller, arr) => {
       if (controller < arr.length) {
         // eslint-disable-next-line object-curly-newline
-        const { _id, gId } = arr[controller];
+        const { _id, objectiveCode } = arr[controller];
         const objectiveStatus = arr[controller].status;
         const objectiveProgramId = arr[controller].programId;
 
@@ -46,7 +46,7 @@ const getObjectives = async (req, res) => {
 
         const projectRemade = {
           _id,
-          gId,
+          objectiveCode,
           status: objectiveStatus,
           programId: objectiveProgramId,
           program: objectiveProgram,

@@ -7,6 +7,7 @@ const Procurement = require('../../model/Procurement');
 const User = require('../../model/User');
 const Mailer = require('../../helpers/Mailer');
 const storeNotification = require('../../helpers/storeNotification');
+const updateItemStatus = require('./updateItemStatus');
 
 const procurementResponse = async (req, res) => {
   const errors = validationResult(req);
@@ -91,22 +92,12 @@ Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
           if (ctl < cat.length) {
             const chkItems = async (ctlItem, itm) => {
               if (ctlItem < itm.length) {
-                if (cat[ctl] === 'Printing') {
-                  await Procurement.updateOne(
-                    {
-                      _id: procurementId,
-                      'specifications.printingArtAndDesign._id': itm[ctlItem],
-                    },
-                    {
-                      // eslint-disable-next-line max-len
-                      $set: {
-                        'specifications.printingArtAndDesign.$.status':
-                          'Pending Requestor Response',
-                      },
-                    }
-                  );
-                }
-
+                await updateItemStatus(
+                  procurementId,
+                  cat[ctl],
+                  itm[ctlItem],
+                  status
+                );
                 chkItems(ctlItem + 1, itm);
               } else {
                 // success
@@ -194,7 +185,6 @@ The procurement Team has responded to your request. Please Login into Ugops to v
             fName: requestor.fName,
             lName: requestor.lName,
           },
-          status,
           programId,
           program,
           programShortForm,
