@@ -72,4 +72,14 @@ router.post(
   procurementController.procurementResponse
 );
 
+/**
+ * @method - GET
+ * @description - Get staff Procurements.
+ * @param - /getStaffProcurements
+ */
+router.get(
+  '/getStaffProcurements/:staffId/:status',
+  procurementController.getStaffProcurements
+);
+
 module.exports = router;
