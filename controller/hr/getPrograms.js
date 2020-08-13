@@ -17,7 +17,8 @@ const getPrograms = async (req, res) => {
           operationsLeadId,
           shortForm,
         } = arr[controller];
-
+        // prettier-ignore
+        const status = arr[controller].status == null ? 'Active' : arr[controller].status;
         const userOppsLd = await User.findOne({
           _id: operationsLeadId,
         });
@@ -62,6 +63,7 @@ const getPrograms = async (req, res) => {
           _id,
           name,
           shortForm,
+          status,
           programManagerId,
           programManagerDetails,
           operationsLeadDetails,

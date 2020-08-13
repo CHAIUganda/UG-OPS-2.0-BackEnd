@@ -19,7 +19,7 @@ const editProgram = async (req, res) => {
     shortForm
   } = req.body;
 
-  let { programManagerId, operationsLeadId } = req.body;
+  let { programManagerId, operationsLeadId, status } = req.body;
 
   try {
     const program = await Program.findOne({
@@ -55,6 +55,13 @@ const editProgram = async (req, res) => {
         message: 'Operations Lead does not Exist',
       });
     }
+    if (status == null) {
+      if (program.status == null) {
+        status = 'Active';
+      } else {
+        status = program.status;
+      }
+    }
 
     // modify program
     await Program.updateOne(
@@ -66,6 +73,7 @@ const editProgram = async (req, res) => {
         $set: {
           name,
           shortForm,
+          status,
           programManagerId: user._id,
           operationsLeadId: userOppsLd._id,
         },
@@ -87,6 +95,7 @@ const editProgram = async (req, res) => {
       _id: program._id,
       name,
       shortForm,
+      status,
       programManagerId,
       programManagerDetails,
       operationsLeadDetails,

@@ -8,6 +8,10 @@ const ProgramSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  status: {
+    type: String,
+    required: false,
+  },
   shortForm: {
     // Name of the Program
     type: String,

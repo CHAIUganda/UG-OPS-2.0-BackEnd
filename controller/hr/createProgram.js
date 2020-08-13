@@ -19,6 +19,7 @@ const createProgram = async (req, res) => {
     programManagerId,
     operationsLeadId
   } = req.body;
+  const status = 'Active';
 
   try {
     const user = await User.findOne({
@@ -50,6 +51,7 @@ const createProgram = async (req, res) => {
     const programtoSave = new Program({
       name,
       shortForm,
+      status,
       programManagerId: user._id,
       operationsLeadId: userOppsLd._id,
     });
@@ -70,6 +72,7 @@ const createProgram = async (req, res) => {
       _id: programtoSave._id,
       name,
       shortForm,
+      status,
       programManagerId,
       programManagerDetails,
       operationsLeadDetails,
