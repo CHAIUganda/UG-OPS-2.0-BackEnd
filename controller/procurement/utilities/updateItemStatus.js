@@ -1,11 +1,11 @@
-const Procurement = require('../../model/Procurement');
+const Procurement = require('../../../model/Procurement');
 
-const updateItemStatus = async (procurementId, category, ItemId, status) => {
+const updateItemStatus = async (procurementId, category, itemId, status) => {
   if (category === 'Printing') {
     await Procurement.updateOne(
       {
         _id: procurementId,
-        'specifications.printingArtAndDesign._id': ItemId,
+        'specifications.printingArtAndDesign._id': itemId,
       },
       {
         // eslint-disable-next-line max-len
@@ -18,7 +18,7 @@ const updateItemStatus = async (procurementId, category, ItemId, status) => {
     await Procurement.updateOne(
       {
         _id: procurementId,
-        'specifications.carHire._id': ItemId,
+        'specifications.carHire._id': itemId,
       },
       {
         // eslint-disable-next-line max-len
@@ -31,7 +31,7 @@ const updateItemStatus = async (procurementId, category, ItemId, status) => {
     await Procurement.updateOne(
       {
         _id: procurementId,
-        'specifications.conferenceFacilities._id': ItemId,
+        'specifications.conferenceFacilities._id': itemId,
       },
       {
         // eslint-disable-next-line max-len
@@ -44,7 +44,7 @@ const updateItemStatus = async (procurementId, category, ItemId, status) => {
     await Procurement.updateOne(
       {
         _id: procurementId,
-        'specifications.stationery._id': ItemId,
+        'specifications.stationery._id': itemId,
       },
       {
         // eslint-disable-next-line max-len
@@ -57,7 +57,7 @@ const updateItemStatus = async (procurementId, category, ItemId, status) => {
     await Procurement.updateOne(
       {
         _id: procurementId,
-        'specifications.dataCollectors._id': ItemId,
+        'specifications.dataCollectors._id': itemId,
       },
       {
         // eslint-disable-next-line max-len
@@ -70,7 +70,7 @@ const updateItemStatus = async (procurementId, category, ItemId, status) => {
     await Procurement.updateOne(
       {
         _id: procurementId,
-        'specifications.accomodation._id': ItemId,
+        'specifications.accomodation._id': itemId,
       },
       {
         // eslint-disable-next-line max-len
@@ -79,11 +79,11 @@ const updateItemStatus = async (procurementId, category, ItemId, status) => {
         },
       }
     );
-  } else if (category === 'Medical equipment') {
+  } else if (category === 'Medical Equipment') {
     await Procurement.updateOne(
       {
         _id: procurementId,
-        'specifications.medicalEquipment._id': ItemId,
+        'specifications.medicalEquipment._id': itemId,
       },
       {
         // eslint-disable-next-line max-len
@@ -96,7 +96,7 @@ const updateItemStatus = async (procurementId, category, ItemId, status) => {
     await Procurement.updateOne(
       {
         _id: procurementId,
-        'specifications.computerAndAccessories._id': ItemId,
+        'specifications.computerAndAccessories._id': itemId,
       },
       {
         // eslint-disable-next-line max-len
@@ -109,7 +109,7 @@ const updateItemStatus = async (procurementId, category, ItemId, status) => {
     await Procurement.updateOne(
       {
         _id: procurementId,
-        'specifications.other._id': ItemId,
+        'specifications.other._id': itemId,
       },
       {
         // eslint-disable-next-line max-len

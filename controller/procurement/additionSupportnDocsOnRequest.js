@@ -4,6 +4,7 @@ const moment = require('moment-timezone');
 const { validationResult } = require('express-validator');
 const Procurement = require('../../model/Procurement');
 const errorToString = require('../../helpers/errorToString');
+const storeItemFile = require('./utilities/storeItemFile');
 
 const additionSupportnDocsOnRequest = async (req, res) => {
   try {
@@ -24,7 +25,7 @@ const additionSupportnDocsOnRequest = async (req, res) => {
       });
     } else {
       const data = [];
-      const { procurementId } = req.body;
+      const { procurementId, category, itemId } = req.body;
       // loop all files
 
       const recurseProcessLeave = async (controller, arr) => {
@@ -35,13 +36,12 @@ const additionSupportnDocsOnRequest = async (req, res) => {
           // move addDoc to uploads directory
           // addDoc.mv(`./uploads/supportnDocs/${addDoc.name}`);
           const nm = addDoc.name.split('.');
-          const fileType = 'SupportnDoc';
           const fileex = nm[nm.length - 1];
-          const fileName = `${procurementId}_${moment(CurrentDate).format(
+          const fileLabel = nm[nm.length - 2];
+          const fileName = `${moment(CurrentDate).format(
             'YYYY-MM-DD'
-          )}_${fileType}_${controller + 1}.${fileex}`;
+          )}_${category}_${fileLabel}_${controller + 1}.${fileex}`;
 
-          addDoc.mv(`${__dirname}\\uploads\\supportnDocs\\${fileName}`);
           const procurement = await Procurement.findOne({
             _id: procurementId,
           });
@@ -50,15 +50,13 @@ const additionSupportnDocsOnRequest = async (req, res) => {
               message: 'Procurement Request does not Exist',
             });
           }
-          const additionalSupportnDocs = {
-            // eslint-disable-next-line max-len
-            name: fileName,
-            desc: '',
-            path: `${__dirname}\\uploads\\supportnDocs\\${fileName}`,
-          };
-          // additional supporting docs on a P request are stored in 1 array
-          procurement.additionalSupportnDocs.push(additionalSupportnDocs);
-          await procurement.save();
+          await storeItemFile(
+            addDoc,
+            procurementId,
+            category,
+            itemId,
+            fileName
+          );
 
           // push file details
           data.push({

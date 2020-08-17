@@ -53,6 +53,15 @@ router.post(
     )
       .not()
       .isEmpty(),
+    check(
+      'category',
+      'Please Enter the category where the attached files belong'
+    )
+      .not()
+      .isEmpty(),
+    check('itemId', 'Please Enter the ItemId where the attached files belong')
+      .not()
+      .isEmpty(),
   ],
   procurementController.additionSupportnDocsOnRequest
 );

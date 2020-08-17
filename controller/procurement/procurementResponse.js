@@ -7,7 +7,7 @@ const Procurement = require('../../model/Procurement');
 const User = require('../../model/User');
 const Mailer = require('../../helpers/Mailer');
 const storeNotification = require('../../helpers/storeNotification');
-const updateItemStatus = require('./updateItemStatus');
+const updateItemStatus = require('./utilities/updateItemStatus');
 
 const procurementResponse = async (req, res) => {
   const errors = validationResult(req);
