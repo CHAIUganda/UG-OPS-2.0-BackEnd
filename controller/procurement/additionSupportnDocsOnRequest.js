@@ -3,6 +3,7 @@ const debug = require('debug')('leave-controller');
 const moment = require('moment-timezone');
 const { validationResult } = require('express-validator');
 const Procurement = require('../../model/Procurement');
+const User = require('../../model/User');
 const errorToString = require('../../helpers/errorToString');
 const storeItemFile = require('./utilities/storeItemFile');
 
@@ -26,6 +27,22 @@ const additionSupportnDocsOnRequest = async (req, res) => {
     } else {
       const data = [];
       const { procurementId, category, itemId } = req.body;
+      const procurement = await Procurement.findOne({
+        _id: procurementId,
+      });
+      if (!procurement) {
+        return res.status(400).json({
+          message: 'Procurement Request does not Exist',
+        });
+      }
+      const user = await User.findOne({
+        _id: procurement.staffId,
+      });
+      if (!user) {
+        return res.status(400).json({
+          message: 'User does not Exist',
+        });
+      }
       // loop all files
 
       const recurseProcessLeave = async (controller, arr) => {
@@ -38,18 +55,11 @@ const additionSupportnDocsOnRequest = async (req, res) => {
           const nm = addDoc.name.split('.');
           const fileex = nm[nm.length - 1];
           const fileLabel = nm[nm.length - 2];
+          const requestor = `${user.fName}_${user.lName}`;
           const fileName = `${moment(CurrentDate).format(
             'YYYY-MM-DD'
-          )}_${category}_${fileLabel}_${controller + 1}.${fileex}`;
+          )}_${requestor}_${category}_${fileLabel}_${controller + 1}.${fileex}`;
 
-          const procurement = await Procurement.findOne({
-            _id: procurementId,
-          });
-          if (!procurement) {
-            return res.status(400).json({
-              message: 'Procurement Request does not Exist',
-            });
-          }
           await storeItemFile(
             addDoc,
             procurementId,

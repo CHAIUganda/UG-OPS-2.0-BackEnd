@@ -55,6 +55,13 @@ app.use('/hrApi', authenticationRequired, hrApi);
 app.use('/procurementApi', authenticationRequired, procurementApi);
 app.use('/financeApi', authenticationRequired, financeApi);
 
+// Serves all the request which includes /procurement in the url from Images folder
+app.use(
+  '/procurementResources',
+  authenticationRequired,
+  express.static(`${__dirname}/controller/procurement/uploads`)
+);
+
 // Launch app to listen to specified port
 https
   .createServer(
