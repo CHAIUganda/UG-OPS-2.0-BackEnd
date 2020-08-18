@@ -10,12 +10,12 @@ const storeItemFile = async (
 ) => {
   if (category === 'Printing') {
     // addDoc.mv(`${__dirname}\\uploads\\supportnDocs\\${fileName}`);
-    addDoc.mv(`../uploads/supportnDocs/Printing/${fileName}`);
+    addDoc.mv(`${__dirname}\\..\\uploads\\supportnDocs\\Printing\\${fileName}`);
     const additionalSupportnDocs = {
       // path: `${__dirname}\\uploads\\supportnDocs\\${fileName}`,
       // eslint-disable-next-line max-len
       name: fileName,
-      path: `../uploads/supportnDocs/Printing/${fileName}`,
+      path: `uploads\\supportnDocs\\Printing\\${fileName}`,
     };
     // additional supporting docs on a P request are stored in 1 array
     await Procurement.updateOne(

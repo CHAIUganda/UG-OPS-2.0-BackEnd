@@ -97,6 +97,7 @@ const editProgram = async (req, res) => {
       shortForm,
       status,
       programManagerId,
+      operationsLeadId,
       programManagerDetails,
       operationsLeadDetails,
     });
