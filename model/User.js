@@ -61,6 +61,7 @@ const UserSchema = mongoose.Schema({
   },
   leaves: [mongoose.Schema.Types.ObjectId],
   procurements: [mongoose.Schema.Types.ObjectId],
+  travels: [mongoose.Schema.Types.ObjectId],
   createdAt: {
     type: Date,
     default: Date.now(),
@@ -119,6 +120,14 @@ const UserSchema = mongoose.Schema({
     },
     financeAdmin: {
       // To track is user is CD
+      type: Boolean,
+      default: false,
+    },
+    securityTeam: {
+      type: Boolean,
+      default: false,
+    },
+    chaiProcurement: {
       type: Boolean,
       default: false,
     },

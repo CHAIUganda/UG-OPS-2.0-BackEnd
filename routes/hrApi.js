@@ -198,4 +198,46 @@ router.post(
   ],
   hrController.addStaffNewWP
 );
+
+/**
+ * @method - POST
+ * @description - submitTravel
+ * @param - /submitTravel
+ */
+router.post(
+  '/submitTravel',
+  [
+    // input validations date validation pending
+    check('employeeName', 'Please Enter the Staff name').not().isEmpty(),
+    check('employeeEmail', 'Please Enter the Staff Email').not().isEmpty(),
+    check('travelLocation', 'Please Enter a the travel location')
+      .not()
+      .isEmpty(),
+    check('typeOTrip', 'Please Enter the type of trip').not().isEmpty(),
+    check('dates', 'Please Enter the dates of travel and return')
+      .not()
+      .isEmpty(),
+    check(
+      'employeeContact',
+      'Please Enter the contact inforamtion while on travel'
+    )
+      .not()
+      .isEmpty(),
+  ],
+  hrController.submitTravel
+);
+
+/**
+ * @method - GET
+ * @description - get All StaffTravels for HR
+ * @param - /getAllStaffTravels
+ */
+router.get('/getAllStaffTravels', hrController.getAllStaffTravels);
+
+/**
+ * @method - GET
+ * @description - get Staff Travels
+ * @param - /getStaffTravels
+ */
+router.get('/getStaffTravels/:email', hrController.getStaffTravels);
 module.exports = router;

@@ -43,6 +43,8 @@ const registerUser = async (req, res) => {
     deputyCountryDirector,
     procurementAdmin,
     financeAdmin,
+    securityTeam,
+    chaiProcurement,
     bankAccounts,
     nssfNumber,
     tinNumber,
@@ -127,6 +129,12 @@ const registerUser = async (req, res) => {
   if (!supervisor === true) {
     supervisor = false;
   }
+  if (!securityTeam === true) {
+    securityTeam = false;
+  }
+  if (!chaiProcurement === true) {
+    chaiProcurement = false;
+  }
   if (!countryDirector === true) {
     countryDirector = false;
   } else {
@@ -182,6 +190,8 @@ const registerUser = async (req, res) => {
         deputyCountryDirector,
         procurementAdmin,
         financeAdmin,
+        securityTeam,
+        chaiProcurement,
       },
       title,
       birthDate,

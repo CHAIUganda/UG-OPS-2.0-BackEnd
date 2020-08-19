@@ -41,6 +41,8 @@ const editUser = async (req, res) => {
     deputyCountryDirector,
     procurementAdmin,
     financeAdmin,
+    securityTeam,
+    chaiProcurement,
     workPermitStartDate,
     workPermitEndDate,
     workPermitStatus,
@@ -152,6 +154,20 @@ const editUser = async (req, res) => {
     if (supervisor == null) {
       supervisor = user.roles.supervisor;
     }
+    if (securityTeam == null) {
+      if (user.roles.securityTeam == null) {
+        securityTeam = false;
+      } else {
+        securityTeam = true;
+      }
+    }
+    if (chaiProcurement == null) {
+      if (user.roles.chaiProcurement == null) {
+        chaiProcurement = false;
+      } else {
+        chaiProcurement = true;
+      }
+    }
     if (countryDirector === true) {
       const cdrole = await User.findOne({
         'roles.countryDirector': true,
@@ -249,6 +265,8 @@ const editUser = async (req, res) => {
             deputyCountryDirector,
             procurementAdmin,
             financeAdmin,
+            securityTeam,
+            chaiProcurement,
           },
           bankAccounts,
           title,
