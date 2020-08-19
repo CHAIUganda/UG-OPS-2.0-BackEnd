@@ -157,12 +157,16 @@ const editUser = async (req, res) => {
     if (securityTeam == null) {
       if (user.roles.securityTeam == null) {
         securityTeam = false;
+      } else if (user.roles.securityTeam === false) {
+        securityTeam = false;
       } else {
         securityTeam = true;
       }
     }
     if (chaiProcurement == null) {
       if (user.roles.chaiProcurement == null) {
+        chaiProcurement = false;
+      } else if (user.roles.chaiProcurement === false) {
         chaiProcurement = false;
       } else {
         chaiProcurement = true;
