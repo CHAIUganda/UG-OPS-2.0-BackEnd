@@ -102,7 +102,7 @@ ${user.fName}  ${user.lName} will be going on a ${typeOTrip} trip to ${travelLoc
         Mailer(from, email, subject, textSecurityTeamMember, '');
         // save notification on user obj
         const notificationTitle = `${user.fName}  ${user.lName} will be going on a ${typeOTrip} trip`;
-        const notificationType = '/hr/allTravelTracker';
+        const notificationType = '/hr/AllTravelTracker';
         const refType = 'TravelTracker';
         const refId = travelRemade._id;
         // prettier-ignore
