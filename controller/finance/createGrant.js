@@ -2,6 +2,7 @@ const { validationResult } = require('express-validator');
 const mongoose = require('mongoose');
 const debug = require('debug')('leave-controller');
 const errorToString = require('../../helpers/errorToString');
+const codesToString = require('../../helpers/codesToString');
 const Grant = require('../../model/Grant');
 const Program = require('../../model/Program');
 
@@ -41,6 +42,8 @@ const createGrant = async (req, res) => {
     }
 
     const gIds = [];
+    const alreadyExistingIds = [];
+    const addedIds = [];
     const recurseProcessLeave = async (controller, arr) => {
       if (controller < arr.length) {
         // eslint-disable-next-line object-curly-newline
@@ -48,6 +51,7 @@ const createGrant = async (req, res) => {
           gId: arr[controller],
         });
         if (grant) {
+          alreadyExistingIds.push(arr[controller]);
           recurseProcessLeave(controller + 1, arr);
         } else {
           const granttoSave = new Grant({
@@ -57,7 +61,7 @@ const createGrant = async (req, res) => {
           });
 
           await granttoSave.save();
-
+          addedIds.push(arr[controller]);
           const grantRemade = {
             _id: granttoSave._id,
             gId: arr[controller],
@@ -71,10 +75,28 @@ const createGrant = async (req, res) => {
           recurseProcessLeave(controller + 1, arr);
         }
       } else {
-        res.status(201).json({
-          message: 'Created Successfully.',
-          gIds,
-        });
+        // eslint-disable-next-line no-lonely-if
+        if (alreadyExistingIds.length > 0) {
+          // prettier-ignore
+          if (addedIds.length > 0) {
+            res.status(400).json({
+              // prettier-ignore
+              message: `${await codesToString(0, addedIds)} added successfully But ${await codesToString(0, alreadyExistingIds)} not added because already existed`,
+              gIds,
+            });
+          } else {
+            res.status(400).json({
+              // prettier-ignore
+              message: `${await codesToString(0, alreadyExistingIds)} not added because already existed`,
+              gIds,
+            });
+          }
+        } else {
+          res.status(201).json({
+            message: 'Created Successfully.',
+            gIds,
+          });
+        }
       }
     };
     await recurseProcessLeave(0, gId);

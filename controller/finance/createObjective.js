@@ -2,6 +2,7 @@ const { validationResult } = require('express-validator');
 const mongoose = require('mongoose');
 const debug = require('debug')('leave-controller');
 const errorToString = require('../../helpers/errorToString');
+const codesToString = require('../../helpers/codesToString');
 const Objective = require('../../model/Objective');
 const Program = require('../../model/Program');
 
@@ -43,6 +44,8 @@ const createObjective = async (req, res) => {
     }
 
     const objectiveCodes = [];
+    const alreadyExistingCodes = [];
+    const addedCodes = [];
     const recurseProcessLeave = async (controller, arr) => {
       if (controller < arr.length) {
         // eslint-disable-next-line object-curly-newline
@@ -50,6 +53,7 @@ const createObjective = async (req, res) => {
           objectiveCode: arr[controller],
         });
         if (objective) {
+          alreadyExistingCodes.push(arr[controller]);
           recurseProcessLeave(controller + 1, arr);
         } else {
           const objectivetoSave = new Objective({
@@ -59,7 +63,7 @@ const createObjective = async (req, res) => {
           });
 
           await objectivetoSave.save();
-
+          addedCodes.push(arr[controller]);
           const objectiveRemade = {
             _id: objectivetoSave._id,
             pId: arr[controller],
@@ -73,10 +77,28 @@ const createObjective = async (req, res) => {
           recurseProcessLeave(controller + 1, arr);
         }
       } else {
-        res.status(201).json({
-          message: 'Created Successfully.',
-          objectiveCodes,
-        });
+        // eslint-disable-next-line no-lonely-if
+        if (alreadyExistingCodes.length > 0) {
+          // prettier-ignore
+          if (addedCodes.length > 0) {
+            res.status(400).json({
+              // prettier-ignore
+              message: `${await codesToString(0, addedCodes)} added successfully But ${await codesToString(0, alreadyExistingCodes)} not added because already existed`,
+              objectiveCodes,
+            });
+          } else {
+            res.status(400).json({
+              // prettier-ignore
+              message: `${await codesToString(0, alreadyExistingCodes)} not added because already existed`,
+              objectiveCodes,
+            });
+          }
+        } else {
+          res.status(201).json({
+            message: 'Created Successfully.',
+            objectiveCodes,
+          });
+        }
       }
     };
     await recurseProcessLeave(0, objectiveCode);
