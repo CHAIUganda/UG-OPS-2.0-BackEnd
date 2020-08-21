@@ -3,6 +3,7 @@
 const createProcurement = require('./createProcurement');
 const additionSupportnDocsOnRequest = require('./additionSupportnDocsOnRequest');
 const procurementResponse = require('./procurementResponse');
+const attachQuoteOnResponse = require('./attachQuoteOnResponse');
 const getStaffProcurements = require('./getStaffProcurements');
 
 // Handle creation of a procurement request
@@ -14,5 +15,8 @@ exports.additionSupportnDocsOnRequest = additionSupportnDocsOnRequest;
 // Handle creation of a procurement response
 exports.procurementResponse = procurementResponse;
 
-// Handle get staff procurement requests
+// Handle uploading quotation file on requests
+exports.attachQuoteOnResponse = attachQuoteOnResponse;
+
+// Handle get staff procurement request response
 exports.getStaffProcurements = getStaffProcurements;

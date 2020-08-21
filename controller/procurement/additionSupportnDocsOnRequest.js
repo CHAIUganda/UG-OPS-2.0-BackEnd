@@ -46,9 +46,9 @@ const additionSupportnDocsOnRequest = async (req, res) => {
       // loop all files
 
       const recurseProcessLeave = async (controller, arr) => {
-        if (controller < arr.length) {
+        if (arr.length == null) {
           // eslint-disable-next-line object-curly-newline
-          const addDoc = arr[controller];
+          const addDoc = arr;
 
           // move addDoc to uploads directory
           // addDoc.mv(`./uploads/supportnDocs/${addDoc.name}`);
@@ -74,15 +74,53 @@ const additionSupportnDocsOnRequest = async (req, res) => {
             mimetype: addDoc.mimetype,
             size: addDoc.size,
           });
-          recurseProcessLeave(controller + 1, arr);
-        } else {
-          // send response
           res.status(201).json({
             message: 'Additional Files submitted successfully',
             data,
           });
+        } else {
+          // eslint-disable-next-line no-lonely-if
+          if (controller < arr.length) {
+            // eslint-disable-next-line object-curly-newline
+            const addDoc = arr[controller];
+
+            // move addDoc to uploads directory
+            // addDoc.mv(`./uploads/supportnDocs/${addDoc.name}`);
+            const nm = addDoc.name.split('.');
+            const fileex = nm[nm.length - 1];
+            const fileLabel = nm[nm.length - 2];
+            const requestor = `${user.fName}_${user.lName}`;
+            const fileName = `${moment(CurrentDate).format(
+              'YYYY-MM-DD'
+            )}_${requestor}_${category}_${fileLabel}_${
+              controller + 1
+            }.${fileex}`;
+
+            await storeItemFile(
+              addDoc,
+              procurementId,
+              category,
+              itemId,
+              fileName
+            );
+
+            // push file details
+            data.push({
+              name: addDoc.name,
+              mimetype: addDoc.mimetype,
+              size: addDoc.size,
+            });
+            recurseProcessLeave(controller + 1, arr);
+          } else {
+            // send response
+            res.status(201).json({
+              message: 'Additional Files submitted successfully',
+              data,
+            });
+          }
         }
       };
+
       await recurseProcessLeave(0, req.files.addnDocs);
     }
   } catch (err) {

@@ -82,6 +82,36 @@ router.post(
 );
 
 /**
+ * @method - POST
+ * @description - uploading qquote files on a procurement response
+ * @param - /attachQuoteOnResponse
+ */
+
+// addnDocs should be the name of the input tag sending files
+router.post(
+  '/attachQuoteOnResponse',
+  [
+    // input validations date validation pending
+    check(
+      'procurementId',
+      'Please Enter a ProcurementId where the quotation belong'
+    )
+      .not()
+      .isEmpty(),
+    check(
+      'responseId',
+      'Please Enter the responseId where the quotation files belongs'
+    )
+      .not()
+      .isEmpty(),
+    check('quoteNumber', 'Please Enter the quote number being sent')
+      .not()
+      .isEmpty(),
+  ],
+  procurementController.attachQuoteOnResponse
+);
+
+/**
  * @method - GET
  * @description - Get staff Procurements.
  * @param - /getStaffProcurements
