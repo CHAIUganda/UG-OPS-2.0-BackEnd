@@ -63,30 +63,30 @@ app.use(
 );
 
 // Launch app to listen to specified port
-// https
-//   .createServer(
-//     {
-//       key: fs.readFileSync(
-//         '/etc/letsencrypt/live/ugtest.clintonhealthaccess.org/privkey.pem',
-//         'utf8'
-//       ),
-//       cert: fs.readFileSync(
-//         '/etc/letsencrypt/live/ugtest.clintonhealthaccess.org/cert.pem',
-//         'utf8'
-//       ),
-//     },
-//     app
-//   )
-//   .listen(port, () => {
-//     debug(`Running UG-OPS 2 on port ${port}`);
-//     console.log(`Running UG-OPS 2 on port ${port}`);
-//   });
+https
+  .createServer(
+    {
+      key: fs.readFileSync(
+        '/etc/letsencrypt/live/ugtest.clintonhealthaccess.org/privkey.pem',
+        'utf8'
+      ),
+      cert: fs.readFileSync(
+        '/etc/letsencrypt/live/ugtest.clintonhealthaccess.org/cert.pem',
+        'utf8'
+      ),
+    },
+    app
+  )
+  .listen(port, () => {
+    debug(`Running UG-OPS 2 on port ${port}`);
+    console.log(`Running UG-OPS 2 on port ${port}`);
+  });
 
 // Launch app to listen to specified port
-app.listen(port, () => {
-  debug(`Running UG-OPS 2 on port ${port}`);
-  console.log(`Running UG-OPS 2 on port ${port}`);
-});
+// app.listen(port, () => {
+//   debug(`Running UG-OPS 2 on port ${port}`);
+//   console.log(`Running UG-OPS 2 on port ${port}`);
+// });
 
 // schedule operations
 schedule.start();
