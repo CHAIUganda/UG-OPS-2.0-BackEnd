@@ -121,4 +121,53 @@ router.get(
   procurementController.getStaffProcurements
 );
 
+/**
+ * @method - POST
+ * @param - /registerVendor
+ * @description - Vendor registration into the system
+ */
+router.post(
+  '/registerVendor',
+  [
+    // input validations
+    check('name', 'Please Enter the Vendor Name').not().isEmpty(),
+    check('vendorTin', 'Please Enter the Vendor Tin Number').not().isEmpty(),
+    check('bankDetails', 'Please Enter the Vendor Bank Details')
+      .not()
+      .isEmpty(),
+    check(
+      'onPrequalifiedList',
+      'Please specify if vendor is on prequalification list'
+    )
+      .not()
+      .isEmpty(),
+    check('exemptFromWHT', 'Please specify if vendor is exempt from WHT')
+      .not()
+      .isEmpty(),
+    check('vendorEmail', 'Please enter a valid Vendor email').isEmail(),
+  ],
+  procurementController.registerVendor
+);
+
+/**
+ * @method - POST
+ * @param - /editVendor
+ * @description - Vendor Modification
+ */
+router.post(
+  '/editVendor',
+  [
+    // input validations
+    check('vendorId', 'Please enter the vendor to edit').not().isEmpty(),
+  ],
+  procurementController.editVendor
+);
+
+/**
+ * @method - GET
+ * @description
+ * @param - /auth/getVendors
+ */
+router.get('/getVendors', procurementController.getVendors);
+
 module.exports = router;

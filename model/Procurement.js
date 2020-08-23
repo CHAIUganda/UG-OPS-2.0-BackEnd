@@ -268,13 +268,11 @@ const ProcurementSchema = mongoose.Schema({
       category: [String],
       itemIds: [mongoose.Schema.Types.ObjectId],
       requires3Quote: Boolean,
-      // string for now  mongoose.Schema.Types.ObjectId
-      recommendedVendor: String,
+      recommendedVendor: mongoose.Schema.Types.ObjectId,
       recommendedVendorJustification: String,
       quotations: {
         quote1: {
-          // string for now  mongoose.Schema.Types.ObjectId
-          vendor: String,
+          vendor: mongoose.Schema.Types.ObjectId,
           price: String,
           available: String,
           dates: String,
@@ -284,7 +282,7 @@ const ProcurementSchema = mongoose.Schema({
           },
         },
         quote2: {
-          vendor: String,
+          vendor: mongoose.Schema.Types.ObjectId,
           price: String,
           available: String,
           dates: String,
@@ -294,7 +292,7 @@ const ProcurementSchema = mongoose.Schema({
           },
         },
         quote3: {
-          vendor: String,
+          vendor: mongoose.Schema.Types.ObjectId,
           price: String,
           available: String,
           dates: String,

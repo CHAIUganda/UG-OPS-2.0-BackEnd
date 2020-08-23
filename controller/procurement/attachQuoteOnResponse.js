@@ -84,7 +84,7 @@ const attachQuoteOnResponse = async (req, res) => {
                     size: addDoc.size,
                   });
                   res.status(201).json({
-                    message: 'Additional Files submitted successfully',
+                    message: 'Quotation submitted successfully',
                     data,
                   });
                 } else {
