@@ -27,6 +27,7 @@ const VendorSchema = mongoose.Schema({
     {
       bankName: String,
       accountNumber: String,
+      accountName: String,
       Currency: String,
     },
   ],

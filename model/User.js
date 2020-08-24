@@ -70,6 +70,7 @@ const UserSchema = mongoose.Schema({
     {
       bankName: String,
       accountNumber: String,
+      accountName: String,
       Currency: String,
       status: String,
     },
