@@ -11,6 +11,10 @@ const VendorSchema = mongoose.Schema({
     type: String,
     required: false,
   },
+  registeredAddress: {
+    type: String,
+    required: false,
+  },
   vendorTin: {
     type: String,
     required: false,

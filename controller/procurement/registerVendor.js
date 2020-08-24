@@ -16,6 +16,7 @@ const registerVendor = async (req, res) => {
   const {
     name,
     vendorEmail,
+    registeredAddress,
     vendorTin,
     exemptFromWHT,
     onPrequalifiedList,
@@ -40,6 +41,7 @@ const registerVendor = async (req, res) => {
     vendor = new Vendor({
       name,
       vendorEmail,
+      registeredAddress,
       vendorTin,
       exemptFromWHT,
       onPrequalifiedList,
@@ -52,6 +54,7 @@ const registerVendor = async (req, res) => {
       _id: vendor._id,
       name,
       vendorEmail,
+      registeredAddress,
       vendorTin,
       exemptFromWHT,
       onPrequalifiedList,

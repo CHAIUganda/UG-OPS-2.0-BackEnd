@@ -15,6 +15,7 @@ const editVendor = async (req, res) => {
   let {
     name,
     vendorEmail,
+    registeredAddress,
     vendorTin,
     exemptFromWHT,
     onPrequalifiedList,
@@ -37,6 +38,9 @@ const editVendor = async (req, res) => {
     }
     if (vendorEmail == null) {
       vendorEmail = vendor.vendorEmail;
+    }
+    if (registeredAddress == null) {
+      registeredAddress = vendor.registeredAddress;
     }
     if (vendorTin == null) {
       vendorTin = vendor.vendorTin;
@@ -70,6 +74,7 @@ const editVendor = async (req, res) => {
         $set: {
           name,
           vendorEmail,
+          registeredAddress,
           vendorTin,
           exemptFromWHT,
           onPrequalifiedList,
@@ -83,6 +88,7 @@ const editVendor = async (req, res) => {
       _id: vendor._id,
       name,
       vendorEmail,
+      registeredAddress,
       vendorTin,
       exemptFromWHT,
       onPrequalifiedList,
