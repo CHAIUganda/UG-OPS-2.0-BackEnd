@@ -132,10 +132,7 @@ router.post(
     // input validations
     check('name', 'Please Enter the Vendor Name').not().isEmpty(),
     check('vendorTin', 'Please Enter the Vendor Tin Number').not().isEmpty(),
-    check(
-      'registeredAddress',
-      'Please Enter the Vendor Tin Numberregistered address'
-    )
+    check('registeredAddress', 'Please Enter the Vendor registered address')
       .not()
       .isEmpty(),
     check('bankDetails', 'Please Enter the Vendor Bank Details')
