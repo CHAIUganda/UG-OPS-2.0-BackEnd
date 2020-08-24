@@ -84,7 +84,6 @@ const UserSchema = mongoose.Schema({
     required: false,
   },
   password: {
-    // pwd left for dev purposes using normal auth
     type: String,
     required: false,
   },
