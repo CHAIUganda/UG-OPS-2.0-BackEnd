@@ -25,12 +25,17 @@ const login = async (req, res) => {
       email,
     });
 
-    // on reg use 2 lines below
-    // caputures pwd and encrpts it and stores crypt
-    // const salt = await bcrypt.genSalt(10);
-    // user.password = await bcrypt.hash(password, salt);
-
     let isMatch;
+    if (!user) {
+      return res.status(400).json({
+        message: 'User doesnot exist',
+      });
+    }
+    if (!user.password) {
+      return res.status(400).json({
+        message: 'Please first activate your account',
+      });
+    }
     if (user) {
       isMatch = await bcrypt.compare(password, user.password);
     }
@@ -41,11 +46,11 @@ const login = async (req, res) => {
       });
     }
 
-    // if (!user.isPwdReset) {
-    //   return res.status(400).json({
-    //     message: 'Please first set a new password'
-    //   });
-    // }
+    if (!user.isPwdReset) {
+      return res.status(400).json({
+        message: 'Please first set a new password',
+      });
+    }
 
     const payload = {
       user: {
@@ -57,7 +62,7 @@ const login = async (req, res) => {
       payload,
       process.env.JWT_SECRET,
       {
-        expiresIn: '1 day', //  values are in seconds, strings need timeunits i.e. "2 days", "10h", "7d"
+        expiresIn: '1h', //  values are in seconds, strings need timeunits i.e. "2 days", "10h", "7d", 1 day
       },
       (err, token) => {
         if (err) throw err;

@@ -2,10 +2,13 @@ const { validationResult } = require('express-validator');
 const debug = require('debug')('server');
 const log4js = require('log4js');
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
+const Token = require('../../model/Token');
 const User = require('../../model/User');
 const Contract = require('../../model/Contract');
 const WorkPermit = require('../../model/WorkPermit');
 const Program = require('../../model/Program');
+const Mailer = require('../../helpers/Mailer');
 const errorToString = require('../../helpers/errorToString');
 
 const registerUser = async (req, res) => {
@@ -219,7 +222,53 @@ const registerUser = async (req, res) => {
 
       await workpermit.save();
     }
-    res.status(201).json({ message: 'User Created successfully' });
+    const payload = {
+      user: {
+        id: user.id,
+      },
+    };
+
+    // resend token to user email token generation is needed here
+    jwt.sign(
+      payload,
+      process.env.JWT_SECRET,
+      {
+        expiresIn: '5 days', // values are in seconds, strings need timeunits i.e "2 days", "10h","7d"
+      },
+      (error, token) => {
+        if (error) throw error;
+        const usertokenDoc = new Token({ _userId: user._id, token });
+        // Save the verification token
+        usertokenDoc.save((err) => {
+          if (err) {
+            return res.status(400).json({ message: err.message });
+          }
+          const subject = 'Ugops Account Setup.';
+          const from = 'UGOperations@clintonhealthaccess.org';
+          const footer = `
+
+With Regards,
+
+Uganda Operations
+Clinton Health Access Initiative
+https://ugops.clintonhealthaccess.org
+
+Disclaimer: This is an auto-generated mail, please do not reply to it.`;
+
+          const UI_HOST = process.env.UI_HOST || 'http://localhost:3000/#/';
+          // mail staff
+          // prettier-ignore
+          const textStaff = `Dear  ${user.fName}, 
+
+Please set your account password by clicking the link: ${UI_HOST}auth/ResetPassword/${user.email}/${token} ${footer}
+                                `;
+          Mailer(from, user.email, subject, textStaff, '');
+        });
+        return res.status(201).json({
+          message: 'User Created successfully',
+        });
+      }
+    );
   } catch (err) {
     debug(err.message);
     logger.error(`Error saving ${err.message}`);

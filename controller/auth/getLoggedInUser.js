@@ -7,14 +7,11 @@ const WorkPermit = require('../../model/WorkPermit');
 const getLoggedInUser = async (req, res) => {
   try {
     // request.user is getting fetched from Middleware after token authentication
-    const { oktaMail } = req;
-    const user = await User.findOne({
-      email: oktaMail,
-    });
+    const user = await User.findById(req.user.id);
 
     if (!user) {
       return res.status(503).json({
-        message: 'User doesnot exist on Ug opps',
+        message: 'User doesnot exist on Ug ops',
       });
     }
 

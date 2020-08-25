@@ -10,8 +10,8 @@ const https = require('https');
 const InitiateMongoServer = require('./config/db');
 const schedule = require('./helpers/schedule');
 const scheduleAnually = require('./helpers/scheduleAnually');
-const authenticationRequired = require('./middleware/oktaAuthenticator');
-// const authenticator = require('./middleware/authenticator'); // to be rplaced with Okta auth
+// const authenticationRequired = require('./middleware/oktaAuthenticator');
+const authenticator = require('./middleware/authenticator');
 
 // Import routes
 const auth = require('./routes/auth');
@@ -48,8 +48,8 @@ app.get('/', (req, res) => res.send('Welcome to UG-OPS 2 API'));
 // Use Api routes in the App
 app.use('/auth', auth);
 // app.use('/auth', auth);
-app.use('/leaveApi', authenticationRequired, leaveApi);
-app.use('/hrApi', authenticationRequired, hrApi);
+app.use('/leaveApi', authenticator, leaveApi);
+app.use('/hrApi', authenticator, hrApi);
 
 // Launch app to listen to specified port
 https
