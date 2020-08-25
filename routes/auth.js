@@ -7,8 +7,8 @@ const { check } = require('express-validator');
 const authController = require('../controller/auth/authController');
 
 const router = express.Router();
-// const authenticator = require('../middleware/authenticator');
-const authenticationRequired = require('../middleware/oktaAuthenticator');
+const authenticator = require('../middleware/authenticator');
+// const authenticationRequired = require('../middleware/oktaAuthenticator');
 
 /**
  * @method - POST
@@ -40,7 +40,6 @@ router.post(
     ).isEmail(),
     check('email', 'Please enter a valid email').isEmail(),
   ],
-  authenticationRequired,
   authController.registerUser
 );
 
@@ -55,7 +54,7 @@ router.post(
     // input validations
     check('staffId', 'Please enter a valid Staff ID').not().isEmpty(),
   ],
-  authenticationRequired,
+  authenticator,
   authController.editUser
 );
 
@@ -71,7 +70,7 @@ router.post(
     check('staffEmail', 'Please enter a valid email').isEmail(),
     check('notificationId', 'Please Provide a notificationId').not().isEmpty(),
   ],
-  authenticationRequired,
+  authenticator,
   authController.handleNotifications
 );
 
@@ -92,17 +91,63 @@ router.post(
 );
 
 /**
+ * @method - POST
+ * @param - /resetOnFirstLogin
+ * @description - User password set on first login
+ */
+router.post(
+  '/resetOnFirstLogin',
+  [
+    check('email', 'Please enter a valid email').isEmail(),
+    check('password', 'Minimum password length is 6').isLength({
+      min: 6,
+    }),
+  ],
+  authController.resetOnFirstLogin
+);
+
+/**
+ * @method - POST
+ * @param - /passwordReset
+ * @description - User password   change
+ */
+router.post(
+  '/passwordReset',
+  [
+    check('email', 'Please enter a valid email').isEmail(),
+    check(
+      'oldPassword',
+      'Enter the old password minimum  length is 6'
+    ).isLength({
+      min: 6,
+    }),
+    check('newPassword', 'Enter a new password minimum  length is 6').isLength({
+      min: 6,
+    }),
+  ],
+  authenticator,
+  authController.passwordReset
+);
+
+/**
+ * @method - POST
+ * @param - http://localhost:8080/auth/reset/
+ * @description - User password set on first login
+ */
+router.post(
+  '/forgotPassword',
+  [check('email', 'Please enter a valid email').isEmail()],
+  authController.forgotPassword
+);
+
+/**
  * @method - GET
  * @description - Get LoggedIn User. authenticator is a middleware will be used to
  * verify the token, retrieve user based on the token payload.
  * calls controller after checking inputs
  * @param - /auth/me
  */
-router.get(
-  '/getLoggedInUser',
-  authenticationRequired,
-  authController.getLoggedInUser
-);
+router.get('/getLoggedInUser', authenticator, authController.getLoggedInUser);
 
 /**
  * @method - GET
@@ -111,6 +156,6 @@ router.get(
  * calls controller after checking inputs
  * @param - /auth/getUsers
  */
-router.get('/getUsers', authenticationRequired, authController.getUsers);
+router.get('/getUsers', authenticator, authController.getUsers);
 
 module.exports = router;

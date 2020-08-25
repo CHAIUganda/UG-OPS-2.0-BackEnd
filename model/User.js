@@ -87,6 +87,10 @@ const UserSchema = mongoose.Schema({
     type: String,
     required: false,
   },
+  isPwdReset: {
+    type: Boolean,
+    default: false,
+  },
   roles: {
     admin: {
       // To track is user is admin
