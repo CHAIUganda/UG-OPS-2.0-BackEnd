@@ -17,6 +17,8 @@ const authenticator = require('./middleware/authenticator');
 const auth = require('./routes/auth');
 const leaveApi = require('./routes/leaveApi');
 const hrApi = require('./routes/hrApi');
+const procurementApi = require('./routes/procurementApi');
+const financeApi = require('./routes/financeApi');
 
 // Initialise the app
 const app = express();
@@ -50,6 +52,15 @@ app.use('/auth', auth);
 // app.use('/auth', auth);
 app.use('/leaveApi', authenticator, leaveApi);
 app.use('/hrApi', authenticator, hrApi);
+app.use('/procurementApi', authenticator, procurementApi);
+app.use('/financeApi', authenticator, financeApi);
+
+// Serves all the request which includes /procurement in the url from Images folder
+app.use(
+  '/procurementResources',
+  authenticator,
+  express.static(`${__dirname}/controller/procurement/uploads`)
+);
 
 // Launch app to listen to specified port
 https
