@@ -8,6 +8,8 @@ const getStaffProcurements = require('./getStaffProcurements');
 const registerVendor = require('./registerVendor');
 const editVendor = require('./editVendor');
 const getVendors = require('./getVendors');
+const getAllProcurements = require('./getAllProcurements');
+const requestorResponse = require('./requestorResponse');
 
 // Handle creation of a procurement request
 exports.createProcurement = createProcurement;
@@ -32,3 +34,9 @@ exports.editVendor = editVendor;
 
 // Handle get vendors
 exports.getVendors = getVendors;
+
+// Handle get All  Procurements
+exports.getAllProcurements = getAllProcurements;
+
+// Handle requestor Response
+exports.requestorResponse = requestorResponse;

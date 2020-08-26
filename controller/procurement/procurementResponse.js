@@ -63,16 +63,17 @@ const procurementResponse = async (req, res) => {
       programShortForm = userProgram.shortForm;
     }
 
-    const subject = 'Uganda Operations Procurements';
+    const subject = 'Procurement team has reponded to your procurement request';
     const from = 'UGOperations@clintonhealthaccess.org';
     const footer = `
   
-Regards,
+With Regards,
   
 Uganda Operations
 Clinton Health Access Initiative
+https://ugops.clintonhealthaccess.org
   
-Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
+Disclaimer: This is an auto-generated mail, please do not reply to it.`;
 
     const status = 'Pending Requestor Response';
     // status = 'Pending LPO';

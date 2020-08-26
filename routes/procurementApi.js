@@ -173,4 +173,32 @@ router.post(
  */
 router.get('/getVendors', procurementController.getVendors);
 
+/**
+ * @method - GET
+ * @description - Get ALL Procurements.
+ * @param - /getAllProcurements
+ */
+router.get(
+  '/getAllProcurements/:status',
+  procurementController.getAllProcurements
+);
+
+/**
+ * @method - POST
+ * @description - Create requestor Response
+ * @param - /requestorResponse
+ */
+router.post(
+  '/requestorResponse',
+  [
+    // input validations date validation pending
+    check('procurementId', 'Please enter the procurement Id').not().isEmpty(),
+    check('responseId', 'Please enter a Response Id').not().isEmpty(),
+    check('choosenQuote', 'Please enter a choosen quote details')
+      .not()
+      .isEmpty(),
+  ],
+  procurementController.requestorResponse
+);
+
 module.exports = router;

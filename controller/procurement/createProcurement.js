@@ -45,6 +45,22 @@ const createProcurement = async (req, res) => {
         message: 'User does not Exist',
       });
     }
+    // chk that requestor is opps ld for theit program
+    const userProgram = await Program.findOne({
+      _id: user.programId,
+    });
+
+    if (!userProgram) {
+      return res.status(400).json({
+        message: `${user.fName} ${user.lName}'s Program does not exist. `,
+      });
+    }
+
+    if (!user._id.equals(userProgram.operationsLeadId)) {
+      return res.status(400).json({
+        message: `${user.fName} ${user.lName} is not the Operations lead for the ${userProgram.shortForm} program `,
+      });
+    }
 
     // check if procurement Admin exists in System
     const procurementAdmin = await User.findOne({
@@ -59,10 +75,6 @@ const createProcurement = async (req, res) => {
     let program;
     let programShortForm;
 
-    const userProgram = await Program.findOne({
-      _id: programId,
-    });
-
     if (!userProgram) {
       program = null;
       programShortForm = null;
@@ -72,16 +84,17 @@ const createProcurement = async (req, res) => {
       programShortForm = userProgram.shortForm;
     }
 
-    const subject = 'Uganda Operations Procurements';
+    const subject = `${user.fName} ${user.lName} has sent in a procurement request`;
     const from = 'UGOperations@clintonhealthaccess.org';
     const footer = `
   
-Regards,
+With Regards,
   
 Uganda Operations
 Clinton Health Access Initiative
+https://ugops.clintonhealthaccess.org
   
-Disclaimer: This is an auto-generated mail. Please do not reply to it.`;
+Disclaimer: This is an auto-generated mail, please do not reply to it.`;
 
     const procurementRemade = new Procurement({
       pId,
